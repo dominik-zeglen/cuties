@@ -1,11 +1,14 @@
 import { Cutie, CutieSimInput, getRandomCutie } from "./cutie";
+import { Egg } from "./egg";
 import { Food } from "./food";
-import { len, Point, sub, toPolar } from "./r2";
+import { getRandomPositionInBounds, len, Point, sub, toPolar } from "./r2";
+import { degree } from "./tree";
 
 export class Sim {
   bounds: Point[];
   cuties: Cutie[];
   food: Food[];
+  eggs: Egg[];
   iteration: number;
 
   entityCounter: number;
@@ -13,6 +16,7 @@ export class Sim {
   constructor(width: number, height: number) {
     this.cuties = [];
     this.food = [];
+    this.eggs = [];
     this.iteration = 0;
     this.entityCounter = 0;
     this.bounds = [
@@ -26,10 +30,10 @@ export class Sim {
   };
 
   shouldSpawnFood = (): boolean => {
-    return this.iteration % 40 === 0 && this.food.length < 20;
+    return this.iteration % 40 === 0 && this.food.length < 60;
   };
 
-  shouldCleanup = (): boolean => {
+  shouldCleanupOutOfBounds = (): boolean => {
     return this.iteration % 600 === 0;
   };
 
@@ -51,39 +55,73 @@ export class Sim {
 
         if (nearestFoodPolarPosition.r < 10) {
           cutie.hunger = 0;
-          this.food = this.food.filter((food) => food.id !== nearestFood.id);
+          nearestFood.shouldDelete = true;
         } else {
           simInput.nearestFood = nearestFoodPolarPosition;
         }
       }
 
       cutie.sim(simInput);
+      if (cutie.shouldLayEgg(this.iteration)) {
+        this.eggs = this.eggs.concat(
+          cutie.layEgg(this.entityCounter, this.iteration)
+        );
+        this.entityCounter++;
+      }
+    });
+
+    this.eggs.forEach((currentEgg) => {
+      if (currentEgg.shouldHatch(this.iteration)) {
+        this.cuties = this.cuties.concat(
+          currentEgg.hatch(this.entityCounter, this.iteration)
+        );
+        this.entityCounter++;
+      }
     });
 
     if (this.shouldSpawnRandomCutie()) {
-      const cutie = getRandomCutie(this.entityCounter);
+      const cutie = getRandomCutie(this.entityCounter, this.iteration);
+      cutie.position = getRandomPositionInBounds(this.bounds);
       this.cuties = this.cuties.concat(cutie);
       this.entityCounter++;
     }
 
     if (this.shouldSpawnFood()) {
-      const food = new Food(this.entityCounter);
-      food.position.x = Math.random() * this.bounds[1].x * 2 + this.bounds[0].x;
-      food.position.y = Math.random() * this.bounds[1].y * 2 + this.bounds[0].y;
+      const food = new Food(this.entityCounter, this.iteration);
+      food.position = getRandomPositionInBounds(this.bounds);
+
       this.food = this.food.concat(food);
       this.entityCounter++;
     }
 
-    if (this.shouldCleanup()) {
-      this.cuties = this.cuties.filter(
-        (cutie) =>
+    if (this.shouldCleanupOutOfBounds()) {
+      this.cuties.forEach((cutie) => {
+        const isInBounds =
           cutie.position.x < this.bounds[1].x &&
           cutie.position.x > this.bounds[0].x &&
           cutie.position.y < this.bounds[1].y &&
-          cutie.position.y > this.bounds[0].y &&
-          cutie.hunger < 1000
-      );
+          cutie.position.y > this.bounds[0].y;
+        if (!isInBounds) {
+          cutie.shouldDelete = true;
+        }
+      });
     }
+
+    if (this.iteration % 120 === 0) {
+      window.cuties = {
+        stats: {
+          degree: {
+            highest: Math.max(
+              ...this.cuties.map((cutie) => degree(cutie.brain.angle))
+            ),
+          },
+        },
+      };
+    }
+
+    this.cuties = this.cuties.filter((cutie) => !cutie.shouldDelete);
+    this.eggs = this.eggs.filter((egg) => !egg.shouldDelete);
+    this.food = this.food.filter((food) => !food.shouldDelete);
 
     this.iteration++;
   };

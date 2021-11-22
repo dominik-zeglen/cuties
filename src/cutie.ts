@@ -1,20 +1,8 @@
+import { CutieBrain, CutieInput, getRandomCutieBrain, mutate } from "./brain";
+import { Egg } from "./egg";
 import { Entity } from "./entity";
-import { add, Point, PolarPoint, toEuclidean } from "./r2";
-import { getValueFromTree, Tree, TreeNode } from "./tree";
-
-export type CutieInput = Record<
-  "hunger" | "distanceToFood" | "angleToFood",
-  number
->;
-const inputKeys: Array<keyof CutieInput> = [
-  "angleToFood",
-  "distanceToFood",
-  "hunger",
-];
-
-export type CutieOutput = Record<"speed" | "angle", number>;
-
-export type CutieBrain = Record<keyof CutieOutput, Tree<CutieInput>>;
+import { add, PolarPoint, toEuclidean } from "./r2";
+import { getValueFromTree } from "./tree";
 
 export interface CutieSimInput {
   nearestFood: PolarPoint;
@@ -22,11 +10,13 @@ export interface CutieSimInput {
 
 export class Cutie extends Entity {
   brain: CutieBrain;
+  lastEggLaying: number;
   hunger: number;
 
-  constructor(id: number) {
-    super(id);
+  constructor(id: number, it: number) {
+    super(id, it);
     this.hunger = 0;
+    this.lastEggLaying = it;
   }
 
   sim = (simInput: CutieSimInput): void => {
@@ -46,39 +36,28 @@ export class Cutie extends Entity {
       })
     );
     this.hunger += 1 + distance;
+
+    if (this.hunger > 1000) {
+      this.shouldDelete = true;
+    }
+  };
+
+  shouldLayEgg = (it: number): boolean => {
+    return this.hunger < 300 && it - this.lastEggLaying > 250;
+  };
+
+  layEgg = (id: number, it: number): Egg => {
+    const egg = new Egg(id, it);
+    egg.position = { ...this.position };
+    egg.brain = Math.random() > 0.4 ? this.brain : mutate(this.brain);
+    this.lastEggLaying = it;
+
+    return egg;
   };
 }
 
-function getRandomCutieInputKey(): keyof CutieInput {
-  return inputKeys[Math.floor(Math.random() * inputKeys.length)];
-}
-
-function getRandomCutieBrainNodeTree(): Tree<CutieInput> {
-  return {
-    key: getRandomCutieInputKey(),
-    left: getRandomCutieBrainNode(),
-    right: getRandomCutieBrainNode(),
-    threshold: Math.random() * 2 - 1,
-  };
-}
-
-export function getRandomCutieBrainNode(): TreeNode<CutieInput> {
-  if (Math.random() < 0.6) {
-    return Math.random() * 2 - 1;
-  }
-
-  return getRandomCutieBrainNodeTree();
-}
-
-export function getRandomCutieBrain(): CutieBrain {
-  return {
-    angle: getRandomCutieBrainNodeTree(),
-    speed: getRandomCutieBrainNodeTree(),
-  };
-}
-
-export function getRandomCutie(id: number): Cutie {
-  const cutie = new Cutie(id);
+export function getRandomCutie(id: number, it: number): Cutie {
+  const cutie = new Cutie(id, it);
 
   cutie.brain = getRandomCutieBrain();
 

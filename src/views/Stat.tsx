@@ -3,7 +3,7 @@ import { StatPage } from "../stats/StatPage";
 import { getSim } from "../utils";
 
 const sims = 10;
-const iterations = 1000;
+const iterations = 1e4;
 
 export const Stat: React.FC = () => {
   const [progress, setProgress] = React.useState(0);

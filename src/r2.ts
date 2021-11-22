@@ -39,3 +39,10 @@ export function sub(a: Point, b: Point): Point {
 export function len(point: Point): number {
   return Math.sqrt(point.x ** 2 + point.y ** 2);
 }
+
+export function getRandomPositionInBounds(bounds: Point[]): Point {
+  return {
+    x: Math.random() * bounds[1].x * 2 + bounds[0].x,
+    y: Math.random() * bounds[1].y * 2 + bounds[0].y,
+  };
+}

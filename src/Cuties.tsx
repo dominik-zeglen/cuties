@@ -30,11 +30,7 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
     () =>
       StyleSheet.create({
         canvas: {
-          backgroundColor: `rgb(
-            ${colormap.current[0][0]},
-            ${colormap.current[0][1]},
-            ${colormap.current[0][2]}
-          )`,
+          backgroundColor: colormap.current[0],
           pointerEvents: "none",
           height,
           width,
@@ -70,6 +66,22 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
       context.ellipse(
         food.position.x + width / 2 - 2,
         food.position.y + height / 2 - 2,
+        3,
+        3,
+        -1,
+        0,
+        2 * 3.141,
+        false
+      );
+      context.stroke();
+    });
+
+    context.strokeStyle = theme.tertiary.string();
+    sim.current.eggs.forEach((egg) => {
+      context.beginPath();
+      context.ellipse(
+        egg.position.x + width / 2 - 2,
+        egg.position.y + height / 2 - 2,
         3,
         3,
         -1,
