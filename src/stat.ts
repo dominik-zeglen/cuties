@@ -1,0 +1,3 @@
+interface StateData {
+  population: number;
+}
