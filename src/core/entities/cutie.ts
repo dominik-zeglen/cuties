@@ -5,10 +5,10 @@ import {
   getRandomCutieAi,
   mutate,
   think,
-} from "./ai";
+} from "../ai";
 import { Egg } from "./egg";
 import { Entity } from "./entity";
-import { add, PolarPoint, toEuclidean } from "./r2";
+import { add, PolarPoint, toEuclidean } from "../r2";
 
 export interface CutieSimInput {
   nearestFood: PolarPoint;

@@ -1,4 +1,4 @@
-import { Cutie, CutieSimInput, getRandomCutie } from "./cutie";
+import { Cutie, CutieSimInput, getRandomCutie } from "./entities/cutie";
 import { Egg } from "./egg";
 import { Food } from "./food";
 import { getRandomPositionInBounds, len, Point, sub, toPolar } from "./r2";
