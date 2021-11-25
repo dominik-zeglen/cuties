@@ -1,55 +1,78 @@
-import { CutieBrain, CutieInput, getRandomCutieBrain, mutate } from "./brain";
+import {
+  CutieBrain,
+  CutieInput,
+  CutieOutput,
+  getRandomCutieBrain,
+  mutate,
+  think,
+} from "./brain";
 import { Egg } from "./egg";
 import { Entity } from "./entity";
 import { add, PolarPoint, toEuclidean } from "./r2";
-import { getValueFromTree } from "./tree";
 
 export interface CutieSimInput {
   nearestFood: PolarPoint;
 }
 
+function limitOutput(value: number): number {
+  return value > 1 ? 1 : value < -1 ? -1 : value;
+}
+
 export class Cutie extends Entity {
+  angle: number;
   brain: CutieBrain;
   lastEggLaying: number;
   hunger: number;
+  thoughts: CutieOutput;
 
   constructor(id: number, it: number) {
     super(id, it);
-    this.hunger = 0;
+    this.angle = 0;
+    this.hunger = 500;
     this.lastEggLaying = it;
+    this.thoughts = {
+      angle: 0,
+      speed: 0,
+    };
   }
 
-  sim = (simInput: CutieSimInput): void => {
-    const input: CutieInput = {
-      angleToFood: simInput.nearestFood.angle,
-      hunger: 10,
-      distanceToFood: simInput.nearestFood.r,
-    };
+  sim = (simInput: CutieSimInput | null): void => {
+    if (simInput) {
+      const input: CutieInput = {
+        angle: this.angle,
+        angleToFood: simInput.nearestFood.angle,
+        hunger: this.hunger,
+        distanceToFood: simInput.nearestFood.r,
+      };
 
-    const distance = (getValueFromTree(this.brain.speed, input) + 1) / 2;
+      this.thoughts = think(input, this.brain);
+    }
+
+    const distance = limitOutput(this.thoughts.speed) * 2;
+    this.angle += limitOutput(this.thoughts.angle) * 2;
 
     this.position = add(
       this.position,
       toEuclidean({
-        angle: getValueFromTree(this.brain.angle, input) * 3.141,
+        angle: this.angle,
         r: distance,
       })
     );
-    this.hunger += 1 + distance;
+    this.hunger += (1 + distance ** 2) / 2;
 
-    if (this.hunger > 1000) {
+    if (this.hunger > 2000) {
       this.shouldDelete = true;
     }
   };
 
   shouldLayEgg = (it: number): boolean => {
-    return this.hunger < 300 && it - this.lastEggLaying > 250;
+    return this.hunger < 250 && it - this.lastEggLaying > 500;
   };
 
   layEgg = (id: number, it: number): Egg => {
     const egg = new Egg(id, it);
     egg.position = { ...this.position };
-    egg.brain = Math.random() > 0.4 ? this.brain : mutate(this.brain);
+    egg.brain = Math.random() > 0.25 ? this.brain : mutate(this.brain);
     this.lastEggLaying = it;
 
     return egg;

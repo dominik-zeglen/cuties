@@ -19,7 +19,7 @@ export interface CutiesProps {}
 
 const width = 1280;
 const height = 800;
-const speed = 10;
+const speed = 100;
 
 export const Cuties: React.FC<CutiesProps> = ({}) => {
   const interval = React.useRef<number>(null);

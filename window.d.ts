@@ -1,9 +1,18 @@
 interface Window {
   cuties: {
-    stats: {
-      degree: {
-        highest: number;
-      };
+    get: {
+      oldest: () => object | null;
     };
+    sim: {
+      current: object;
+      pause: () => void;
+      run: () => void;
+    };
+    started: number;
+    lastReload: number;
+    stats: {
+      itPerSecond: number;
+    };
+    iteration: number;
   };
 }

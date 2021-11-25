@@ -1,76 +1,87 @@
-import { copyTree, TreeBranching, TreeNode } from "./tree";
+import { dot, add, MathArray, multiply, clone } from "mathjs";
+
+type Matrix = number[][];
 
 export type CutieInput = Record<
-  "hunger" | "distanceToFood" | "angleToFood",
+  "hunger" | "angleToFood" | "angle" | "distanceToFood",
   number
 >;
-const inputKeys: Array<keyof CutieInput> = [
-  "angleToFood",
-  "distanceToFood",
-  "hunger",
+const inputs = 5;
+export type CutieOutput = Record<"speed" | "angle", number>;
+export type CutieBrain = Record<keyof CutieOutput, Matrix[]>;
+
+const outputKeys: Array<keyof CutieOutput> = ["angle", "speed"];
+function getRandomCutieOutputKey(): keyof CutieOutput {
+  return outputKeys[Math.floor(Math.random() * outputKeys.length)];
+}
+
+const baseSystem = [
+  Array(inputs).fill(Array(inputs).fill(0)),
+  Array(inputs).fill(1),
 ];
 
-export type CutieOutput = Record<"speed" | "angle", number>;
-const outputKeys: Array<keyof CutieOutput> = ["angle", "speed"];
-
-export type CutieBrain = Record<keyof CutieOutput, TreeNode<CutieInput>>;
-
-function getRandomCutieInputKey(): keyof CutieInput {
-  return inputKeys[Math.floor(Math.random() * inputKeys.length)];
+function getRandomValue(): number {
+  return Math.random() * 2 - 1;
 }
 
-function getRandomCutieBrainNodeTree(): TreeNode<CutieInput> {
-  return {
-    key: getRandomCutieInputKey(),
-    left: getRandomCutieBrainNode(),
-    right: getRandomCutieBrainNode(),
-    threshold: Math.random() * 2 - 1,
-    isLeaf: false,
-  };
-}
+function getRandomSystem(divide = 100): Matrix[] {
+  const system = [
+    Array(inputs)
+      .fill(0)
+      .map(() => Array(inputs).fill(0)),
+    Array(inputs).fill(0),
+  ];
 
-export function getRandomCutieBrainNode(): TreeNode<CutieInput> {
-  if (Math.random() < 0.55) {
-    return {
-      isLeaf: true,
-      value: Math.random() * 2 - 1,
-    };
+  for (let index = 0; index < Math.random() * 3 + 1; index++) {
+    system[0][Math.floor(Math.random() * inputs)][
+      Math.floor(Math.random() * inputs)
+    ] = getRandomValue() / divide;
   }
 
-  return getRandomCutieBrainNodeTree();
+  for (let index = 0; index < Math.random() * 1 + 1; index++) {
+    system[1][Math.floor(Math.random() * inputs)] = getRandomValue() / divide;
+  }
+
+  return system;
+}
+
+function addSystems(a: Matrix[], b: Matrix[]): Matrix[] {
+  return [add(a[0], b[0]) as Matrix, add(a[1], b[1]) as Matrix];
 }
 
 export function getRandomCutieBrain(): CutieBrain {
   return {
-    angle: getRandomCutieBrainNodeTree(),
-    speed: getRandomCutieBrainNodeTree(),
+    angle: addSystems(baseSystem, getRandomSystem(inputs ** 3)),
+    speed: addSystems(baseSystem, getRandomSystem(inputs ** 3)),
   };
 }
 
-function mutateNode(node: TreeNode<CutieInput>): TreeNode<CutieInput> {
-  if (Math.random() > 0.75) {
-    return getRandomCutieBrainNode();
-  }
+export function think(input: CutieInput, brain: CutieBrain): CutieOutput {
+  const inputMatrix = [
+    [input.angle],
+    [input.angleToFood],
+    [input.distanceToFood],
+    [input.hunger],
+    [1],
+  ];
 
-  if (!node.isLeaf) {
-    return {
-      ...node,
-      left: mutateNode((node as TreeBranching<CutieInput>).left),
-      right: mutateNode((node as TreeBranching<CutieInput>).right),
-    };
-  }
-
-  return node;
+  return {
+    angle: dot(
+      brain.angle[1],
+      multiply(brain.angle[0], inputMatrix) as MathArray
+    ),
+    speed: dot(
+      brain.speed[1],
+      multiply(brain.speed[0], inputMatrix) as MathArray
+    ),
+  };
 }
 
 export function mutate(brain: CutieBrain): CutieBrain {
-  const mutated = {
-    angle: copyTree(brain.angle),
-    speed: copyTree(brain.speed),
-  };
-  const key = outputKeys[Math.floor(Math.random() * outputKeys.length)];
+  const mutatedBrain = clone(brain);
+  const key = getRandomCutieOutputKey();
 
-  mutated[key] = mutateNode(mutated[key]);
+  mutatedBrain[key] = addSystems(brain[key], getRandomSystem());
 
-  return mutated;
+  return brain;
 }

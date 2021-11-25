@@ -21,6 +21,8 @@ export const Home: React.FC = () => {
       >
         <Button onClick={() => history.push("/stat")}>Stats</Button>
         <Button onClick={() => setKey(+new Date())}>Restart</Button>
+        <Button onClick={() => window.cuties.sim.pause()}>Pause</Button>
+        <Button onClick={() => window.cuties.sim.run()}>Run</Button>
       </div>
     </Container>
   );

@@ -10,6 +10,7 @@ export class Sim {
   food: Food[];
   eggs: Egg[];
   iteration: number;
+  paused: boolean;
 
   entityCounter: number;
 
@@ -23,18 +24,60 @@ export class Sim {
       { x: -width / 2, y: -height / 2 },
       { x: width / 2, y: height / 2 },
     ];
+
+    window.cuties = {
+      get: {
+        oldest: this.getOldest,
+      },
+      sim: {
+        current: this,
+        pause: this.pause,
+        run: this.run,
+      },
+      lastReload: Date.now(),
+      started: Date.now(),
+      iteration: 0,
+      stats: {
+        itPerSecond: 0,
+      },
+    };
   }
 
+  pause = () => {
+    this.paused = true;
+  };
+  run = () => {
+    this.paused = false;
+  };
+
+  getOldest = (): Cutie | null => {
+    if (!this.cuties) {
+      return null;
+    }
+
+    let oldest = this.cuties[0];
+    this.cuties.forEach((cutie) => {
+      if (cutie.createdAt < oldest.createdAt) {
+        oldest = cutie;
+      }
+    });
+
+    return oldest;
+  };
+
   shouldSpawnRandomCutie = (): boolean => {
-    return this.iteration % 120 === 0;
+    return this.iteration % 600 === 0 && this.cuties.length < 40;
   };
 
   shouldSpawnFood = (): boolean => {
-    return this.iteration % 40 === 0 && this.food.length < 60;
+    return (
+      this.iteration % 40 === 0 &&
+      this.food.length < 800 - this.cuties.length * 50
+    );
   };
 
   shouldCleanupOutOfBounds = (): boolean => {
-    return this.iteration % 600 === 0;
+    return this.iteration % 60 === 0;
   };
 
   getNearestFood = (point: Point): Food =>
@@ -43,11 +86,15 @@ export class Sim {
     )[0];
 
   next = (): void => {
+    if (this.paused) {
+      return;
+    }
+
     this.cuties.forEach((cutie) => {
       const simInput: CutieSimInput = {
         nearestFood: { angle: 0, r: 0 },
       };
-      if (this.food.length) {
+      if (this.food.length && this.iteration % 5 === 0) {
         const nearestFood = this.getNearestFood(cutie.position);
         const nearestFoodPolarPosition = toPolar(
           sub(cutie.position, nearestFood.position)
@@ -96,27 +143,28 @@ export class Sim {
 
     if (this.shouldCleanupOutOfBounds()) {
       this.cuties.forEach((cutie) => {
-        const isInBounds =
-          cutie.position.x < this.bounds[1].x &&
-          cutie.position.x > this.bounds[0].x &&
-          cutie.position.y < this.bounds[1].y &&
-          cutie.position.y > this.bounds[0].y;
-        if (!isInBounds) {
-          cutie.shouldDelete = true;
+        if (cutie.position.x > this.bounds[1].x) {
+          cutie.position.x = this.bounds[0].x;
+        }
+        if (cutie.position.y > this.bounds[1].y) {
+          cutie.position.y = this.bounds[0].y;
+        }
+
+        if (cutie.position.x < this.bounds[0].x) {
+          cutie.position.x = this.bounds[1].x;
+        }
+        if (cutie.position.y < this.bounds[0].y) {
+          cutie.position.y = this.bounds[1].y;
         }
       });
     }
 
     if (this.iteration % 120 === 0) {
-      window.cuties = {
-        stats: {
-          degree: {
-            highest: Math.max(
-              ...this.cuties.map((cutie) => degree(cutie.brain.angle))
-            ),
-          },
-        },
-      };
+      (window.cuties.lastReload = Date.now()),
+        (window.cuties.stats = {
+          itPerSecond: 120000 / (Date.now() - window.cuties.lastReload),
+        });
+      window.cuties.iteration = this.iteration;
     }
 
     this.cuties = this.cuties.filter((cutie) => !cutie.shouldDelete);
