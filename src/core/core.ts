@@ -87,6 +87,22 @@ export class Sim {
       len(sub(point, a.position)) > len(sub(point, b.position)) ? 1 : -1
     )[0];
 
+  collectGarbage = () => {
+    this.cuties = this.cuties.filter((cutie) => !cutie.shouldDelete);
+    this.eggs = this.eggs.filter((egg) => !egg.shouldDelete);
+    this.food = this.food.filter((food) => !food.shouldDelete);
+  };
+
+  getStats = () => {
+    if (this.iteration % 120 === 0) {
+      (window.cuties.lastReload = Date.now()),
+        (window.cuties.stats = {
+          itPerSecond: 120000 / (Date.now() - window.cuties.lastReload),
+        });
+      window.cuties.iteration = this.iteration;
+    }
+  };
+
   next = (): void => {
     if (this.paused) {
       return;
@@ -151,35 +167,24 @@ export class Sim {
       this.entityCounter++;
     }
 
-    if (this.shouldCleanupOutOfBounds()) {
-      this.cuties.forEach((cutie) => {
-        if (cutie.position.x > this.bounds[1].x) {
-          cutie.position.x = this.bounds[0].x;
-        }
-        if (cutie.position.y > this.bounds[1].y) {
-          cutie.position.y = this.bounds[0].y;
-        }
+    this.cuties.forEach((cutie) => {
+      if (cutie.position.x > this.bounds[1].x) {
+        cutie.position.x = this.bounds[0].x;
+      }
+      if (cutie.position.y > this.bounds[1].y) {
+        cutie.position.y = this.bounds[0].y;
+      }
 
-        if (cutie.position.x < this.bounds[0].x) {
-          cutie.position.x = this.bounds[1].x;
-        }
-        if (cutie.position.y < this.bounds[0].y) {
-          cutie.position.y = this.bounds[1].y;
-        }
-      });
-    }
+      if (cutie.position.x < this.bounds[0].x) {
+        cutie.position.x = this.bounds[1].x;
+      }
+      if (cutie.position.y < this.bounds[0].y) {
+        cutie.position.y = this.bounds[1].y;
+      }
+    });
 
-    if (this.iteration % 120 === 0) {
-      (window.cuties.lastReload = Date.now()),
-        (window.cuties.stats = {
-          itPerSecond: 120000 / (Date.now() - window.cuties.lastReload),
-        });
-      window.cuties.iteration = this.iteration;
-    }
-
-    this.cuties = this.cuties.filter((cutie) => !cutie.shouldDelete);
-    this.eggs = this.eggs.filter((egg) => !egg.shouldDelete);
-    this.food = this.food.filter((food) => !food.shouldDelete);
+    this.collectGarbage();
+    this.getStats();
 
     this.iteration++;
   };

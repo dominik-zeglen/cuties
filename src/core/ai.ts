@@ -24,7 +24,7 @@ function getRandomValue(): number {
   return Math.random() * 2 - 1;
 }
 
-function getRandomSystem(divide = 100): Matrix[] {
+function getRandomSystem(divide: number): Matrix[] {
   const system = [
     Array(inputs)
       .fill(0)
@@ -81,7 +81,7 @@ export function mutate(brain: CutieAi): CutieAi {
   const mutatedBrain = clone(brain);
   const key = getRandomCutieOutputKey();
 
-  mutatedBrain[key] = addSystems(brain[key], getRandomSystem());
+  mutatedBrain[key] = addSystems(brain[key], getRandomSystem(inputs ** 3 / 10));
 
   return brain;
 }
