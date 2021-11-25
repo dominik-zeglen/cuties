@@ -77,6 +77,10 @@ export class Cutie extends Entity {
 
     return egg;
   };
+
+  shouldDumpWaste = (it: number): boolean => {
+    return (it - this.createdAt) % 1000 === 0;
+  };
 }
 
 export function getRandomCutie(id: number, it: number): Cutie {

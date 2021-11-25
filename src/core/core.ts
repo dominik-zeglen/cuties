@@ -1,13 +1,14 @@
 import { Cutie, CutieSimInput, getRandomCutie } from "./entities/cutie";
-import { Egg } from "./egg";
-import { Food } from "./food";
+import { Egg } from "./entities/egg";
+import { Food } from "./entities/food";
 import { getRandomPositionInBounds, len, Point, sub, toPolar } from "./r2";
-import { degree } from "./tree";
+import { Waste } from "./entities/waste";
 
 export class Sim {
   bounds: Point[];
   cuties: Cutie[];
   food: Food[];
+  waste: Waste[];
   eggs: Egg[];
   iteration: number;
   paused: boolean;
@@ -18,6 +19,7 @@ export class Sim {
     this.cuties = [];
     this.food = [];
     this.eggs = [];
+    this.waste = [];
     this.iteration = 0;
     this.entityCounter = 0;
     this.bounds = [
@@ -113,6 +115,14 @@ export class Sim {
         this.eggs = this.eggs.concat(
           cutie.layEgg(this.entityCounter, this.iteration)
         );
+        this.entityCounter++;
+      }
+
+      if (cutie.shouldDumpWaste(this.iteration)) {
+        const waste = new Waste(this.entityCounter, this.iteration);
+        waste.position = getRandomPositionInBounds(this.bounds);
+
+        this.waste = this.waste.concat(waste);
         this.entityCounter++;
       }
     });

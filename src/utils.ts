@@ -1,4 +1,4 @@
-import { Sim } from "./core";
+import { Sim } from "./core/core";
 
 export function transpose<T>(array: T[][]): T[][] {
   return array[0].map((_, colIndex) => array.map((row) => row[colIndex]));

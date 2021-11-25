@@ -2,7 +2,7 @@ import React from "react";
 import { theme } from "./components/theme";
 import { StyleSheet, css } from "aphrodite";
 import Color from "color";
-import { Sim } from "./core";
+import { Sim } from "./core/core";
 
 function createColormap(nshades: number): string[] {
   return Array<Color>(nshades)
@@ -17,7 +17,7 @@ function createColormap(nshades: number): string[] {
 
 export interface CutiesProps {}
 
-const width = 1280;
+const width = 1024;
 const height = 800;
 const speed = 100;
 
@@ -34,7 +34,6 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
           pointerEvents: "none",
           height,
           width,
-          imageRendering: "pixelated",
         },
       }),
     []
@@ -90,6 +89,22 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
         false
       );
       context.stroke();
+    });
+
+    context.fillStyle = theme.entities.dump.string();
+    sim.current.waste.forEach((waste) => {
+      context.beginPath();
+      context.ellipse(
+        waste.position.x + width / 2 - 2,
+        waste.position.y + height / 2 - 2,
+        3,
+        3,
+        -1,
+        0,
+        2 * 3.141,
+        false
+      );
+      context.fill();
     });
 
     window.requestAnimationFrame(paint);
