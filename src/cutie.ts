@@ -1,11 +1,11 @@
 import {
-  CutieBrain,
+  CutieAi,
   CutieInput,
   CutieOutput,
-  getRandomCutieBrain,
+  getRandomCutieAi,
   mutate,
   think,
-} from "./brain";
+} from "./ai";
 import { Egg } from "./egg";
 import { Entity } from "./entity";
 import { add, PolarPoint, toEuclidean } from "./r2";
@@ -20,7 +20,7 @@ function limitOutput(value: number): number {
 
 export class Cutie extends Entity {
   angle: number;
-  brain: CutieBrain;
+  brain: CutieAi;
   lastEggLaying: number;
   hunger: number;
   thoughts: CutieOutput;
@@ -82,7 +82,7 @@ export class Cutie extends Entity {
 export function getRandomCutie(id: number, it: number): Cutie {
   const cutie = new Cutie(id, it);
 
-  cutie.brain = getRandomCutieBrain();
+  cutie.brain = getRandomCutieAi();
 
   return cutie;
 }

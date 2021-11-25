@@ -8,7 +8,7 @@ export type CutieInput = Record<
 >;
 const inputs = 5;
 export type CutieOutput = Record<"speed" | "angle", number>;
-export type CutieBrain = Record<keyof CutieOutput, Matrix[]>;
+export type CutieAi = Record<keyof CutieOutput, Matrix[]>;
 
 const outputKeys: Array<keyof CutieOutput> = ["angle", "speed"];
 function getRandomCutieOutputKey(): keyof CutieOutput {
@@ -49,14 +49,14 @@ function addSystems(a: Matrix[], b: Matrix[]): Matrix[] {
   return [add(a[0], b[0]) as Matrix, add(a[1], b[1]) as Matrix];
 }
 
-export function getRandomCutieBrain(): CutieBrain {
+export function getRandomCutieAi(): CutieAi {
   return {
     angle: addSystems(baseSystem, getRandomSystem(inputs ** 3)),
     speed: addSystems(baseSystem, getRandomSystem(inputs ** 3)),
   };
 }
 
-export function think(input: CutieInput, brain: CutieBrain): CutieOutput {
+export function think(input: CutieInput, brain: CutieAi): CutieOutput {
   const inputMatrix = [
     [input.angle],
     [input.angleToFood],
@@ -77,7 +77,7 @@ export function think(input: CutieInput, brain: CutieBrain): CutieOutput {
   };
 }
 
-export function mutate(brain: CutieBrain): CutieBrain {
+export function mutate(brain: CutieAi): CutieAi {
   const mutatedBrain = clone(brain);
   const key = getRandomCutieOutputKey();
 

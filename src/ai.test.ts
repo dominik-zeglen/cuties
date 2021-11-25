@@ -1,4 +1,4 @@
-import { CutieInput, think } from "./brain";
+import { CutieInput, think } from "./ai";
 
 test("Inputs work correctly", () => {
   const brain = {
