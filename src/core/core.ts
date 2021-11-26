@@ -119,7 +119,7 @@ export class Sim {
   };
 
   shouldSpawnRandomCutie = (): boolean => {
-    return this.iteration % 60 === 0 && this.entityLoader.cuties.length < 40;
+    return this.iteration % 60 === 0 && this.entityLoader.cuties.length < 15;
   };
 
   shouldSpawnFood = (): boolean => {
