@@ -3,29 +3,80 @@ import { Egg } from "./entities/egg";
 import { Food } from "./entities/food";
 import { getRandomPositionInBounds, len, Point, sub, toPolar } from "./r2";
 import { Waste } from "./entities/waste";
+import { Entity } from "./entities/entity";
+
+class EntityLoader {
+  entities: Entity[];
+
+  _food: Food[] | null;
+  _cuties: Cutie[] | null;
+  _eggs: Egg[] | null;
+  _waste: Egg[] | null;
+
+  constructor() {
+    this.entities = [];
+  }
+
+  init = (entities: Entity[]) => {
+    this.entities = entities;
+
+    this._food = null;
+    this._cuties = null;
+    this._eggs = null;
+    this._waste = null;
+  };
+
+  get food(): Food[] {
+    if (this._food) {
+      return this._food;
+    }
+
+    return this.entities.filter((entity) => entity instanceof Food);
+  }
+
+  get cuties(): Cutie[] {
+    if (this._cuties) {
+      return this._cuties;
+    }
+
+    return this.entities.filter((entity) => entity instanceof Cutie) as Cutie[];
+  }
+
+  get eggs(): Egg[] {
+    if (this._eggs) {
+      return this._eggs;
+    }
+
+    return this.entities.filter((entity) => entity instanceof Egg) as Egg[];
+  }
+
+  get waste(): Waste[] {
+    if (this._waste) {
+      return this._waste;
+    }
+
+    return this.entities.filter((entity) => entity instanceof Waste) as Waste[];
+  }
+}
 
 export class Sim {
   bounds: Point[];
-  cuties: Cutie[];
-  food: Food[];
-  waste: Waste[];
-  eggs: Egg[];
+  entities: Entity[];
   iteration: number;
   paused: boolean;
 
+  entityLoader: EntityLoader;
   entityCounter: number;
 
   constructor(width: number, height: number) {
-    this.cuties = [];
-    this.food = [];
-    this.eggs = [];
-    this.waste = [];
+    this.entities = [];
     this.iteration = 0;
     this.entityCounter = 0;
     this.bounds = [
       { x: -width / 2, y: -height / 2 },
       { x: width / 2, y: height / 2 },
     ];
+    this.entityLoader = new EntityLoader();
 
     window.cuties = {
       get: {
@@ -53,12 +104,12 @@ export class Sim {
   };
 
   getOldest = (): Cutie | null => {
-    if (!this.cuties) {
+    if (!this.entityLoader.cuties) {
       return null;
     }
 
-    let oldest = this.cuties[0];
-    this.cuties.forEach((cutie) => {
+    let oldest = this.entityLoader.cuties[0];
+    this.entityLoader.cuties.forEach((cutie) => {
       if (cutie.createdAt < oldest.createdAt) {
         oldest = cutie;
       }
@@ -68,13 +119,13 @@ export class Sim {
   };
 
   shouldSpawnRandomCutie = (): boolean => {
-    return this.iteration % 600 === 0 && this.cuties.length < 40;
+    return this.iteration % 60 === 0 && this.entityLoader.cuties.length < 40;
   };
 
   shouldSpawnFood = (): boolean => {
     return (
-      this.iteration % 40 === 0 &&
-      this.food.length < 800 - this.cuties.length * 50
+      this.iteration % 30 === 0 &&
+      this.entityLoader.food.length < 800 - this.entityLoader.cuties.length * 50
     );
   };
 
@@ -83,14 +134,12 @@ export class Sim {
   };
 
   getNearestFood = (point: Point): Food =>
-    [...this.food].sort((a, b) =>
+    [...this.entityLoader.food].sort((a, b) =>
       len(sub(point, a.position)) > len(sub(point, b.position)) ? 1 : -1
     )[0];
 
   collectGarbage = () => {
-    this.cuties = this.cuties.filter((cutie) => !cutie.shouldDelete);
-    this.eggs = this.eggs.filter((egg) => !egg.shouldDelete);
-    this.food = this.food.filter((food) => !food.shouldDelete);
+    this.entities = this.entities.filter((entity) => !entity.shouldDelete);
   };
 
   getStats = () => {
@@ -103,16 +152,23 @@ export class Sim {
     }
   };
 
+  registerEntity = (entity: Entity) => {
+    this.entities.push(entity);
+    this.entityCounter++;
+  };
+
   next = (): void => {
     if (this.paused) {
       return;
     }
 
-    this.cuties.forEach((cutie) => {
+    this.entityLoader.init(this.entities);
+
+    this.entityLoader.cuties.forEach((cutie) => {
       const simInput: CutieSimInput = {
         nearestFood: { angle: 0, r: 0 },
       };
-      if (this.food.length && this.iteration % 5 === 0) {
+      if (this.entityLoader.food.length && this.iteration % 5 === 0) {
         const nearestFood = this.getNearestFood(cutie.position);
         const nearestFoodPolarPosition = toPolar(
           sub(cutie.position, nearestFood.position)
@@ -128,46 +184,36 @@ export class Sim {
 
       cutie.sim(simInput);
       if (cutie.shouldLayEgg(this.iteration)) {
-        this.eggs = this.eggs.concat(
-          cutie.layEgg(this.entityCounter, this.iteration)
-        );
-        this.entityCounter++;
+        this.registerEntity(cutie.layEgg(this.entityCounter, this.iteration));
       }
 
       if (cutie.shouldDumpWaste(this.iteration)) {
         const waste = new Waste(this.entityCounter, this.iteration);
         waste.position = getRandomPositionInBounds(this.bounds);
 
-        this.waste = this.waste.concat(waste);
-        this.entityCounter++;
+        this.registerEntity(waste);
       }
     });
 
-    this.eggs.forEach((currentEgg) => {
-      if (currentEgg.shouldHatch(this.iteration)) {
-        this.cuties = this.cuties.concat(
-          currentEgg.hatch(this.entityCounter, this.iteration)
-        );
-        this.entityCounter++;
+    this.entityLoader.eggs.forEach((egg) => {
+      if (egg.shouldHatch(this.iteration)) {
+        this.registerEntity(egg.hatch(this.entityCounter, this.iteration));
       }
     });
 
     if (this.shouldSpawnRandomCutie()) {
       const cutie = getRandomCutie(this.entityCounter, this.iteration);
       cutie.position = getRandomPositionInBounds(this.bounds);
-      this.cuties = this.cuties.concat(cutie);
-      this.entityCounter++;
+      this.registerEntity(cutie);
     }
 
     if (this.shouldSpawnFood()) {
       const food = new Food(this.entityCounter, this.iteration);
       food.position = getRandomPositionInBounds(this.bounds);
-
-      this.food = this.food.concat(food);
-      this.entityCounter++;
+      this.registerEntity(food);
     }
 
-    this.cuties.forEach((cutie) => {
+    this.entityLoader.cuties.forEach((cutie) => {
       if (cutie.position.x > this.bounds[1].x) {
         cutie.position.x = this.bounds[0].x;
       }

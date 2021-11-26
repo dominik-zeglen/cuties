@@ -1,4 +1,4 @@
-import { Point } from "./r2";
+import { Point } from "../r2";
 
 export class Entity {
   id: number;

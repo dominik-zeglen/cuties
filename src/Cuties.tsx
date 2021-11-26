@@ -48,7 +48,7 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
     context.clearRect(0, 0, canvas.current.width, canvas.current.height);
     context.strokeStyle = theme.secondary.string();
 
-    sim.current.cuties.forEach((cutie) => {
+    sim.current.entityLoader.cuties.forEach((cutie) => {
       context.beginPath();
       context.rect(
         cutie.position.x + width / 2 - 2,
@@ -60,7 +60,7 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
     });
 
     context.strokeStyle = theme.primary.string();
-    sim.current.food.forEach((food) => {
+    sim.current.entityLoader.food.forEach((food) => {
       context.beginPath();
       context.ellipse(
         food.position.x + width / 2 - 2,
@@ -76,7 +76,7 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
     });
 
     context.strokeStyle = theme.tertiary.string();
-    sim.current.eggs.forEach((egg) => {
+    sim.current.entityLoader.eggs.forEach((egg) => {
       context.beginPath();
       context.ellipse(
         egg.position.x + width / 2 - 2,
@@ -92,7 +92,7 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
     });
 
     context.fillStyle = theme.entities.dump.string();
-    sim.current.waste.forEach((waste) => {
+    sim.current.entityLoader.waste.forEach((waste) => {
       context.beginPath();
       context.ellipse(
         waste.position.x + width / 2 - 2,
