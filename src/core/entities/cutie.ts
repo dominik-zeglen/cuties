@@ -49,7 +49,7 @@ export class Cutie extends Entity {
     }
 
     const distance = limitOutput(this.thoughts.speed);
-    this.angle += limitOutput(this.thoughts.angle) * 2;
+    this.angle += limitOutput(this.thoughts.angle) * 4;
 
     this.position = add(
       this.position,

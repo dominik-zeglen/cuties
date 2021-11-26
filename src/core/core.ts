@@ -167,9 +167,7 @@ export class Sim {
     this.entityLoader.init(this.entities);
 
     this.entityLoader.cuties.forEach((cutie) => {
-      const simInput: CutieSimInput = {
-        nearestFood: { angle: 0, r: 0 },
-      };
+      let simInput: CutieSimInput | null = null;
       if (this.entityLoader.food.length && this.iteration % 5 === 0) {
         const nearestFood = this.getNearestFood(cutie.position);
         const nearestFoodPolarPosition = toPolar(
@@ -180,7 +178,9 @@ export class Sim {
           cutie.hunger = 0;
           nearestFood.shouldDelete = true;
         } else {
-          simInput.nearestFood = nearestFoodPolarPosition;
+          simInput = {
+            nearestFood: nearestFoodPolarPosition,
+          };
         }
       }
 
