@@ -48,7 +48,7 @@ export class Cutie extends Entity {
       this.thoughts = think(input, this.brain);
     }
 
-    const distance = limitOutput(this.thoughts.speed) * 2;
+    const distance = limitOutput(this.thoughts.speed);
     this.angle += limitOutput(this.thoughts.angle) * 2;
 
     this.position = add(
@@ -58,7 +58,7 @@ export class Cutie extends Entity {
         r: distance,
       })
     );
-    this.hunger += (1 + distance ** 2) / 2;
+    this.hunger += 1 + distance ** 2;
 
     if (this.hunger > 2000) {
       this.shouldDelete = true;

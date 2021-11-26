@@ -11,7 +11,7 @@ class EntityLoader {
   _food: Food[] | null;
   _cuties: Cutie[] | null;
   _eggs: Egg[] | null;
-  _waste: Egg[] | null;
+  _waste: Waste[] | null;
 
   constructor() {
     this.entities = [];
@@ -64,6 +64,7 @@ export class Sim {
   entities: Entity[];
   iteration: number;
   paused: boolean;
+  selected: string | null;
 
   entityLoader: EntityLoader;
   entityCounter: number;
@@ -77,6 +78,7 @@ export class Sim {
       { x: width / 2, y: height / 2 },
     ];
     this.entityLoader = new EntityLoader();
+    this.selected = null;
 
     window.cuties = {
       get: {
@@ -212,6 +214,15 @@ export class Sim {
       food.position = getRandomPositionInBounds(this.bounds);
       this.registerEntity(food);
     }
+
+    this.entityLoader.waste.forEach((waste) => {
+      if (waste.shouldBecomeFood(this.iteration)) {
+        waste.shouldDelete = true;
+        const food = new Food(this.entityCounter, this.iteration);
+        food.position = { ...waste.position };
+        this.registerEntity(food);
+      }
+    });
 
     this.entityLoader.cuties.forEach((cutie) => {
       if (cutie.position.x > this.bounds[1].x) {
