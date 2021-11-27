@@ -6,8 +6,14 @@ import {
   think,
 } from "../ai";
 import { Egg } from "./egg";
-import { Entity } from "./entity";
-import { add, PolarPoint, toEuclidean } from "../r2";
+import { Entity, InitialEntityInput } from "./entity";
+import {
+  add,
+  getRandomPositionInBounds,
+  Point,
+  PolarPoint,
+  toEuclidean,
+} from "../r2";
 
 export interface CutieSimInput {
   nearestFood: PolarPoint;
@@ -15,6 +21,11 @@ export interface CutieSimInput {
 
 function limitOutput(value: number): number {
   return value > 1 ? 1 : value < -1 ? -1 : value;
+}
+
+export interface InitialCutieInput extends InitialEntityInput {
+  brain: CutieAi;
+  ancestors: number;
 }
 
 export class Cutie extends Entity {
@@ -25,8 +36,8 @@ export class Cutie extends Entity {
   thoughts: CutieOutput;
   ancestors: number;
 
-  constructor(id: number, it: number) {
-    super(id, it);
+  constructor(id: number, it: number, initial: InitialCutieInput) {
+    super(id, it, initial);
     this.angle = 0;
     this.hunger = 500;
     this.lastEggLaying = it;
@@ -34,16 +45,17 @@ export class Cutie extends Entity {
       angle: 0,
       speed: 0,
     };
-    this.ancestors = 0;
+    this.ancestors = initial.ancestors;
+    this.brain = initial.brain;
   }
 
   sim = (simInput: CutieSimInput | null): void => {
     if (simInput) {
       const input: CutieInput = {
-        angle: this.angle,
-        angleToFood: simInput.nearestFood.angle,
-        hunger: this.hunger,
-        distanceToFood: simInput.nearestFood.r,
+        angle: this.angle / Math.PI,
+        angleToFood: simInput.nearestFood.angle / Math.PI,
+        hunger: this.hunger / 2000,
+        distanceToFood: simInput.nearestFood.r / 200,
       };
 
       this.thoughts = think(input, this.brain);
@@ -67,12 +79,13 @@ export class Cutie extends Entity {
   };
 
   shouldLayEgg = (it: number): boolean => {
-    return this.hunger < 250 && it - this.lastEggLaying > 500;
+    return this.hunger < 400 && it - this.lastEggLaying > 500;
   };
 
   layEgg = (id: number, it: number): Egg => {
     const egg = new Egg(id, it, this);
     this.lastEggLaying = it;
+    this.hunger += 800;
 
     return egg;
   };
@@ -82,10 +95,12 @@ export class Cutie extends Entity {
   };
 }
 
-export function getRandomCutie(id: number, it: number): Cutie {
-  const cutie = new Cutie(id, it);
-
-  cutie.brain = getRandomCutieAi();
+export function getRandomCutie(id: number, it: number, bounds: Point[]): Cutie {
+  const cutie = new Cutie(id, it, {
+    ancestors: 0,
+    brain: getRandomCutieAi(),
+    position: getRandomPositionInBounds(bounds),
+  });
 
   return cutie;
 }

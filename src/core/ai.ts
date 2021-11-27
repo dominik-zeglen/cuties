@@ -51,8 +51,8 @@ function addSystems(a: Matrix[], b: Matrix[]): Matrix[] {
 
 export function getRandomCutieAi(): CutieAi {
   return {
-    angle: addSystems(baseSystem, getRandomSystem(inputs ** 3)),
-    speed: addSystems(baseSystem, getRandomSystem(inputs ** 3)),
+    angle: addSystems(baseSystem, getRandomSystem(inputs)),
+    speed: addSystems(baseSystem, getRandomSystem(inputs)),
   };
 }
 
@@ -81,7 +81,7 @@ export function mutate(brain: CutieAi): CutieAi {
   const mutatedBrain = clone(brain);
   const key = getRandomCutieOutputKey();
 
-  mutatedBrain[key] = addSystems(brain[key], getRandomSystem(inputs ** 3 / 10));
+  mutatedBrain[key] = addSystems(brain[key], getRandomSystem(inputs / 10));
 
   return brain;
 }

@@ -8,9 +8,8 @@ export class Egg extends Entity {
   spawnTime: number;
 
   constructor(id: number, it: number, parent: Cutie) {
-    super(id, it);
+    super(id, it, { position: parent.position });
     this.spawnTime = 800;
-    this.position = { ...parent.position };
     this.ai = Math.random() < 0.25 ? mutate(parent.brain) : parent.brain;
     this.ancestors = parent.ancestors + 1;
   }
@@ -20,10 +19,11 @@ export class Egg extends Entity {
   };
 
   hatch = (id: number, it: number): Cutie => {
-    const cutie = new Cutie(id, it);
-    cutie.position = { ...this.position };
-    cutie.brain = this.ai;
-    cutie.ancestors = this.ancestors;
+    const cutie = new Cutie(id, it, {
+      position: this.position,
+      brain: this.ai,
+      ancestors: this.ancestors,
+    });
     this.shouldDelete = true;
 
     return cutie;

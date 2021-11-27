@@ -168,10 +168,10 @@ export class Sim {
 
     this.entityLoader.cuties.forEach((cutie) => {
       let simInput: CutieSimInput | null = null;
-      if (this.entityLoader.food.length && this.iteration % 5 === 0) {
+      if (this.entityLoader.food.length && this.iteration % 2 === 0) {
         const nearestFood = this.getNearestFood(cutie.position);
         const nearestFoodPolarPosition = toPolar(
-          sub(cutie.position, nearestFood.position)
+          sub(nearestFood.position, cutie.position)
         );
 
         if (nearestFoodPolarPosition.r < 10) {
@@ -190,8 +190,9 @@ export class Sim {
       }
 
       if (cutie.shouldDumpWaste(this.iteration)) {
-        const waste = new Waste(this.entityCounter, this.iteration);
-        waste.position = getRandomPositionInBounds(this.bounds);
+        const waste = new Waste(this.entityCounter, this.iteration, {
+          position: cutie.position,
+        });
 
         this.registerEntity(waste);
       }
@@ -204,39 +205,49 @@ export class Sim {
     });
 
     if (this.shouldSpawnRandomCutie()) {
-      const cutie = getRandomCutie(this.entityCounter, this.iteration);
+      const cutie = getRandomCutie(
+        this.entityCounter,
+        this.iteration,
+        this.bounds
+      );
       cutie.position = getRandomPositionInBounds(this.bounds);
       this.registerEntity(cutie);
     }
 
     if (this.shouldSpawnFood()) {
-      const food = new Food(this.entityCounter, this.iteration);
-      food.position = getRandomPositionInBounds(this.bounds);
+      const food = new Food(this.entityCounter, this.iteration, {
+        position: getRandomPositionInBounds(this.bounds),
+      });
       this.registerEntity(food);
     }
 
     this.entityLoader.waste.forEach((waste) => {
       if (waste.shouldBecomeFood(this.iteration)) {
         waste.shouldDelete = true;
-        const food = new Food(this.entityCounter, this.iteration);
-        food.position = { ...waste.position };
+        const food = new Food(this.entityCounter, this.iteration, {
+          position: waste.position,
+        });
         this.registerEntity(food);
       }
     });
 
     this.entityLoader.cuties.forEach((cutie) => {
       if (cutie.position.x > this.bounds[1].x) {
-        cutie.position.x = this.bounds[0].x;
+        // cutie.position.x = this.bounds[0].x;
+        cutie.shouldDelete = true;
       }
       if (cutie.position.y > this.bounds[1].y) {
-        cutie.position.y = this.bounds[0].y;
+        // cutie.position.y = this.bounds[0].y;
+        cutie.shouldDelete = true;
       }
 
       if (cutie.position.x < this.bounds[0].x) {
-        cutie.position.x = this.bounds[1].x;
+        // cutie.position.x = this.bounds[1].x;
+        cutie.shouldDelete = true;
       }
       if (cutie.position.y < this.bounds[0].y) {
-        cutie.position.y = this.bounds[1].y;
+        // cutie.position.y = this.bounds[1].y;
+        cutie.shouldDelete = true;
       }
       if (cutie.angle > Math.PI || cutie.angle < Math.PI) {
         cutie.angle = Math.atan2(Math.sin(cutie.angle), Math.cos(cutie.angle));
