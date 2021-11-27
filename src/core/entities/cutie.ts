@@ -3,7 +3,6 @@ import {
   CutieInput,
   CutieOutput,
   getRandomCutieAi,
-  mutate,
   think,
 } from "../ai";
 import { Egg } from "./egg";
@@ -24,6 +23,7 @@ export class Cutie extends Entity {
   lastEggLaying: number;
   hunger: number;
   thoughts: CutieOutput;
+  ancestors: number;
 
   constructor(id: number, it: number) {
     super(id, it);
@@ -34,6 +34,7 @@ export class Cutie extends Entity {
       angle: 0,
       speed: 0,
     };
+    this.ancestors = 0;
   }
 
   sim = (simInput: CutieSimInput | null): void => {
@@ -58,7 +59,7 @@ export class Cutie extends Entity {
         r: distance,
       })
     );
-    this.hunger += 1 + distance ** 2;
+    this.hunger += 0.75 + distance ** 2;
 
     if (this.hunger > 2000) {
       this.shouldDelete = true;
@@ -70,9 +71,7 @@ export class Cutie extends Entity {
   };
 
   layEgg = (id: number, it: number): Egg => {
-    const egg = new Egg(id, it);
-    egg.position = { ...this.position };
-    egg.brain = Math.random() > 0.25 ? this.brain : mutate(this.brain);
+    const egg = new Egg(id, it, this);
     this.lastEggLaying = it;
 
     return egg;

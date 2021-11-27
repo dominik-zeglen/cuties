@@ -238,6 +238,9 @@ export class Sim {
       if (cutie.position.y < this.bounds[0].y) {
         cutie.position.y = this.bounds[1].y;
       }
+      if (cutie.angle > Math.PI || cutie.angle < Math.PI) {
+        cutie.angle = Math.atan2(Math.sin(cutie.angle), Math.cos(cutie.angle));
+      }
     });
 
     this.collectGarbage();
