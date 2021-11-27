@@ -1,8 +1,10 @@
-import React from "react";
+import React, { MouseEventHandler } from "react";
 import { theme } from "./components/theme";
 import { StyleSheet, css } from "aphrodite";
 import Color from "color";
 import { Sim } from "./core/core";
+import minBy from "lodash/minBy";
+import { len, sub } from "./core/r2";
 
 function createColormap(nshades: number): string[] {
   return Array<Color>(nshades)
@@ -31,7 +33,6 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
       StyleSheet.create({
         canvas: {
           backgroundColor: colormap.current[0],
-          pointerEvents: "none",
           height,
           width,
         },
@@ -51,8 +52,8 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
     sim.current.entityLoader.cuties.forEach((cutie) => {
       context.beginPath();
       context.rect(
-        cutie.position.x + width / 2 - 2,
-        cutie.position.y + height / 2 - 2,
+        cutie.position.x + width / 2 - 4,
+        cutie.position.y + height / 2 - 4,
         5,
         5
       );
@@ -107,6 +108,26 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
       context.fill();
     });
 
+    if (window.cuties.selected) {
+      if (window.cuties.selected.shouldDelete) {
+        window.cuties.selected = undefined;
+      } else {
+        context.strokeStyle = theme.primary.string();
+        context.beginPath();
+        context.ellipse(
+          window.cuties.selected.position.x + width / 2 - 2,
+          window.cuties.selected.position.y + height / 2 - 2,
+          9,
+          9,
+          -1,
+          0,
+          2 * 3.141,
+          false
+        );
+        context.stroke();
+      }
+    }
+
     window.requestAnimationFrame(paint);
   };
 
@@ -120,12 +141,35 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
     return () => clearInterval(interval.current);
   }, []);
 
+  const handleClick: MouseEventHandler<HTMLCanvasElement> = React.useCallback(
+    (event) => {
+      const rect = event.currentTarget.getBoundingClientRect();
+      const point = {
+        x: event.clientX - rect.left - width / 2,
+        y: event.clientY - rect.top - height / 2,
+      };
+
+      const id = minBy(
+        sim.current.entities.map((ent) => ({
+          id: ent.id,
+          dist: len(sub(ent.position, point)),
+        })),
+        "dist"
+      ).id;
+      window.cuties.selected = sim.current.entities.find(
+        (ent) => ent.id === id
+      );
+    },
+    []
+  );
+
   return (
     <canvas
       className={css(styles.canvas)}
       height={height}
       width={width}
       ref={canvas}
+      onClick={handleClick}
     />
   );
 };
