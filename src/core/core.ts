@@ -4,6 +4,7 @@ import { Food } from "./entities/food";
 import { getRandomPositionInBounds, len, Point, sub, toPolar } from "./r2";
 import { Waste } from "./entities/waste";
 import { Entity } from "./entities/entity";
+import minBy from "lodash/minBy";
 
 class EntityLoader {
   entities: Entity[];
@@ -136,9 +137,7 @@ export class Sim {
   };
 
   getNearestFood = (point: Point): Food =>
-    [...this.entityLoader.food].sort((a, b) =>
-      len(sub(point, a.position)) > len(sub(point, b.position)) ? 1 : -1
-    )[0];
+    minBy(this.entityLoader.food, (food) => len(sub(food.position, point)));
 
   collectGarbage = () => {
     this.entities = this.entities.filter((entity) => !entity.shouldDelete);
