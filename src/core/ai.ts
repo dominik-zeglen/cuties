@@ -21,7 +21,7 @@ const baseSystem = [
 ];
 
 function getRandomValue(): number {
-  return Math.random() * 2 - 1;
+  return Math.random() > 0.5 ? 1 : -1;
 }
 
 function getRandomSystem(divide: number): Matrix[] {

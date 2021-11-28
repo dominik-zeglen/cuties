@@ -61,7 +61,7 @@ export class Cutie extends Entity {
       this.thoughts = think(input, this.brain);
     }
 
-    const distance = limitOutput(this.thoughts.speed);
+    const distance = limitOutput(this.thoughts.speed) * 2;
     this.angle += limitOutput(this.thoughts.angle) * 4;
 
     this.position = add(

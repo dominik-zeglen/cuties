@@ -4,7 +4,8 @@ import { StyleSheet, css } from "aphrodite";
 import Color from "color";
 import { Sim } from "./core/core";
 import minBy from "lodash/minBy";
-import { len, sub } from "./core/r2";
+import { add, len, sub, toEuclidean, toPolar } from "./core/r2";
+import { drawIndicator } from "./paint";
 
 function createColormap(nshades: number): string[] {
   return Array<Color>(nshades)
@@ -112,19 +113,11 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
       if (window.cuties.selected.shouldDelete) {
         window.cuties.selected = undefined;
       } else {
-        context.strokeStyle = theme.primary.string();
-        context.beginPath();
-        context.ellipse(
-          window.cuties.selected.position.x + width / 2 - 2,
-          window.cuties.selected.position.y + height / 2 - 2,
-          9,
-          9,
-          -1,
-          0,
-          2 * 3.141,
-          false
-        );
-        context.stroke();
+        drawIndicator(context, {
+          entity: window.cuties.selected,
+          width,
+          height,
+        });
       }
     }
 

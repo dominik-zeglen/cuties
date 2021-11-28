@@ -10,7 +10,7 @@ export interface PolarPoint {
 
 export function toPolar(point: Point): PolarPoint {
   return {
-    angle: Math.atan(point.y / point.x),
+    angle: Math.atan2(point.y, point.x),
     r: len(point),
   };
 }
