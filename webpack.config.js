@@ -1,6 +1,7 @@
 const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
 const config = {
   entry: "./src/index.tsx",
@@ -35,6 +36,7 @@ const config = {
       inject: true,
       template: "./src/index.html",
     }),
+    new ForkTsCheckerWebpackPlugin(),
   ],
   devServer: {
     static: {
@@ -47,6 +49,7 @@ const config = {
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
   },
+  devtool: "source-map",
 };
 
 module.exports = config;

@@ -14,5 +14,6 @@ interface Window {
       itPerSecond: number;
     };
     iteration: number;
+    selected: any; // Actually it's Cutie but module resolution order fails here
   };
 }

@@ -12,14 +12,14 @@ export function getSim(iterations: number): Promise<number[]> {
       let oldest = 0;
       for (let it = 0; it < iterations; it++) {
         sim.next();
-        sim.cuties.forEach((cutie) => {
+        sim.entityLoader.cuties.forEach((cutie) => {
           if (it - cutie.createdAt > oldest) {
             oldest = it - cutie.createdAt;
           }
         });
 
         if (it % 100 === 0) {
-          population[it / 100] = sim.cuties.length;
+          population[it / 100] = sim.entityLoader.cuties.length;
         }
       }
 
