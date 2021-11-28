@@ -4,7 +4,7 @@ import { StyleSheet, css } from "aphrodite";
 import Color from "color";
 import { Sim } from "./core/core";
 import minBy from "lodash/minBy";
-import { add, len, sub, toEuclidean, toPolar } from "./core/r2";
+import { len, sub } from "./core/r2";
 import { drawIndicator } from "./paint";
 
 function createColormap(nshades: number): string[] {
