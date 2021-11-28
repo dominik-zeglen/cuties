@@ -87,6 +87,21 @@ export class Sim {
     minBy(this.entityLoader.food, (food) => len(sub(food.position, point)));
 
   collectGarbage = () => {
+    this.entityLoader.cuties.forEach((cutie) => {
+      if (cutie.position.x > this.bounds[1].x) {
+        cutie.shouldDelete = true;
+      }
+      if (cutie.position.y > this.bounds[1].y) {
+        cutie.shouldDelete = true;
+      }
+
+      if (cutie.position.x < this.bounds[0].x) {
+        cutie.shouldDelete = true;
+      }
+      if (cutie.position.y < this.bounds[0].y) {
+        cutie.shouldDelete = true;
+      }
+    });
     this.entities = this.entities.filter((entity) => !entity.shouldDelete);
   };
 
@@ -178,23 +193,6 @@ export class Sim {
     });
 
     this.entityLoader.cuties.forEach((cutie) => {
-      if (cutie.position.x > this.bounds[1].x) {
-        // cutie.position.x = this.bounds[0].x;
-        cutie.shouldDelete = true;
-      }
-      if (cutie.position.y > this.bounds[1].y) {
-        // cutie.position.y = this.bounds[0].y;
-        cutie.shouldDelete = true;
-      }
-
-      if (cutie.position.x < this.bounds[0].x) {
-        // cutie.position.x = this.bounds[1].x;
-        cutie.shouldDelete = true;
-      }
-      if (cutie.position.y < this.bounds[0].y) {
-        // cutie.position.y = this.bounds[1].y;
-        cutie.shouldDelete = true;
-      }
       if (cutie.angle > Math.PI || cutie.angle < Math.PI) {
         cutie.angle = Math.atan2(Math.sin(cutie.angle), Math.cos(cutie.angle));
       }
