@@ -24,13 +24,13 @@ function limitOutput(value: number): number {
 }
 
 export interface InitialCutieInput extends InitialEntityInput {
-  brain: CutieAi;
+  ai: CutieAi;
   ancestors: number;
 }
 
 export class Cutie extends Entity {
   angle: number;
-  brain: CutieAi;
+  ai: CutieAi;
   lastEggLaying: number;
   hunger: number;
   thoughts: CutieOutput;
@@ -46,7 +46,7 @@ export class Cutie extends Entity {
       speed: 0,
     };
     this.ancestors = initial.ancestors;
-    this.brain = initial.brain;
+    this.ai = initial.ai;
   }
 
   sim = (simInput: CutieSimInput | null): void => {
@@ -58,7 +58,7 @@ export class Cutie extends Entity {
         distanceToFood: simInput.nearestFood.r / 200,
       };
 
-      this.thoughts = think(input, this.brain);
+      this.thoughts = think(input, this.ai);
     }
 
     const distance = limitOutput(this.thoughts.speed) * 2;
@@ -98,7 +98,7 @@ export class Cutie extends Entity {
 export function getRandomCutie(id: number, it: number, bounds: Point[]): Cutie {
   const cutie = new Cutie(id, it, {
     ancestors: 0,
-    brain: getRandomCutieAi(),
+    ai: getRandomCutieAi(),
     position: getRandomPositionInBounds(bounds),
   });
 

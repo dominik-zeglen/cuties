@@ -56,7 +56,7 @@ export function getRandomCutieAi(): CutieAi {
   };
 }
 
-export function think(input: CutieInput, brain: CutieAi): CutieOutput {
+export function think(input: CutieInput, ai: CutieAi): CutieOutput {
   const inputMatrix = [
     [input.angle],
     [input.angleToFood],
@@ -66,22 +66,16 @@ export function think(input: CutieInput, brain: CutieAi): CutieOutput {
   ];
 
   return {
-    angle: dot(
-      brain.angle[1],
-      multiply(brain.angle[0], inputMatrix) as MathArray
-    ),
-    speed: dot(
-      brain.speed[1],
-      multiply(brain.speed[0], inputMatrix) as MathArray
-    ),
+    angle: dot(ai.angle[1], multiply(ai.angle[0], inputMatrix) as MathArray),
+    speed: dot(ai.speed[1], multiply(ai.speed[0], inputMatrix) as MathArray),
   };
 }
 
-export function mutate(brain: CutieAi): CutieAi {
-  const mutatedBrain = clone(brain);
+export function mutate(ai: CutieAi): CutieAi {
+  const mutatedAi = clone(ai);
   const key = getRandomCutieOutputKey();
 
-  mutatedBrain[key] = addSystems(brain[key], getRandomSystem(inputs / 10));
+  mutatedAi[key] = addSystems(ai[key], getRandomSystem(inputs / 10));
 
-  return brain;
+  return ai;
 }

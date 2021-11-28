@@ -1,7 +1,7 @@
 import { CutieInput, think } from "./ai";
 
 test("Inputs work correctly", () => {
-  const brain = {
+  const ai = {
     angle: [
       [
         [-1, 1, 0, 0, 0],
@@ -31,7 +31,7 @@ test("Inputs work correctly", () => {
     hunger: 100,
   };
 
-  const output = think(input, brain as any);
+  const output = think(input, ai as any);
 
   expect(output.angle).toBeGreaterThan(0);
   expect(output.speed).toBeGreaterThan(0);
