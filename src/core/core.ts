@@ -117,7 +117,7 @@ export class Sim {
       if (this.entityLoader.food.length && this.iteration % 2 === 0) {
         const nearestFood = this.getNearestFood(cutie.position);
         const nearestFoodPolarPosition = toPolar(
-          sub(nearestFood.position, cutie.position)
+          sub(cutie.position, nearestFood.position)
         );
 
         if (nearestFoodPolarPosition.r < 10) {
