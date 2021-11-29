@@ -119,9 +119,7 @@ export class Cutie extends Entity {
     return egg;
   };
 
-  shouldDumpWaste = (): boolean => {
-    return this.wasteStored > 1000;
-  };
+  shouldDumpWaste = (): boolean => this.wasteStored > 1000;
 
   dumpWaste = (id: number, it: number): Waste => {
     this.wasteStored -= 1000;

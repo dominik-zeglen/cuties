@@ -1,9 +1,9 @@
 import React, { MouseEventHandler } from "react";
-import { theme } from "./components/theme";
 import { StyleSheet, css } from "aphrodite";
 import Color from "color";
-import { Sim } from "./core/sim";
 import minBy from "lodash/minBy";
+import { Sim } from "./core/sim";
+import { theme } from "./components/theme";
 import { len, sub } from "./core/r2";
 import { drawIndicator } from "./paint";
 
@@ -24,7 +24,7 @@ const width = 1024;
 const height = 800;
 const speed = 100;
 
-export const Cuties: React.FC<CutiesProps> = ({}) => {
+export const Cuties: React.FC<CutiesProps> = () => {
   const interval = React.useRef<number>(null);
   const sim = React.useRef<Sim>(new Sim(width, height));
   const canvas = React.useRef<HTMLCanvasElement>(null);
@@ -142,13 +142,13 @@ export const Cuties: React.FC<CutiesProps> = ({}) => {
         y: event.clientY - rect.top - height / 2,
       };
 
-      const id = minBy(
+      const { id } = minBy(
         sim.current.entities.map((ent) => ({
           id: ent.id,
           dist: len(sub(ent.position, point)),
         })),
         "dist"
-      ).id;
+      );
       window.cuties.selected = sim.current.entities.find(
         (ent) => ent.id === id
       );

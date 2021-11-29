@@ -15,5 +15,23 @@ module.exports = {
   plugins: ["react", "@typescript-eslint"],
   rules: {
     quotes: ["error", "double"],
+    "import/extensions": "off",
+    "import/prefer-default-export": "off",
+    "import/no-unresolved": "off",
+    "no-plusplus": "off",
+    "no-loop-func": "off",
+    "no-nested-ternary": "off",
+    "lines-between-class-members": "off",
+    "no-param-reassign": "off",
+    "react/jsx-filename-extension": "off",
+    "react/function-component-definition": [
+      "error",
+      {
+        namedComponents: "arrow-function",
+        unnamedComponents: "arrow-function",
+      },
+    ],
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": ["error"],
   },
 };

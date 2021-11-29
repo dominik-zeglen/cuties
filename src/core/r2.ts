@@ -8,6 +8,10 @@ export interface PolarPoint {
   r: number;
 }
 
+export function len(point: Point): number {
+  return Math.sqrt(point.x ** 2 + point.y ** 2);
+}
+
 export function toPolar(point: Point): PolarPoint {
   return {
     angle: Math.atan2(point.y, point.x),
@@ -34,10 +38,6 @@ export function sub(a: Point, b: Point): Point {
     x: a.x - b.x,
     y: a.y - b.y,
   };
-}
-
-export function len(point: Point): number {
-  return Math.sqrt(point.x ** 2 + point.y ** 2);
 }
 
 export function getRandomPositionInBounds(bounds: Point[]): Point {

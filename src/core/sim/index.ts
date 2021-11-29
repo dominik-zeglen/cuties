@@ -1,7 +1,7 @@
+import minBy from "lodash/minBy";
 import { Food } from "../entities/food";
 import { len, Point, sub } from "../r2";
 import { Entity } from "../entities/entity";
-import minBy from "lodash/minBy";
 import { EntityLoader } from "../entities/loader";
 import { shouldSpawnFood, shouldSpawnRandomCutie, spawnRandoms } from "./spawn";
 import { cleanupDepletedFood, cleanupOutOfBounds } from "./gc";
@@ -13,7 +13,6 @@ export class Sim {
   iteration: number;
   paused: boolean;
   selected: string | null;
-
   entityLoader: EntityLoader;
   entityCounter: number;
 
@@ -47,6 +46,7 @@ export class Sim {
   pause = () => {
     this.paused = true;
   };
+
   run = () => {
     this.paused = false;
   };
@@ -56,9 +56,7 @@ export class Sim {
 
   shouldSpawnFood = () => shouldSpawnFood(this.iteration, this.entityLoader);
 
-  shouldCleanupOutOfBounds = (): boolean => {
-    return this.iteration % 60 === 0;
-  };
+  shouldCleanupOutOfBounds = (): boolean => this.iteration % 60 === 0;
 
   getNearestFood = (point: Point): Food =>
     minBy(this.entityLoader.food, (food) => len(sub(food.position, point)));

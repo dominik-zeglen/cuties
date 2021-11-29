@@ -6,7 +6,7 @@
   "scripts": {
     "start": "NODE_ENV=development webpack serve",
     "test": "jest",
-    "lint": "eslint ./**/*.ts*; prettier . --check"
+    "lint": "eslint ./**/*.ts* --fix; prettier . --write"
   },
   "author": "",
   "license": "ISC",
