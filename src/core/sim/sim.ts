@@ -1,7 +1,6 @@
 import type { Sim } from ".";
 import type { CutieSimInput } from "../entities/cutie";
 import { Food } from "../entities/food";
-import { Waste } from "../entities/waste";
 import { sub, toPolar } from "../r2";
 
 export function simCuties(sim: Sim) {

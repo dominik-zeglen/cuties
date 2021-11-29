@@ -1,4 +1,4 @@
-import { Sim } from "./";
+import { Sim } from ".";
 import { Cutie } from "../entities/cutie";
 import { Food } from "../entities/food";
 

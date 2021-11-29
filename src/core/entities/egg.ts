@@ -1,5 +1,5 @@
 import { Cutie } from "./cutie";
-import { CutieAi, mutate } from "./../ai";
+import { CutieAi, mutate } from "../ai";
 import { Entity } from "./entity";
 
 export class Egg extends Entity {
@@ -14,9 +14,7 @@ export class Egg extends Entity {
     this.ancestors = parent.ancestors + 1;
   }
 
-  shouldHatch = (it: number): boolean => {
-    return it - this.createdAt === this.spawnTime;
-  };
+  shouldHatch = (it: number): boolean => it - this.createdAt === this.spawnTime;
 
   hatch = (id: number, it: number): Cutie => {
     const cutie = new Cutie(id, it, {

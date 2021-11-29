@@ -3,9 +3,9 @@ import { Food } from "../entities/food";
 import { Point } from "../r2";
 
 export function cleanupDepletedFood(food: Food[]) {
-  food.forEach((food) => {
-    if (food.value <= 0) {
-      food.shouldDelete = true;
+  food.forEach((foodPellet) => {
+    if (foodPellet.value <= 0) {
+      foodPellet.shouldDelete = true;
     }
   });
 }

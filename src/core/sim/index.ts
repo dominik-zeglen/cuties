@@ -69,10 +69,10 @@ export class Sim {
 
   getStats = () => {
     if (this.iteration % 120 === 0) {
-      (window.cuties.lastReload = Date.now()),
-        (window.cuties.stats = {
-          itPerSecond: 120000 / (Date.now() - window.cuties.lastReload),
-        });
+      window.cuties.stats = {
+        itPerSecond: 120000 / (Date.now() - window.cuties.lastReload),
+      };
+      window.cuties.lastReload = Date.now();
       window.cuties.iteration = this.iteration;
     }
   };

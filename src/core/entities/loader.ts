@@ -7,10 +7,10 @@ import { Waste } from "./waste";
 export class EntityLoader {
   entities: Entity[];
 
-  _food: Food[] | null;
-  _cuties: Cutie[] | null;
-  _eggs: Egg[] | null;
-  _waste: Waste[] | null;
+  cachedFood: Food[] | null;
+  cachedCuties: Cutie[] | null;
+  cachedEggs: Egg[] | null;
+  cachedWaste: Waste[] | null;
 
   constructor() {
     this.entities = [];
@@ -19,39 +19,39 @@ export class EntityLoader {
   init = (entities: Entity[]) => {
     this.entities = entities;
 
-    this._food = null;
-    this._cuties = null;
-    this._eggs = null;
-    this._waste = null;
+    this.cachedFood = null;
+    this.cachedCuties = null;
+    this.cachedEggs = null;
+    this.cachedWaste = null;
   };
 
   get food(): Food[] {
-    if (this._food) {
-      return this._food;
+    if (this.cachedFood) {
+      return this.cachedFood;
     }
 
     return this.entities.filter((entity) => entity instanceof Food) as Food[];
   }
 
   get cuties(): Cutie[] {
-    if (this._cuties) {
-      return this._cuties;
+    if (this.cachedCuties) {
+      return this.cachedCuties;
     }
 
     return this.entities.filter((entity) => entity instanceof Cutie) as Cutie[];
   }
 
   get eggs(): Egg[] {
-    if (this._eggs) {
-      return this._eggs;
+    if (this.cachedEggs) {
+      return this.cachedEggs;
     }
 
     return this.entities.filter((entity) => entity instanceof Egg) as Egg[];
   }
 
   get waste(): Waste[] {
-    if (this._waste) {
-      return this._waste;
+    if (this.cachedWaste) {
+      return this.cachedWaste;
     }
 
     return this.entities.filter((entity) => entity instanceof Waste) as Waste[];
