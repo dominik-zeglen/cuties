@@ -1,10 +1,10 @@
-import { Cutie, CutieSimInput, getRandomCutie } from "./entities/cutie";
-import { Food } from "./entities/food";
-import { getRandomPositionInBounds, len, Point, sub, toPolar } from "./r2";
-import { Waste } from "./entities/waste";
-import { Entity } from "./entities/entity";
+import { Cutie, CutieSimInput, getRandomCutie } from "../entities/cutie";
+import { Food } from "../entities/food";
+import { getRandomPositionInBounds, len, Point, sub, toPolar } from "../r2";
+import { Waste } from "../entities/waste";
+import { Entity } from "../entities/entity";
 import minBy from "lodash/minBy";
-import { EntityLoader } from "./entities/loader";
+import { EntityLoader } from "../entities/loader";
 
 export class Sim {
   bounds: Point[];

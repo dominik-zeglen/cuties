@@ -1,6 +1,6 @@
-import { Sim } from "./core";
-import { Cutie } from "./entities/cutie";
-import { Food } from "./entities/food";
+import { Sim } from "./";
+import { Cutie } from "../entities/cutie";
+import { Food } from "../entities/food";
 
 test("Gets nearest food", () => {
   const sim = new Sim(10, 10);
