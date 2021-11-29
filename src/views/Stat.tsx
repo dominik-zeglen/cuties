@@ -12,14 +12,16 @@ export const Stat: React.FC = () => {
 
   React.useEffect(() => {
     interval.current = setTimeout(async () => {
-      const data: number[][] = Array(sims).fill([]);
+      const newData: number[][] = Array(sims).fill([]);
 
       for (let index = 0; index < sims; index++) {
-        data[index] = await getSim(iterations);
+        // TODO: fix this
+        // eslint-disable-next-line
+        newData[index] = await getSim(iterations);
         setProgress((index + 1) / sims);
       }
 
-      setData(data);
+      setData(newData);
     }, 0) as unknown as number;
 
     return () => clearInterval(interval.current);

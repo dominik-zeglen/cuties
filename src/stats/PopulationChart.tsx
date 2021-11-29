@@ -10,15 +10,18 @@ export interface PopulationChartProps {
   data: number[][];
 }
 
-export const PopulationChart: React.FC<PopulationChartProps> = ({ data }) => {
+export const PopulationChart: React.FC<PopulationChartProps> = ({
+  data: populationData,
+}) => {
   const canvas = React.useRef<HTMLCanvasElement>(null);
 
   React.useEffect(() => {
-    if (data) {
+    if (populationData) {
+      // eslint-disable-next-line no-new
       new Chart(canvas.current, {
         data: {
           datasets: [
-            ...data.map((data, index) => {
+            ...populationData.map((data, index) => {
               const color = theme.primary.rotate(index * 8);
 
               return {
@@ -36,17 +39,19 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({ data }) => {
               borderWidth: 3,
               pointRadius: 0,
               label: "mean",
-              data: transpose(data).map((iteration) => mean(iteration)),
+              data: transpose(populationData).map((iteration) =>
+                mean(iteration)
+              ),
             },
           ],
-          labels: Array(data[0].length)
+          labels: Array(populationData[0].length)
             .fill(0)
             .map((_, index) => (index + 1).toString()),
         },
         type: "line",
       });
     }
-  }, [data]);
+  }, [populationData]);
 
   return <canvas height="800" width="1200" ref={canvas} />;
 };

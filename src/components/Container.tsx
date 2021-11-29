@@ -6,7 +6,7 @@ export const Container: React.FC = (props) => (
     {...props}
     style={{
       margin: `${theme.spacing * 3}px auto`,
-      minHeight: `calc(100vh - ${(theme.spacing * 3) & 2})`,
+      minHeight: `calc(100vh - ${theme.spacing * 3})`,
       width: 1024,
     }}
   />

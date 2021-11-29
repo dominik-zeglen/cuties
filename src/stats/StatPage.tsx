@@ -1,11 +1,9 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 import { Button } from "../components/Button";
 import { Container } from "../components/Container";
-import "../components/Loader";
 import { Loader } from "../components/Loader";
-import "./PopulationChart";
 import { PopulationChart } from "./PopulationChart";
-import { useHistory } from "react-router-dom";
 
 export interface StatPageProps {
   data: number[][] | undefined;

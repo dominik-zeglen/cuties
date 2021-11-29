@@ -1,7 +1,7 @@
 import React from "react";
-import { theme } from "./theme";
 import { StyleSheet, css } from "aphrodite";
 import clsx from "clsx";
+import { theme } from "./theme";
 
 export interface ButtonProps
   extends React.DetailedHTMLProps<
@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
 });
 
 export const Button: React.FC<ButtonProps> = ({ className, ...props }) => (
+  // eslint-disable-next-line react/button-has-type
   <button className={clsx(className, css(styles.button))} {...props} />
 );
 Button.displayName = "Button";
