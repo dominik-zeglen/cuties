@@ -6,7 +6,7 @@
   "scripts": {
     "start": "NODE_ENV=development webpack serve",
     "test": "jest",
-    "lint": "eslint .; prettier . --check"
+    "lint": "eslint ./**/*.ts*; prettier . --check"
   },
   "author": "",
   "license": "ISC",
@@ -21,6 +21,7 @@
     "esbuild-loader": "^2.16.0",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "^19.0.1",
+    "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.27.1",
