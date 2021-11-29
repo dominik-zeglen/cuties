@@ -26,12 +26,11 @@ export function simCuties(sim: Sim) {
       sim.registerEntity(cutie.layEgg(sim.entityCounter, sim.iteration));
     }
 
-    if (cutie.shouldDumpWaste(sim.iteration)) {
-      const waste = new Waste(sim.entityCounter, sim.iteration, {
-        position: cutie.position,
-      });
-
-      sim.registerEntity(waste);
+    if (cutie.shouldDumpWaste()) {
+      const waste = cutie.dumpWaste(sim.entityCounter, sim.iteration);
+      if (sim.entityLoader.waste.length < 700) {
+        sim.registerEntity(waste);
+      }
     }
   });
 }

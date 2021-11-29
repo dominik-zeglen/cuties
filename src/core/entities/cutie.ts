@@ -15,6 +15,7 @@ import {
   toEuclidean,
 } from "../r2";
 import { Food } from "./food";
+import { Waste } from "./waste";
 
 const maxHunger = 2000;
 const initialHunger = maxHunger / 4;
@@ -39,6 +40,7 @@ export class Cutie extends Entity {
   hunger: number;
   thoughts: CutieOutput;
   ancestors: number;
+  wasteStored: number;
 
   constructor(id: number, it: number, initial: InitialCutieInput) {
     super(id, it, initial);
@@ -53,6 +55,7 @@ export class Cutie extends Entity {
     };
     this.ancestors = initial.ancestors;
     this.ai = initial.ai;
+    this.wasteStored = 0;
   }
 
   sim = (simInput: CutieSimInput | null): void => {
@@ -77,10 +80,13 @@ export class Cutie extends Entity {
         r: distance,
       })
     );
-    this.hunger +=
+    const energy =
       (0.75 + distance ** 2) *
       (this.thoughts.eat ? 2 : 1) *
       (this.thoughts.layEgg ? 2 : 1);
+
+    this.hunger += energy;
+    this.wasteStored += energy;
 
     if (this.hunger > maxHunger) {
       this.shouldDelete = true;
@@ -108,12 +114,20 @@ export class Cutie extends Entity {
     const egg = new Egg(id, it, this);
     this.lastEggLaying = it;
     this.hunger += 800;
+    this.wasteStored += 800;
 
     return egg;
   };
 
-  shouldDumpWaste = (it: number): boolean => {
-    return (it - this.createdAt) % 1000 === 0;
+  shouldDumpWaste = (): boolean => {
+    return this.wasteStored > 1000;
+  };
+
+  dumpWaste = (id: number, it: number): Waste => {
+    this.wasteStored -= 1000;
+    return new Waste(id, it, {
+      position: this.position,
+    });
   };
 }
 
