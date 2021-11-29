@@ -15,6 +15,9 @@ import {
   toEuclidean,
 } from "../r2";
 
+const maxHunger = 2000;
+const initialHunger = maxHunger / 4;
+
 export interface CutieSimInput {
   nearestFood: PolarPoint;
 }
@@ -39,11 +42,13 @@ export class Cutie extends Entity {
   constructor(id: number, it: number, initial: InitialCutieInput) {
     super(id, it, initial);
     this.angle = 0;
-    this.hunger = 500;
+    this.hunger = initialHunger;
     this.lastEggLaying = it;
     this.thoughts = {
       angle: 0,
       speed: 0,
+      eat: 0,
+      layEgg: 0,
     };
     this.ancestors = initial.ancestors;
     this.ai = initial.ai;
@@ -54,7 +59,7 @@ export class Cutie extends Entity {
       const input: CutieInput = {
         angle: this.angle / Math.PI,
         angleToFood: simInput.nearestFood.angle / Math.PI,
-        hunger: this.hunger / 2000,
+        hunger: this.hunger / maxHunger,
         distanceToFood: simInput.nearestFood.r / 200,
       };
 
@@ -71,16 +76,22 @@ export class Cutie extends Entity {
         r: distance,
       })
     );
-    this.hunger += 0.75 + distance ** 2;
+    this.hunger +=
+      (0.75 + distance ** 2) *
+      (this.thoughts.eat ? 2 : 1) *
+      (this.thoughts.layEgg ? 2 : 1);
 
-    if (this.hunger > 2000) {
+    if (this.hunger > maxHunger) {
       this.shouldDelete = true;
     }
   };
 
-  shouldLayEgg = (it: number): boolean => {
-    return this.hunger < 400 && it - this.lastEggLaying > 500;
-  };
+  wantsToEat = (): boolean => this.thoughts.eat < 0.5;
+
+  wantsToLayEgg = (): boolean => this.thoughts.layEgg < 0.5;
+
+  canLayEgg = (it: number): boolean =>
+    this.hunger < 400 && it - this.lastEggLaying > initialHunger;
 
   layEgg = (id: number, it: number): Egg => {
     const egg = new Egg(id, it, this);

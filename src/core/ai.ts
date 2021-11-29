@@ -7,10 +7,15 @@ export type CutieInput = Record<
   number
 >;
 const inputs = 5;
-export type CutieOutput = Record<"speed" | "angle", number>;
+export type CutieOutput = Record<"speed" | "angle" | "eat" | "layEgg", number>;
 export type CutieAi = Record<keyof CutieOutput, Matrix[]>;
 
-const outputKeys: Array<keyof CutieOutput> = ["angle", "speed"];
+const outputKeys: Array<keyof CutieOutput> = [
+  "angle",
+  "speed",
+  "eat",
+  "layEgg",
+];
 function getRandomCutieOutputKey(): keyof CutieOutput {
   return outputKeys[Math.floor(Math.random() * outputKeys.length)];
 }
@@ -53,6 +58,8 @@ export function getRandomCutieAi(): CutieAi {
   return {
     angle: addSystems(baseSystem, getRandomSystem(inputs)),
     speed: addSystems(baseSystem, getRandomSystem(inputs)),
+    eat: addSystems(baseSystem, getRandomSystem(inputs)),
+    layEgg: addSystems(baseSystem, getRandomSystem(inputs)),
   };
 }
 
@@ -68,6 +75,8 @@ export function think(input: CutieInput, ai: CutieAi): CutieOutput {
   return {
     angle: dot(ai.angle[1], multiply(ai.angle[0], inputMatrix) as MathArray),
     speed: dot(ai.speed[1], multiply(ai.speed[0], inputMatrix) as MathArray),
+    eat: dot(ai.speed[1], multiply(ai.speed[0], inputMatrix) as MathArray),
+    layEgg: dot(ai.speed[1], multiply(ai.speed[0], inputMatrix) as MathArray),
   };
 }
 

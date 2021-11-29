@@ -135,7 +135,7 @@ export class Sim {
           sub(cutie.position, nearestFood.position)
         );
 
-        if (nearestFoodPolarPosition.r < 10) {
+        if (nearestFoodPolarPosition.r < 10 && cutie.wantsToEat()) {
           cutie.hunger = 0;
           nearestFood.shouldDelete = true;
         } else {
@@ -146,7 +146,7 @@ export class Sim {
       }
 
       cutie.sim(simInput);
-      if (cutie.shouldLayEgg(this.iteration)) {
+      if (cutie.wantsToLayEgg() && cutie.canLayEgg(this.iteration)) {
         this.registerEntity(cutie.layEgg(this.entityCounter, this.iteration));
       }
 
