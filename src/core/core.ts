@@ -87,6 +87,11 @@ export class Sim {
     minBy(this.entityLoader.food, (food) => len(sub(food.position, point)));
 
   collectGarbage = () => {
+    this.entityLoader.food.forEach((food) => {
+      if (food.value <= 0) {
+        food.shouldDelete = true;
+      }
+    });
     this.entityLoader.cuties.forEach((cutie) => {
       if (cutie.position.x > this.bounds[1].x) {
         cutie.shouldDelete = true;
@@ -136,13 +141,11 @@ export class Sim {
         );
 
         if (nearestFoodPolarPosition.r < 10 && cutie.wantsToEat()) {
-          cutie.hunger = 0;
-          nearestFood.shouldDelete = true;
-        } else {
-          simInput = {
-            nearestFood: nearestFoodPolarPosition,
-          };
+          cutie.eat(nearestFood);
         }
+        simInput = {
+          nearestFood: nearestFoodPolarPosition,
+        };
       }
 
       cutie.sim(simInput);

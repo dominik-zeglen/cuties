@@ -30,7 +30,7 @@ export class EntityLoader {
       return this._food;
     }
 
-    return this.entities.filter((entity) => entity instanceof Food);
+    return this.entities.filter((entity) => entity instanceof Food) as Food[];
   }
 
   get cuties(): Cutie[] {

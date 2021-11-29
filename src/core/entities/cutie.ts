@@ -14,6 +14,7 @@ import {
   PolarPoint,
   toEuclidean,
 } from "../r2";
+import { Food } from "./food";
 
 const maxHunger = 2000;
 const initialHunger = maxHunger / 4;
@@ -83,6 +84,16 @@ export class Cutie extends Entity {
 
     if (this.hunger > maxHunger) {
       this.shouldDelete = true;
+    }
+  };
+
+  eat = (food: Food) => {
+    this.hunger -= food.value;
+    if (this.hunger < 0) {
+      food.value = -this.hunger;
+      this.hunger = 0;
+    } else {
+      food.value = 0;
     }
   };
 
