@@ -2,7 +2,7 @@ import React, { MouseEventHandler } from "react";
 import { theme } from "./components/theme";
 import { StyleSheet, css } from "aphrodite";
 import Color from "color";
-import { Sim } from "./core/core";
+import { Sim } from "./core/sim";
 import minBy from "lodash/minBy";
 import { len, sub } from "./core/r2";
 import { drawIndicator } from "./paint";

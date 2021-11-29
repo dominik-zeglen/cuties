@@ -1,8 +1,5 @@
 interface Window {
   cuties: {
-    get: {
-      oldest: () => object | null;
-    };
     sim: {
       current: object;
       pause: () => void;
