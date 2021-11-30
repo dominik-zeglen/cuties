@@ -27,8 +27,8 @@ export class Sim {
     this.iteration = 0;
     this.entityCounter = 0;
     this.bounds = [
-      { x: -width / 2, y: -height / 2 },
-      { x: width / 2, y: height / 2 },
+      { x: 0, y: 0 },
+      { x: width, y: height },
     ];
     this.entityLoader = new EntityLoader();
     this.selected = null;

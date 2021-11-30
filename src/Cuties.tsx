@@ -52,12 +52,7 @@ export const Cuties: React.FC<CutiesProps> = () => {
 
     sim.current.entityLoader.cuties.forEach((cutie) => {
       context.beginPath();
-      context.rect(
-        cutie.position.x + width / 2 - 4,
-        cutie.position.y + height / 2 - 4,
-        5,
-        5
-      );
+      context.rect(cutie.position.x - 4, cutie.position.y - 4, 5, 5);
       context.stroke();
     });
 
@@ -65,8 +60,8 @@ export const Cuties: React.FC<CutiesProps> = () => {
     sim.current.entityLoader.food.forEach((food) => {
       context.beginPath();
       context.ellipse(
-        food.position.x + width / 2 - 2,
-        food.position.y + height / 2 - 2,
+        food.position.x - 2,
+        food.position.y - 2,
         3,
         3,
         -1,
@@ -81,8 +76,8 @@ export const Cuties: React.FC<CutiesProps> = () => {
     sim.current.entityLoader.eggs.forEach((egg) => {
       context.beginPath();
       context.ellipse(
-        egg.position.x + width / 2 - 2,
-        egg.position.y + height / 2 - 2,
+        egg.position.x - 2,
+        egg.position.y - 2,
         3,
         3,
         -1,
@@ -97,8 +92,8 @@ export const Cuties: React.FC<CutiesProps> = () => {
     sim.current.entityLoader.waste.forEach((waste) => {
       context.beginPath();
       context.ellipse(
-        waste.position.x + width / 2 - 2,
-        waste.position.y + height / 2 - 2,
+        waste.position.x - 2,
+        waste.position.y - 2,
         3,
         3,
         -1,
@@ -138,8 +133,8 @@ export const Cuties: React.FC<CutiesProps> = () => {
     (event) => {
       const rect = event.currentTarget.getBoundingClientRect();
       const point = {
-        x: event.clientX - rect.left - width / 2,
-        y: event.clientY - rect.top - height / 2,
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
       };
 
       const { id } = minBy(
