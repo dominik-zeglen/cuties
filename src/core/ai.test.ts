@@ -1,28 +1,7 @@
-import { CutieInput, think } from "./ai";
+import { CutieInput, getRandomCutieAi, think } from "./ai";
 
 test("Inputs work correctly", () => {
-  const ai = {
-    angle: [
-      [
-        [-1, 1, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-      ],
-      [1, 0, 0, 0, 0],
-    ],
-    speed: [
-      [
-        [0, 0, 0, 0, 1],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-      ],
-      [1, 0, 0, 0, 0],
-    ],
-  };
+  const ai = getRandomCutieAi();
 
   const input: CutieInput = {
     angle: -Math.PI / 4,
@@ -31,8 +10,10 @@ test("Inputs work correctly", () => {
     hunger: 100,
   };
 
-  const output = think(input, ai as any);
+  const output = think(input, ai);
 
-  expect(output.angle).toBeGreaterThan(0);
-  expect(output.speed).toBeGreaterThan(0);
+  expect(output.angle).toEqual(expect.any(Number));
+  expect(output.speed).toEqual(expect.any(Number));
+  expect(output.layEgg).toEqual(expect.any(Number));
+  expect(output.speed).toEqual(expect.any(Number));
 });

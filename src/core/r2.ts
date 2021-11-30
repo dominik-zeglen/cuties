@@ -19,7 +19,7 @@ export function toPolar(point: Point): PolarPoint {
   };
 }
 
-export function toEuclidean(point: PolarPoint): Point {
+export function toCartesian(point: PolarPoint): Point {
   return {
     x: point.r * Math.cos(point.angle),
     y: point.r * Math.sin(point.angle),

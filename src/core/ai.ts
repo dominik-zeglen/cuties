@@ -1,4 +1,4 @@
-import { dot, add, MathArray, multiply, clone } from "mathjs";
+import { add, multiply, map } from "mathjs";
 
 type Matrix = number[][];
 
@@ -8,83 +8,55 @@ export type CutieInput = Record<
 >;
 const inputs = 5;
 export type CutieOutput = Record<"speed" | "angle" | "eat" | "layEgg", number>;
-export type CutieAi = Record<keyof CutieOutput, Matrix[]>;
+export type CutieAi = Matrix[];
 
-const outputKeys: Array<keyof CutieOutput> = [
-  "angle",
-  "speed",
-  "eat",
-  "layEgg",
-];
-function getRandomCutieOutputKey(): keyof CutieOutput {
-  return outputKeys[Math.floor(Math.random() * outputKeys.length)];
-}
-
-const baseSystem = [
-  Array(inputs).fill(Array(inputs).fill(0)),
-  Array(inputs).fill(1),
-];
-
-function getRandomValue(): number {
-  return Math.random() > 0.5 ? 1 : -1;
-}
+const baseSystem = [Array(inputs).fill(Array(inputs).fill(0))];
 
 function getRandomSystem(divide: number): Matrix[] {
   const system = [
     Array(inputs)
       .fill(0)
       .map(() => Array(inputs).fill(0)),
-    Array(inputs).fill(0),
   ];
 
-  for (let index = 0; index < Math.random() * 3 + 1; index++) {
-    system[0][Math.floor(Math.random() * inputs)][
-      Math.floor(Math.random() * inputs)
-    ] = getRandomValue() / divide;
-  }
-
-  for (let index = 0; index < Math.random() * 1 + 1; index++) {
-    system[1][Math.floor(Math.random() * inputs)] = getRandomValue() / divide;
+  for (let layer = 0; layer < system.length; layer++) {
+    for (let index = 0; index < Math.random() * inputs ** 2 + 1; index++) {
+      system[layer][Math.floor(Math.random() * inputs)][
+        Math.floor(Math.random() * inputs)
+      ] = (Math.random() - 0.5) / divide;
+    }
   }
 
   return system;
 }
 
 function addSystems(a: Matrix[], b: Matrix[]): Matrix[] {
-  return [add(a[0], b[0]) as Matrix, add(a[1], b[1]) as Matrix];
+  return a.map((_, layerIndex) => add(a[layerIndex], b[layerIndex]) as Matrix);
 }
 
 export function getRandomCutieAi(): CutieAi {
-  return {
-    angle: addSystems(baseSystem, getRandomSystem(inputs)),
-    speed: addSystems(baseSystem, getRandomSystem(inputs)),
-    eat: addSystems(baseSystem, getRandomSystem(inputs)),
-    layEgg: addSystems(baseSystem, getRandomSystem(inputs)),
-  };
+  return addSystems(baseSystem, getRandomSystem(1));
 }
 
+// 1 x 5 . 5 x 5  => 1 x 5
 export function think(input: CutieInput, ai: CutieAi): CutieOutput {
   const inputMatrix = [
-    [input.angle],
-    [input.angleToFood],
-    [input.distanceToFood],
-    [input.hunger],
-    [1],
+    [input.angle, input.angleToFood, input.distanceToFood, input.hunger, 1],
   ];
 
+  const output = ai.reduce(
+    (prevLayer, layer) => map(multiply(prevLayer, layer), Math.tanh),
+    inputMatrix
+  );
+
   return {
-    angle: dot(ai.angle[1], multiply(ai.angle[0], inputMatrix) as MathArray),
-    speed: dot(ai.speed[1], multiply(ai.speed[0], inputMatrix) as MathArray),
-    eat: dot(ai.speed[1], multiply(ai.speed[0], inputMatrix) as MathArray),
-    layEgg: dot(ai.speed[1], multiply(ai.speed[0], inputMatrix) as MathArray),
+    angle: output[0][0],
+    speed: output[0][1],
+    eat: output[0][2],
+    layEgg: output[0][3],
   };
 }
 
 export function mutate(ai: CutieAi): CutieAi {
-  const mutatedAi = clone(ai);
-  const key = getRandomCutieOutputKey();
-
-  mutatedAi[key] = addSystems(ai[key], getRandomSystem(inputs / 10));
-
-  return ai;
+  return addSystems(ai, getRandomSystem(10));
 }

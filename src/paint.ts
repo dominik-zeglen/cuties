@@ -1,6 +1,6 @@
 import { theme } from "./components/theme";
 import { Entity } from "./core/entities/entity";
-import { add, toEuclidean } from "./core/r2";
+import { add, toCartesian } from "./core/r2";
 
 interface DrawIndicatorOpts {
   entity: Entity & { angle?: number };
@@ -33,7 +33,7 @@ export function drawIndicator(
       opts.entity.position.y + opts.height / 2 - 2
     );
     const angleIndicator = add(
-      toEuclidean({
+      toCartesian({
         r: 20,
         angle: opts.entity.angle,
       }),

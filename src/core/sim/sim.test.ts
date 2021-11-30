@@ -22,12 +22,7 @@ test("Gets nearest food", () => {
 
 test("Properly calculates eaten food", () => {
   const cutie = new Cutie(2, 1, {
-    ai: {
-      angle: [],
-      eat: [],
-      layEgg: [],
-      speed: [],
-    },
+    ai: [],
     ancestors: 0,
     position: { x: 0, y: 0 },
   });

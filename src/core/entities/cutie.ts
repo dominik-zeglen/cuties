@@ -12,20 +12,17 @@ import {
   getRandomPositionInBounds,
   Point,
   PolarPoint,
-  toEuclidean,
+  toCartesian,
 } from "../r2";
 import { Food } from "./food";
 import { Waste } from "./waste";
 
 const maxHunger = 2000;
 const initialHunger = maxHunger / 4;
+const eggCost = 1000;
 
 export interface CutieSimInput {
   nearestFood: PolarPoint;
-}
-
-function limitOutput(value: number): number {
-  return value > 1 ? 1 : value < -1 ? -1 : value;
 }
 
 export interface InitialCutieInput extends InitialEntityInput {
@@ -70,20 +67,20 @@ export class Cutie extends Entity {
       this.thoughts = think(input, this.ai);
     }
 
-    const distance = limitOutput(this.thoughts.speed) * 2;
-    this.angle += limitOutput(this.thoughts.angle) * 4;
+    const distance = this.thoughts.speed * 2;
+    this.angle += this.thoughts.angle * 4;
 
     this.position = add(
       this.position,
-      toEuclidean({
+      toCartesian({
         angle: this.angle,
         r: distance,
       })
     );
     const energy =
-      (0.75 + distance ** 2) *
-      (this.thoughts.eat ? 2 : 1) *
-      (this.thoughts.layEgg ? 2 : 1);
+      (0.25 + distance ** 2) *
+      (this.wantsToEat() ? 2 : 1) *
+      (this.wantsToLayEgg() ? 1.5 : 1);
 
     this.hunger += energy;
     this.wasteStored += energy;
@@ -103,18 +100,19 @@ export class Cutie extends Entity {
     }
   };
 
-  wantsToEat = (): boolean => this.thoughts.eat < 0.5;
+  wantsToEat = (): boolean => this.thoughts.eat > 0;
 
-  wantsToLayEgg = (): boolean => this.thoughts.layEgg < 0.5;
+  wantsToLayEgg = (): boolean => this.thoughts.layEgg > 0;
 
   canLayEgg = (it: number): boolean =>
-    this.hunger < 400 && it - this.lastEggLaying > initialHunger;
+    this.hunger < maxHunger - eggCost &&
+    it - this.lastEggLaying > initialHunger;
 
   layEgg = (id: number, it: number): Egg => {
     const egg = new Egg(id, it, this);
     this.lastEggLaying = it;
-    this.hunger += 800;
-    this.wasteStored += 800;
+    this.hunger += eggCost;
+    this.wasteStored += eggCost;
 
     return egg;
   };

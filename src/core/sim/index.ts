@@ -3,8 +3,14 @@ import { Food } from "../entities/food";
 import { len, Point, sub } from "../r2";
 import { Entity } from "../entities/entity";
 import { EntityLoader } from "../entities/loader";
-import { shouldSpawnFood, shouldSpawnRandomCutie, spawnRandoms } from "./spawn";
-import { cleanupDepletedFood, cleanupOutOfBounds } from "./gc";
+import {
+  shouldSpawnFood,
+  shouldSpawnRandomCutie,
+  spawnRandomCutie,
+  spawnRandomFood,
+  spawnRandoms,
+} from "./spawn";
+import { cleanDepletedFood, cleanOutOfBounds } from "./gc";
 import { simCuties, simEggs, simWaste } from "./sim";
 
 export class Sim {
@@ -26,6 +32,14 @@ export class Sim {
     ];
     this.entityLoader = new EntityLoader();
     this.selected = null;
+
+    while (this.shouldSpawnFood()) {
+      spawnRandomFood(this);
+      this.entityLoader.init(this.entities);
+    }
+    for (let cutieIndex = 0; cutieIndex < 15; cutieIndex++) {
+      spawnRandomCutie(this);
+    }
 
     window.cuties = {
       sim: {
@@ -61,9 +75,11 @@ export class Sim {
   getNearestFood = (point: Point): Food =>
     minBy(this.entityLoader.food, (food) => len(sub(food.position, point)));
 
-  collectGarbage = () => {
-    cleanupDepletedFood(this.entityLoader.food);
-    cleanupOutOfBounds(this.entities, this.bounds);
+  clean = () => {
+    cleanDepletedFood(this.entityLoader.food);
+    if (this.iteration % 5) {
+      cleanOutOfBounds(this.entities, this.bounds);
+    }
     this.entities = this.entities.filter((entity) => !entity.shouldDelete);
   };
 
@@ -105,7 +121,7 @@ export class Sim {
 
     this.regenerate();
 
-    this.collectGarbage();
+    this.clean();
     this.getStats();
 
     this.iteration++;
