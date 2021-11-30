@@ -1,3 +1,4 @@
+import QuadTree from "@timohausmann/quadtree-js";
 import minBy from "lodash/minBy";
 import { Food } from "../entities/food";
 import { len, Point, sub } from "../r2";
@@ -21,6 +22,7 @@ export class Sim {
   selected: string | null;
   entityLoader: EntityLoader;
   entityCounter: number;
+  qtree: QuadTree;
 
   constructor(width: number, height: number) {
     this.entities = [];
@@ -32,6 +34,12 @@ export class Sim {
     ];
     this.entityLoader = new EntityLoader();
     this.selected = null;
+    this.qtree = new QuadTree({
+      height,
+      width,
+      x: 0,
+      y: 0,
+    });
 
     while (this.shouldSpawnFood()) {
       spawnRandomFood(this);
@@ -72,8 +80,18 @@ export class Sim {
 
   shouldCleanupOutOfBounds = (): boolean => this.iteration % 60 === 0;
 
-  getNearestFood = (point: Point): Food =>
-    minBy(this.entityLoader.food, (food) => len(sub(food.position, point)));
+  getNearestFood = (point: Point, radius: number): Food | undefined =>
+    minBy(
+      this.qtree
+        .retrieve({
+          height: radius,
+          width: radius,
+          x: point.x - radius / 2,
+          y: point.y - radius / 2,
+        })
+        .filter((entity) => entity instanceof Food) as Food[],
+      (food) => len(sub(food.position, point))
+    );
 
   clean = () => {
     cleanDepletedFood(this.entityLoader.food);
@@ -111,6 +129,8 @@ export class Sim {
       return;
     }
 
+    this.qtree.clear();
+    this.entities.forEach((entity) => this.qtree.insert(entity));
     this.entityLoader.init(this.entities);
 
     simCuties(this);

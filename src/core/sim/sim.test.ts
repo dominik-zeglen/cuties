@@ -15,7 +15,7 @@ test("Gets nearest food", () => {
   ];
 
   sim.entityLoader.init(sim.entities);
-  const nearest = sim.getNearestFood({ x: 3, y: 1 });
+  const nearest = sim.getNearestFood({ x: 3, y: 1 }, 10);
 
   expect(nearest.id).toBe(1);
 });

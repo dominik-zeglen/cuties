@@ -51,6 +51,7 @@
     ]
   },
   "dependencies": {
+    "@timohausmann/quadtree-js": "^1.2.5",
     "@types/color": "^3.0.2",
     "@types/lodash": "^4.14.177",
     "@types/react": "^17.0.31",

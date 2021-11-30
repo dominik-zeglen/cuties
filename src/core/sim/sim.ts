@@ -7,17 +7,19 @@ export function simCuties(sim: Sim) {
   sim.entityLoader.cuties.forEach((cutie) => {
     let simInput: CutieSimInput | null = null;
     if (sim.entityLoader.food.length && sim.iteration % 2 === 0) {
-      const nearestFood = sim.getNearestFood(cutie.position);
-      const nearestFoodPolarPosition = toPolar(
-        sub(cutie.position, nearestFood.position)
-      );
+      const nearestFood = sim.getNearestFood(cutie.position, 300);
+      if (nearestFood) {
+        const nearestFoodPolarPosition = toPolar(
+          sub(cutie.position, nearestFood.position)
+        );
 
-      if (nearestFoodPolarPosition.r < 10 && cutie.wantsToEat()) {
-        cutie.eat(nearestFood);
+        if (nearestFoodPolarPosition.r < 10 && cutie.wantsToEat()) {
+          cutie.eat(nearestFood);
+        }
+        simInput = {
+          nearestFood: nearestFoodPolarPosition,
+        };
       }
-      simInput = {
-        nearestFood: nearestFoodPolarPosition,
-      };
     }
 
     cutie.sim(simInput);
