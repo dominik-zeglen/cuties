@@ -5,14 +5,17 @@ import { len, Point, sub } from "../r2";
 import { Entity } from "../entities/entity";
 import { EntityLoader } from "../entities/loader";
 import {
+  shouldSpawnFlower,
   shouldSpawnFood,
   shouldSpawnRandomCutie,
   spawnRandomCutie,
   spawnRandomFood,
   spawnRandoms,
 } from "./spawn";
-import { cleanDepletedFood, cleanOutOfBounds } from "./gc";
-import { simCuties, simEggs, simWaste } from "./sim";
+import { cleanDepletedPellets, cleanOutOfBounds } from "./gc";
+import { simCuties, simEggs, simFlowers, simWaste } from "./sim";
+import { Constructor } from "../../../tsUtils";
+import { Waste } from "../entities/waste";
 
 export class Sim {
   bounds: Point[];
@@ -78,23 +81,36 @@ export class Sim {
 
   shouldSpawnFood = () => shouldSpawnFood(this.iteration, this.entityLoader);
 
+  shouldSpawnFlower = () =>
+    shouldSpawnFlower(this.iteration, this.entityLoader);
+
   shouldCleanupOutOfBounds = (): boolean => this.iteration % 60 === 0;
 
+  getNearest = <T extends Entity>(
+    point: Point,
+    kind: Constructor<Entity>,
+    radius: number
+  ): T[] =>
+    this.qtree
+      .retrieve({
+        height: radius,
+        width: radius,
+        x: point.x - radius / 2,
+        y: point.y - radius / 2,
+      })
+      .filter((entity) => entity instanceof kind) as unknown as T[];
+
   getNearestFood = (point: Point, radius: number): Food | undefined =>
-    minBy(
-      this.qtree
-        .retrieve({
-          height: radius,
-          width: radius,
-          x: point.x - radius / 2,
-          y: point.y - radius / 2,
-        })
-        .filter((entity) => entity instanceof Food) as Food[],
-      (food) => len(sub(food.position, point))
+    minBy(this.getNearest(point, Food, radius), (entity) =>
+      len(sub(entity.position, point))
     );
 
+  getNearestWaste = (point: Point, radius: number): Waste[] | undefined =>
+    this.getNearest(point, Waste, radius);
+
   clean = () => {
-    cleanDepletedFood(this.entityLoader.food);
+    cleanDepletedPellets(this.entityLoader.food);
+    cleanDepletedPellets(this.entityLoader.waste);
     if (this.iteration % 5) {
       cleanOutOfBounds(this.entities, this.bounds);
     }
@@ -134,6 +150,7 @@ export class Sim {
     this.entityLoader.init(this.entities);
 
     simCuties(this);
+    simFlowers(this);
     simEggs(this);
     simWaste(this);
 

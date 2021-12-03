@@ -1,6 +1,7 @@
 import type { Sim } from ".";
 import type { CutieSimInput } from "../entities/cutie";
 import { Food } from "../entities/food";
+import { Waste } from "../entities/waste";
 import { sub, toPolar } from "../r2";
 
 export function simCuties(sim: Sim) {
@@ -29,9 +30,31 @@ export function simCuties(sim: Sim) {
 
     if (cutie.shouldDumpWaste()) {
       const waste = cutie.dumpWaste(sim.entityCounter, sim.iteration);
-      if (sim.entityLoader.waste.length < 700) {
-        sim.registerEntity(waste);
-      }
+      sim.registerEntity(waste);
+    }
+
+    if (cutie.shouldDelete) {
+      const remains = new Waste(sim.entityCounter, sim.iteration, {
+        position: cutie.position,
+      });
+      remains.value = 100;
+      sim.registerEntity(remains);
+    }
+  });
+}
+
+export function simFlowers(sim: Sim) {
+  sim.entityLoader.flowers.forEach((flower) => {
+    flower.sim({
+      waste: sim.getNearestWaste(flower.position, 70),
+    });
+
+    if (flower.canProduce(sim.iteration)) {
+      sim.registerEntity(flower.produce(sim.entityCounter, sim.iteration));
+    }
+
+    if (flower.canSpawnFood()) {
+      sim.registerEntity(flower.spawnFood(sim.entityCounter, sim.iteration));
     }
   });
 }
@@ -45,13 +68,5 @@ export function simEggs(sim: Sim) {
 }
 
 export function simWaste(sim: Sim) {
-  sim.entityLoader.waste.forEach((waste) => {
-    if (waste.shouldBecomeFood(sim.iteration)) {
-      waste.shouldDelete = true;
-      const food = new Food(sim.entityCounter, sim.iteration, {
-        position: waste.position,
-      });
-      sim.registerEntity(food);
-    }
-  });
+  sim.entityLoader.waste.forEach((waste) => waste.sim());
 }

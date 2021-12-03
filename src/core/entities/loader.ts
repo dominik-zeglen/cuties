@@ -1,6 +1,7 @@
 import { Cutie } from "./cutie";
 import { Egg } from "./egg";
 import { Entity } from "./entity";
+import { Flower } from "./flowers";
 import { Food } from "./food";
 import { Waste } from "./waste";
 
@@ -9,6 +10,7 @@ export class EntityLoader {
 
   cachedFood: Food[] | null;
   cachedCuties: Cutie[] | null;
+  cachedFlowers: Flower[] | null;
   cachedEggs: Egg[] | null;
   cachedWaste: Waste[] | null;
 
@@ -21,6 +23,7 @@ export class EntityLoader {
 
     this.cachedFood = null;
     this.cachedCuties = null;
+    this.cachedFlowers = null;
     this.cachedEggs = null;
     this.cachedWaste = null;
   };
@@ -39,6 +42,16 @@ export class EntityLoader {
     }
 
     return this.entities.filter((entity) => entity instanceof Cutie) as Cutie[];
+  }
+
+  get flowers(): Flower[] {
+    if (this.cachedFlowers) {
+      return this.cachedFlowers;
+    }
+
+    return this.entities.filter(
+      (entity) => entity instanceof Flower
+    ) as Flower[];
   }
 
   get eggs(): Egg[] {

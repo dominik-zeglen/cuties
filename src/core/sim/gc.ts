@@ -1,11 +1,12 @@
 import { Entity } from "../entities/entity";
 import { Food } from "../entities/food";
+import { Waste } from "../entities/waste";
 import { Point } from "../r2";
 
-export function cleanDepletedFood(food: Food[]) {
-  food.forEach((foodPellet) => {
-    if (foodPellet.value <= 0) {
-      foodPellet.shouldDelete = true;
+export function cleanDepletedPellets(pellets: Array<Food | Waste>) {
+  pellets.forEach((pellet) => {
+    if (pellet.value <= 0) {
+      pellet.shouldDelete = true;
     }
   });
 }

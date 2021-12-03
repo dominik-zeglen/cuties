@@ -4,8 +4,9 @@ import Color from "color";
 import minBy from "lodash/minBy";
 import { Sim } from "./core/sim";
 import { theme } from "./components/theme";
-import { len, sub } from "./core/r2";
+import { add, len, sub, toCartesian } from "./core/r2";
 import { drawIndicator } from "./paint";
+import { maxValue } from "./core/entities/waste";
 
 function createColormap(nshades: number): string[] {
   return Array<Color>(nshades)
@@ -48,20 +49,13 @@ export const Cuties: React.FC<CutiesProps> = () => {
 
     const context = canvas.current.getContext("2d");
     context.clearRect(0, 0, canvas.current.width, canvas.current.height);
-    context.strokeStyle = theme.secondary.string();
-
-    sim.current.entityLoader.cuties.forEach((cutie) => {
-      context.beginPath();
-      context.rect(cutie.position.x - 4, cutie.position.y - 4, 5, 5);
-      context.stroke();
-    });
 
     context.strokeStyle = theme.primary.string();
     sim.current.entityLoader.food.forEach((food) => {
       context.beginPath();
       context.ellipse(
-        food.position.x - 2,
-        food.position.y - 2,
+        food.position.x,
+        food.position.y,
         3,
         3,
         -1,
@@ -76,8 +70,8 @@ export const Cuties: React.FC<CutiesProps> = () => {
     sim.current.entityLoader.eggs.forEach((egg) => {
       context.beginPath();
       context.ellipse(
-        egg.position.x - 2,
-        egg.position.y - 2,
+        egg.position.x,
+        egg.position.y,
         3,
         3,
         -1,
@@ -90,18 +84,44 @@ export const Cuties: React.FC<CutiesProps> = () => {
 
     context.fillStyle = theme.entities.dump.string();
     sim.current.entityLoader.waste.forEach((waste) => {
+      const size = (waste.value / maxValue) * 3 + 1;
+
       context.beginPath();
       context.ellipse(
-        waste.position.x - 2,
-        waste.position.y - 2,
-        3,
-        3,
+        waste.position.x,
+        waste.position.y,
+        size,
+        size,
         -1,
         0,
-        2 * 3.141,
+        2 * Math.PI,
         false
       );
       context.fill();
+    });
+
+    context.save();
+    context.strokeStyle = theme.primary.string();
+    context.lineWidth = 3;
+    sim.current.entityLoader.flowers.forEach((flower) => {
+      context.beginPath();
+      const directionVector = toCartesian({
+        angle: flower.angle,
+        r: 5,
+      });
+      const beginPos = sub(flower.position, directionVector);
+      const endPos = add(flower.position, directionVector);
+      context.moveTo(beginPos.x, beginPos.y);
+      context.lineTo(endPos.x, endPos.y);
+      context.stroke();
+    });
+    context.restore();
+
+    context.strokeStyle = theme.secondary.string();
+    sim.current.entityLoader.cuties.forEach((cutie) => {
+      context.beginPath();
+      context.rect(cutie.position.x - 4, cutie.position.y - 4, 5, 5);
+      context.stroke();
     });
 
     if (window.cuties.selected) {

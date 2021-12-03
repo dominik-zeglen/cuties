@@ -1,5 +1,6 @@
 import type { Sim } from ".";
 import { getRandomCutie } from "../entities/cutie";
+import { getRandomFlower } from "../entities/flowers";
 import { Food } from "../entities/food";
 import type { EntityLoader } from "../entities/loader";
 import { getRandomPositionInBounds } from "../r2";
@@ -12,7 +13,13 @@ export function shouldSpawnRandomCutie(
 }
 
 export function shouldSpawnFood(it: number, loader: EntityLoader): boolean {
-  return it % 30 === 0 && loader.food.length < 800 - loader.cuties.length * 50;
+  return it % 30 === 0 && loader.food.length < 800 - loader.cuties.length * 15;
+}
+
+export function shouldSpawnFlower(it: number, loader: EntityLoader): boolean {
+  return (
+    it % 30 === 0 && loader.flowers.length < 10 && loader.waste.length > 20
+  );
 }
 
 export function spawnRandomFood(sim: Sim) {
@@ -20,6 +27,11 @@ export function spawnRandomFood(sim: Sim) {
     position: getRandomPositionInBounds(sim.bounds),
   });
   sim.registerEntity(food);
+}
+
+export function spawnRandomFlower(sim: Sim) {
+  const flower = getRandomFlower(sim.entityCounter, sim.iteration, sim.bounds);
+  sim.registerEntity(flower);
 }
 
 export function spawnRandomCutie(sim: Sim) {
@@ -35,5 +47,9 @@ export function spawnRandoms(sim: Sim) {
 
   if (sim.shouldSpawnFood()) {
     spawnRandomFood(sim);
+  }
+
+  if (sim.shouldSpawnFlower()) {
+    spawnRandomFlower(sim);
   }
 }

@@ -61,6 +61,7 @@
     "clsx": "^1.1.1",
     "color": "^4.0.1",
     "colormap": "^2.3.2",
+    "lindenmayer": "^1.5.4",
     "lodash": "^4.17.21",
     "mathjs": "^10.0.0",
     "react": "^17.0.2",

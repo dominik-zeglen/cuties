@@ -18,8 +18,9 @@ import { Food } from "./food";
 import { Waste } from "./waste";
 
 const maxHunger = 2000;
-const initialHunger = maxHunger / 4;
 const eggCost = 1000;
+const initialHunger = maxHunger - eggCost * 0.9;
+const eatingRate = 40;
 
 export interface CutieSimInput {
   nearestFood: PolarPoint;
@@ -68,7 +69,7 @@ export class Cutie extends Entity {
     }
 
     const distance = this.thoughts.speed * 2;
-    this.angle += this.thoughts.angle * 4;
+    this.angle += ((this.thoughts.angle * Math.PI) / 180) * 22;
 
     this.position = add(
       this.position,
@@ -91,22 +92,21 @@ export class Cutie extends Entity {
   };
 
   eat = (food: Food) => {
-    this.hunger -= food.value;
+    this.hunger -= eatingRate;
     if (this.hunger < 0) {
       food.value = -this.hunger;
       this.hunger = 0;
     } else {
-      food.value = 0;
+      food.value -= eatingRate;
     }
   };
 
-  wantsToEat = (): boolean => this.thoughts.eat > 0;
+  wantsToEat = (): boolean => this.thoughts.eat > -0.5;
 
-  wantsToLayEgg = (): boolean => this.thoughts.layEgg > 0;
+  wantsToLayEgg = (): boolean => this.thoughts.layEgg > -0.5;
 
   canLayEgg = (it: number): boolean =>
-    this.hunger < maxHunger - eggCost &&
-    it - this.lastEggLaying > initialHunger;
+    this.hunger + eggCost * 1.1 < maxHunger && it - this.lastEggLaying > 1000;
 
   layEgg = (id: number, it: number): Egg => {
     const egg = new Egg(id, it, this);
