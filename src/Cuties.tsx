@@ -4,8 +4,8 @@ import Color from "color";
 import minBy from "lodash/minBy";
 import { Sim } from "./core/sim";
 import { theme } from "./components/theme";
-import { add, len, sub, toCartesian } from "./core/r2";
-import { drawIndicator } from "./paint";
+import { len, sub } from "./core/r2";
+import { drawFlower, drawIndicator } from "./paint";
 import { maxValue } from "./core/entities/waste";
 import { defaultInitialFoodValue } from "./core/entities/food";
 
@@ -103,20 +103,10 @@ export const Cuties: React.FC<CutiesProps> = () => {
       context.fill();
     });
 
-    context.save();
     context.strokeStyle = theme.primary.string();
-    context.lineWidth = 2;
-    sim.current.entityLoader.flowerRoots.forEach((flower) => {
-      context.beginPath();
-      context.moveTo(flower.position.x, flower.position.y);
-      let node = flower;
-      while (node.next) {
-        context.lineTo(node.next.position.x, node.next.position.y);
-        node = node.next;
-      }
-      context.stroke();
-    });
-    context.restore();
+    sim.current.entityLoader.flowerRoots.forEach((flower) =>
+      drawFlower(context, flower)
+    );
 
     context.strokeStyle = theme.secondary.string();
     sim.current.entityLoader.cuties.forEach((cutie) => {

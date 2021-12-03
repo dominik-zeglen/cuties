@@ -1,6 +1,12 @@
 import LSystem from "lindenmayer";
 import { Entity, InitialEntityInput } from "./entity";
-import { add, getRandomPositionInBounds, Point, toCartesian } from "../r2";
+import {
+  add,
+  getRandomPositionInBounds,
+  Point,
+  PolarPoint,
+  toCartesian,
+} from "../r2";
 import { Waste } from "./waste";
 import { Food } from "./food";
 
@@ -27,7 +33,7 @@ export interface InitialFlowerInput extends InitialEntityInput {
 export class Flower extends Entity {
   angle: number;
   parent: Flower | null;
-  next: Flower | null;
+  next: Flower[] | null;
   hunger: number;
   produces: string | null;
   wasteStored: number;
@@ -36,7 +42,7 @@ export class Flower extends Entity {
   constructor(id: number, it: number, initial: InitialFlowerInput) {
     super(id, it, initial);
     this.angle = initial.angle;
-    this.next = null;
+    this.next = [];
     this.parent = initial.parent;
     this.produces = initial.produces;
     this.hunger = initialHunger;
@@ -46,14 +52,22 @@ export class Flower extends Entity {
   die = () => {
     this.shouldDelete = true;
     if (this.next) {
-      this.next.parent = null;
-      if (Math.random() < 0.05) {
-        this.next.die();
-      }
+      this.next.forEach((node) => {
+        node.parent = null;
+        if (Math.random() < 0.05) {
+          node.die();
+        }
+      });
     }
     if (this.parent) {
-      this.parent.next = null;
+      this.parent.next = this.parent.next.filter((node) => node.id !== this.id);
     }
+  };
+
+  applyForce = (forceVec?: PolarPoint) => {
+    const force = forceVec ?? { angle: this.angle, r: 0.01 };
+    this.position = add(this.position, toCartesian(force));
+    this.next.forEach((node) => node.applyForce(force));
   };
 
   sim = (simInput: FlowerSimInput | null): void => {
@@ -78,14 +92,23 @@ export class Flower extends Entity {
     }
 
     if (direction === null) {
-      if (this.next && this.next.eat(waste, "forward")) {
-        return true;
+      if (this.next.length) {
+        for (let node = 0; node < this.next.length; node++) {
+          if (this.next[node].eat(waste, direction)) {
+            return true;
+          }
+        }
       }
       return this.parent && this.parent.eat(waste, "backward");
     }
 
     if (this.next && direction === "forward") {
-      return this.next.eat(waste, direction);
+      for (let node = 0; node < this.next.length; node++) {
+        if (this.next[node].eat(waste, direction)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     if (this.parent && direction === "backward") {
@@ -102,10 +125,12 @@ export class Flower extends Entity {
 
   canProduce = (it: number): boolean =>
     this.hunger + produceCost + 100 < maxHunger &&
-    !this.next &&
+    this.next.length === 0 &&
     it - this.createdAt > 1000;
 
-  produce = (id: number, it: number): Flower => {
+  produce = (id: number, it: number): Flower[] => {
+    let { angle } = this;
+
     const system = new LSystem({
       axiom: "N",
       productions: {
@@ -113,43 +138,53 @@ export class Flower extends Entity {
           successors: [
             {
               weight: 0.15,
-              successor: "N+",
+              successor: "+N",
             },
             {
               weight: 0.15,
-              successor: "N-",
+              successor: "-N",
             },
             {
-              weight: 0.6,
+              weight: 0.5,
               successor: "N",
             },
             {
               weight: 0.1,
-              successor: "N++",
+              successor: "++N",
+            },
+            {
+              weight: 0.05,
+              successor: "++N---N",
+            },
+            {
+              weight: 0.05,
+              successor: "++N--N",
             },
           ],
         },
       },
       finals: {
         N: () => {
-          this.next = new Flower(id, it, {
-            angle: this.angle,
-            parent: this,
-            position: add(
-              this.position,
-              toCartesian({
-                angle: this.angle,
-                r: 30,
-              })
-            ),
-            produces: null,
-          });
+          this.next.push(
+            new Flower(id, it, {
+              angle,
+              parent: this,
+              position: add(
+                this.position,
+                toCartesian({
+                  angle,
+                  r: 30,
+                })
+              ),
+              produces: null,
+            })
+          );
         },
         "+": () => {
-          this.next.angle += Math.PI / 6;
+          angle += Math.PI / 6;
         },
         "-": () => {
-          this.next.angle -= Math.PI / 6;
+          angle -= Math.PI / 6;
         },
       },
     });

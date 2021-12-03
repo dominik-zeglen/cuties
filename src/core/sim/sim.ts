@@ -54,13 +54,19 @@ export function simFlowers(sim: Sim) {
     });
 
     if (flower.canProduce(sim.iteration)) {
-      sim.registerEntity(flower.produce(sim.entityCounter, sim.iteration));
+      flower
+        .produce(sim.entityCounter, sim.iteration)
+        .forEach(sim.registerEntity);
     }
 
     if (flower.canSpawnFood()) {
       sim.registerEntity(flower.spawnFood(sim.entityCounter, sim.iteration));
     }
   });
+}
+
+export function simFlowerRoots(sim: Sim) {
+  sim.entityLoader.flowerRoots.forEach((root) => root.applyForce());
 }
 
 export function simEggs(sim: Sim) {
