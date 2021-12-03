@@ -7,6 +7,7 @@ import { theme } from "./components/theme";
 import { add, len, sub, toCartesian } from "./core/r2";
 import { drawIndicator } from "./paint";
 import { maxValue } from "./core/entities/waste";
+import { defaultInitialFoodValue } from "./core/entities/food";
 
 function createColormap(nshades: number): string[] {
   return Array<Color>(nshades)
@@ -52,12 +53,14 @@ export const Cuties: React.FC<CutiesProps> = () => {
 
     context.strokeStyle = theme.primary.string();
     sim.current.entityLoader.food.forEach((food) => {
+      const size = (food.value / defaultInitialFoodValue) * 3 + 1;
+
       context.beginPath();
       context.ellipse(
         food.position.x,
         food.position.y,
-        3,
-        3,
+        size,
+        size,
         -1,
         0,
         2 * 3.141,

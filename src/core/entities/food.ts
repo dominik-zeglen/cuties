@@ -1,6 +1,6 @@
 import { Entity, InitialEntityInput } from "./entity";
 
-const defaultInitialFoodValue = 1000;
+export const defaultInitialFoodValue = 1000;
 
 export interface InitialFoodInput extends InitialEntityInput {
   value?: number;
