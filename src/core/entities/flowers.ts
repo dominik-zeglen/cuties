@@ -47,6 +47,9 @@ export class Flower extends Entity {
     this.shouldDelete = true;
     if (this.next) {
       this.next.parent = null;
+      if (Math.random() < 0.05) {
+        this.next.die();
+      }
     }
     if (this.parent) {
       this.parent.next = null;

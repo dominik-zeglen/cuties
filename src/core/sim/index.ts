@@ -13,7 +13,7 @@ import {
   spawnRandoms,
 } from "./spawn";
 import { cleanDepletedPellets, cleanOutOfBounds } from "./gc";
-import { simCuties, simEggs, simFlowers, simWaste } from "./sim";
+import { simCuties, simEggs, simFlowers, simFood, simWaste } from "./sim";
 import { Constructor } from "../../../tsUtils";
 import { Waste } from "../entities/waste";
 
@@ -153,6 +153,7 @@ export class Sim {
     simFlowers(this);
     simEggs(this);
     simWaste(this);
+    simFood(this);
 
     spawnRandoms(this);
 

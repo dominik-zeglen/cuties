@@ -74,3 +74,7 @@ export function simEggs(sim: Sim) {
 export function simWaste(sim: Sim) {
   sim.entityLoader.waste.forEach((waste) => waste.sim());
 }
+
+export function simFood(sim: Sim) {
+  sim.entityLoader.food.forEach((food) => food.sim());
+}
