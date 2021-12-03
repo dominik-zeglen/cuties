@@ -13,6 +13,7 @@ export class EntityLoader {
   cachedFlowers: Flower[] | null;
   cachedEggs: Egg[] | null;
   cachedWaste: Waste[] | null;
+  cachedFlowerRoots: Flower[] | null;
 
   constructor() {
     this.entities = [];
@@ -26,6 +27,7 @@ export class EntityLoader {
     this.cachedFlowers = null;
     this.cachedEggs = null;
     this.cachedWaste = null;
+    this.cachedFlowerRoots = null;
   };
 
   get food(): Food[] {
@@ -52,6 +54,16 @@ export class EntityLoader {
     return this.entities.filter(
       (entity) => entity instanceof Flower
     ) as Flower[];
+  }
+
+  get flowerRoots(): Flower[] {
+    if (this.cachedFlowers) {
+      return this.cachedFlowers;
+    }
+
+    return (
+      this.entities.filter((entity) => entity instanceof Flower) as Flower[]
+    ).filter((flower) => !flower.parent);
   }
 
   get eggs(): Egg[] {
