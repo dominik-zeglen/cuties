@@ -4,28 +4,6 @@ import { add, getRandomPositionInBounds, Point, toCartesian } from "../r2";
 import { Waste } from "./waste";
 import { Food } from "./food";
 
-const system = new LSystem({
-  axiom: "N",
-  productions: {
-    N: {
-      successors: [
-        {
-          weight: 0.15,
-          successor: "N+",
-        },
-        {
-          weight: 0.15,
-          successor: "N-",
-        },
-        {
-          weight: 0.7,
-          successor: "N",
-        },
-      ],
-    },
-  },
-});
-
 const maxHunger = 2000;
 const produceCost = 400;
 const initialHunger = maxHunger - produceCost * 0.9;
@@ -116,8 +94,28 @@ export class Flower extends Entity {
     it - this.createdAt > 1000;
 
   produce = (id: number, it: number): Flower => {
-    this.hunger += produceCost;
-    const nextAxiom = system.iterate(1);
+    const system = new LSystem({
+      axiom: "N",
+      productions: {
+        N: {
+          successors: [
+            {
+              weight: 0.15,
+              successor: "N+",
+            },
+            {
+              weight: 0.15,
+              successor: "N-",
+            },
+            {
+              weight: 0.7,
+              successor: "N",
+            },
+          ],
+        },
+      },
+    });
+    const nextAxiom = system.iterate();
 
     this.next = new Flower(id, it, {
       angle:
@@ -136,13 +134,17 @@ export class Flower extends Entity {
       ),
       produces: null,
     });
+    this.hunger += produceCost;
 
     return this.next;
   };
 
   spawnFood = (id: number, it: number): Food => {
     const food = new Food(id, it, {
-      position: this.position,
+      position: add(this.position, {
+        x: (Math.random() - 0.5) * 20,
+        y: (Math.random() - 0.5) * 20,
+      }),
       value: foodValue,
     });
     this.hunger += foodEnergyCostRatio * foodValue;
