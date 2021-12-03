@@ -15,8 +15,8 @@ export function drawIndicator(
   context.strokeStyle = theme.primary.string();
   context.beginPath();
   context.ellipse(
-    opts.entity.position.x - 2,
-    opts.entity.position.y - 2,
+    opts.entity.position.x,
+    opts.entity.position.y,
     9,
     9,
     -1,
@@ -28,7 +28,7 @@ export function drawIndicator(
 
   if (opts.entity.angle !== undefined) {
     context.beginPath();
-    context.moveTo(opts.entity.position.x - 2, opts.entity.position.y - 2);
+    context.moveTo(opts.entity.position.x, opts.entity.position.y);
     const angleIndicator = add(
       toCartesian({
         r: 20,
@@ -36,7 +36,7 @@ export function drawIndicator(
       }),
       opts.entity.position
     );
-    context.lineTo(angleIndicator.x - 2, angleIndicator.y - 2);
+    context.lineTo(angleIndicator.x, angleIndicator.y);
     context.stroke();
   }
 }

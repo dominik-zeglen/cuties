@@ -105,7 +105,7 @@ export const Cuties: React.FC<CutiesProps> = () => {
 
     context.save();
     context.strokeStyle = theme.primary.string();
-    context.lineWidth = 3;
+    context.lineWidth = 2;
     sim.current.entityLoader.flowers.forEach((flower) => {
       context.beginPath();
       const directionVector = toCartesian({
@@ -123,7 +123,7 @@ export const Cuties: React.FC<CutiesProps> = () => {
     context.strokeStyle = theme.secondary.string();
     sim.current.entityLoader.cuties.forEach((cutie) => {
       context.beginPath();
-      context.rect(cutie.position.x - 4, cutie.position.y - 4, 5, 5);
+      context.rect(cutie.position.x - 2, cutie.position.y - 2, 5, 5);
       context.stroke();
     });
 
