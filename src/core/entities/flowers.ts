@@ -1,17 +1,30 @@
+import LSystem from "lindenmayer";
 import { Entity, InitialEntityInput } from "./entity";
 import { add, getRandomPositionInBounds, Point, toCartesian } from "../r2";
 import { Waste } from "./waste";
 import { Food } from "./food";
-//   import LSystem from 'lindenmayer'
 
-//   const system = new LSystem({
-//       axiom:"N",
-//       productions:{
-//           N: [{
-//               symbol:'F+F-'
-//           }]
-//       }
-//   })
+const system = new LSystem({
+  axiom: "N",
+  productions: {
+    N: {
+      successors: [
+        {
+          weight: 0.15,
+          successor: "N+",
+        },
+        {
+          weight: 0.15,
+          successor: "N-",
+        },
+        {
+          weight: 0.7,
+          successor: "N",
+        },
+      ],
+    },
+  },
+});
 
 const maxHunger = 2000;
 const produceCost = 400;
@@ -104,8 +117,15 @@ export class Flower extends Entity {
 
   produce = (id: number, it: number): Flower => {
     this.hunger += produceCost;
+    const nextAxiom = system.iterate(1);
+
     this.next = new Flower(id, it, {
-      angle: this.angle,
+      angle:
+        nextAxiom === "N+"
+          ? this.angle + Math.PI / 6
+          : nextAxiom === "N+"
+          ? this.angle - Math.PI / 6
+          : this.angle,
       parent: this,
       position: add(
         this.position,

@@ -1,6 +1,5 @@
 import type { Sim } from ".";
 import type { CutieSimInput } from "../entities/cutie";
-import { Food } from "../entities/food";
 import { Waste } from "../entities/waste";
 import { sub, toPolar } from "../r2";
 
@@ -8,7 +7,7 @@ export function simCuties(sim: Sim) {
   sim.entityLoader.cuties.forEach((cutie) => {
     let simInput: CutieSimInput | null = null;
     if (sim.entityLoader.food.length && sim.iteration % 2 === 0) {
-      const nearestFood = sim.getNearestFood(cutie.position, 300);
+      const nearestFood = sim.getNearestFood(cutie.position, 400);
       if (nearestFood) {
         const nearestFoodPolarPosition = toPolar(
           sub(cutie.position, nearestFood.position)
@@ -19,6 +18,10 @@ export function simCuties(sim: Sim) {
         }
         simInput = {
           nearestFood: nearestFoodPolarPosition,
+        };
+      } else {
+        simInput = {
+          nearestFood: { angle: 0, r: 0 },
         };
       }
     }
