@@ -1,4 +1,3 @@
-import QuadTree from "@timohausmann/quadtree-js";
 import minBy from "lodash/minBy";
 import { Food } from "../entities/food";
 import { len, Point, sub } from "../r2";
@@ -32,7 +31,6 @@ export class Sim {
   selected: string | null;
   entityLoader: EntityLoader;
   entityCounter: number;
-  qtree: QuadTree;
 
   constructor(width: number, height: number) {
     this.entities = [];
@@ -42,14 +40,8 @@ export class Sim {
       { x: 0, y: 0 },
       { x: width, y: height },
     ];
-    this.entityLoader = new EntityLoader();
+    this.entityLoader = new EntityLoader(width, height);
     this.selected = null;
-    this.qtree = new QuadTree({
-      height,
-      width,
-      x: 0,
-      y: 0,
-    });
 
     while (this.shouldSpawnFood()) {
       spawnRandomFood(this);
@@ -94,26 +86,25 @@ export class Sim {
   shouldCleanupOutOfBounds = (): boolean => this.iteration % 60 === 0;
 
   getNearest = <T extends Entity>(
+    qtree: Quadtree,
     point: Point,
-    kind: Constructor<Entity>,
     radius: number
   ): T[] =>
-    this.qtree
-      .retrieve({
-        height: radius,
-        width: radius,
-        x: point.x - radius / 2,
-        y: point.y - radius / 2,
-      })
-      .filter((entity) => entity instanceof kind) as unknown as T[];
+    qtree.retrieve({
+      height: radius,
+      width: radius,
+      x: point.x - radius / 2,
+      y: point.y - radius / 2,
+    }) as T[];
 
   getNearestFood = (point: Point, radius: number): Food | undefined =>
-    minBy(this.getNearest(point, Food, radius), (entity) =>
-      len(sub(entity.position, point))
+    minBy(
+      this.getNearest(this.entityLoader.foodQTree, point, radius),
+      (entity) => len(sub(entity.position, point))
     );
 
   getNearestWaste = (point: Point, radius: number): Waste[] | undefined =>
-    this.getNearest(point, Waste, radius);
+    this.getNearest(this.entityLoader.wasteQTree, point, radius);
 
   clean = () => {
     cleanDepletedPellets(this.entityLoader.food);
@@ -152,8 +143,6 @@ export class Sim {
       return;
     }
 
-    this.qtree.clear();
-    this.entities.forEach((entity) => this.qtree.insert(entity));
     this.entityLoader.init(this.entities);
 
     simCuties(this);

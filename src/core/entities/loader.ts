@@ -1,3 +1,4 @@
+import QuadTree from "@timohausmann/quadtree-js";
 import { Cutie } from "./cutie";
 import { Egg } from "./egg";
 import { Entity } from "./entity";
@@ -15,8 +16,29 @@ export class EntityLoader {
   cachedWaste: Waste[] | null;
   cachedFlowerRoots: Flower[] | null;
 
-  constructor() {
+  width: number;
+  height: number;
+
+  qtrees: Record<"food" | "waste", Quadtree | null>;
+
+  constructor(width: number, height: number) {
     this.entities = [];
+    this.width = width;
+    this.height = height;
+    this.qtrees = {
+      food: new QuadTree({
+        height: this.height,
+        width: this.width,
+        x: 0,
+        y: 0,
+      }),
+      waste: new QuadTree({
+        height: this.height,
+        width: this.width,
+        x: 0,
+        y: 0,
+      }),
+    };
   }
 
   init = (entities: Entity[]) => {
@@ -28,57 +50,81 @@ export class EntityLoader {
     this.cachedEggs = null;
     this.cachedWaste = null;
     this.cachedFlowerRoots = null;
+
+    this.qtrees.food.clear();
+    this.qtrees.waste.clear();
   };
 
   get food(): Food[] {
-    if (this.cachedFood) {
-      return this.cachedFood;
+    if (!this.cachedFood) {
+      this.cachedFood = this.entities.filter(
+        (entity) => entity instanceof Food
+      ) as Food[];
     }
 
-    return this.entities.filter((entity) => entity instanceof Food) as Food[];
+    return this.cachedFood;
+  }
+
+  get foodQTree(): QuadTree {
+    if (this.qtrees.food.objects.length === 0) {
+      this.food.forEach((food) => this.qtrees.food.insert(food));
+    }
+
+    return this.qtrees.food;
   }
 
   get cuties(): Cutie[] {
-    if (this.cachedCuties) {
-      return this.cachedCuties;
+    if (!this.cachedCuties) {
+      this.cachedCuties = this.entities.filter(
+        (entity) => entity instanceof Cutie
+      ) as Cutie[];
     }
-
-    return this.entities.filter((entity) => entity instanceof Cutie) as Cutie[];
+    return this.cachedCuties;
   }
 
   get flowers(): Flower[] {
-    if (this.cachedFlowers) {
-      return this.cachedFlowers;
+    if (!this.cachedFlowers) {
+      this.cachedFlowers = this.entities.filter(
+        (entity) => entity instanceof Flower
+      ) as Flower[];
     }
 
-    return this.entities.filter(
-      (entity) => entity instanceof Flower
-    ) as Flower[];
+    return this.cachedFlowers;
   }
 
   get flowerRoots(): Flower[] {
-    if (this.cachedFlowers) {
-      return this.cachedFlowers;
+    if (!this.cachedFlowerRoots) {
+      this.cachedFlowerRoots = this.flowers.filter((flower) => !flower.parent);
     }
 
-    return (
-      this.entities.filter((entity) => entity instanceof Flower) as Flower[]
-    ).filter((flower) => !flower.parent);
+    return this.cachedFlowers;
   }
 
   get eggs(): Egg[] {
-    if (this.cachedEggs) {
-      return this.cachedEggs;
+    if (!this.cachedEggs) {
+      this.cachedEggs = this.entities.filter(
+        (entity) => entity instanceof Egg
+      ) as Egg[];
     }
 
-    return this.entities.filter((entity) => entity instanceof Egg) as Egg[];
+    return this.cachedEggs;
   }
 
   get waste(): Waste[] {
-    if (this.cachedWaste) {
-      return this.cachedWaste;
+    if (!this.cachedWaste) {
+      this.cachedWaste = this.entities.filter(
+        (entity) => entity instanceof Waste
+      ) as Waste[];
     }
 
-    return this.entities.filter((entity) => entity instanceof Waste) as Waste[];
+    return this.cachedWaste;
+  }
+
+  get wasteQTree(): QuadTree {
+    if (this.qtrees.waste.objects.length === 0) {
+      this.waste.forEach((waste) => this.qtrees.waste.insert(waste));
+    }
+
+    return this.qtrees.waste;
   }
 }
