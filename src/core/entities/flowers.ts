@@ -67,8 +67,11 @@ export class Flower extends Entity {
   applyForce = (forceVec?: PolarPoint) => {
     const force = forceVec ?? { angle: this.angle, r: 0.01 };
     this.position = add(this.position, toCartesian(force));
-    this.next.forEach((node) => node.applyForce(force));
+    this.getChildren().forEach((node) => node.applyForce(force));
   };
+
+  getChildren = (): Flower[] =>
+    this.next.reduce((acc, node) => [...acc, ...node.getChildren()], []);
 
   sim = (simInput: FlowerSimInput | null): void => {
     simInput.waste.forEach((waste) => this.eat(waste, null));
@@ -199,8 +202,8 @@ export class Flower extends Entity {
   spawnFood = (id: number, it: number): Food => {
     const food = new Food(id, it, {
       position: add(this.position, {
-        x: (Math.random() - 0.5) * 20,
-        y: (Math.random() - 0.5) * 20,
+        x: (Math.random() - 0.5) * 40,
+        y: (Math.random() - 0.5) * 40,
       }),
       value: foodValue,
     });
