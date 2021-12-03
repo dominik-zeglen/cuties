@@ -14,6 +14,7 @@ const foodEnergyCostRatio = 0.25;
 export type EatDirection = "forward" | "backward" | null;
 
 export interface FlowerSimInput {
+  iteration: number;
   waste: Waste[];
 }
 
@@ -42,19 +43,27 @@ export class Flower extends Entity {
     this.sunlightStored = 0;
   }
 
+  die = () => {
+    this.shouldDelete = true;
+    if (this.next) {
+      this.next.parent = null;
+    }
+    if (this.parent) {
+      this.parent.next = null;
+    }
+  };
+
   sim = (simInput: FlowerSimInput | null): void => {
     simInput.waste.forEach((waste) => this.eat(waste, null));
     this.hunger += eatingRate / 3;
     this.sunlightStored += 0.45;
 
     if (this.hunger > maxHunger) {
-      this.shouldDelete = true;
-      if (this.next) {
-        this.next.parent = null;
-      }
-      if (this.parent) {
-        this.parent.next = null;
-      }
+      this.die();
+    }
+
+    if (simInput.iteration - this.createdAt > 10000 && Math.random() < 0.0001) {
+      this.die();
     }
   };
 
@@ -108,32 +117,42 @@ export class Flower extends Entity {
               successor: "N-",
             },
             {
-              weight: 0.7,
+              weight: 0.6,
               successor: "N",
+            },
+            {
+              weight: 0.1,
+              successor: "N++",
             },
           ],
         },
       },
+      finals: {
+        N: () => {
+          this.next = new Flower(id, it, {
+            angle: this.angle,
+            parent: this,
+            position: add(
+              this.position,
+              toCartesian({
+                angle: this.angle,
+                r: 30,
+              })
+            ),
+            produces: null,
+          });
+        },
+        "+": () => {
+          this.next.angle += Math.PI / 6;
+        },
+        "-": () => {
+          this.next.angle -= Math.PI / 6;
+        },
+      },
     });
-    const nextAxiom = system.iterate();
+    system.iterate();
+    system.final();
 
-    this.next = new Flower(id, it, {
-      angle:
-        nextAxiom === "N+"
-          ? this.angle + Math.PI / 6
-          : nextAxiom === "N+"
-          ? this.angle - Math.PI / 6
-          : this.angle,
-      parent: this,
-      position: add(
-        this.position,
-        toCartesian({
-          angle: this.angle,
-          r: 30,
-        })
-      ),
-      produces: null,
-    });
     this.hunger += produceCost;
 
     return this.next;

@@ -17,10 +17,12 @@ declare module "lindenmayer" {
   export interface LSystemInit<T extends {} = {}> {
     axiom: string;
     productions: Record<string, string | Array<Production & T> | Successors>;
+    finals: Record<string, () => void>;
   }
   export default class LSystem {
     constructor(opts: LSystemInit);
 
     iterate: (its?: number) => string;
+    final: () => void;
   }
 }

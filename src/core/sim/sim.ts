@@ -49,6 +49,7 @@ export function simCuties(sim: Sim) {
 export function simFlowers(sim: Sim) {
   sim.entityLoader.flowers.forEach((flower) => {
     flower.sim({
+      iteration: sim.iteration,
       waste: sim.getNearestWaste(flower.position, 70),
     });
 
