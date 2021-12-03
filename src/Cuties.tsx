@@ -110,7 +110,7 @@ export const Cuties: React.FC<CutiesProps> = () => {
       context.beginPath();
       const directionVector = toCartesian({
         angle: flower.angle,
-        r: 5,
+        r: 15,
       });
       const beginPos = sub(flower.position, directionVector);
       const endPos = add(flower.position, directionVector);

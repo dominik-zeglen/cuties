@@ -131,7 +131,7 @@ export class Flower extends Entity {
         this.position,
         toCartesian({
           angle: this.angle,
-          r: 10,
+          r: 30,
         })
       ),
       produces: null,
