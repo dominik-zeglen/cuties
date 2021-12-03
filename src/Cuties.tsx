@@ -108,13 +108,6 @@ export const Cuties: React.FC<CutiesProps> = () => {
     context.lineWidth = 2;
     sim.current.entityLoader.flowerRoots.forEach((flower) => {
       context.beginPath();
-      // const directionVector = toCartesian({
-      //   angle: flower.angle,
-      //   r: 15,
-      // });
-      // const beginPos = sub(, directionVector);
-      // const endPos = add(flower.position, directionVector);
-      // context.lineTo(endPos.x, endPos.y);
       context.moveTo(flower.position.x, flower.position.y);
       let node = flower;
       while (node.next) {
