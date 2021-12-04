@@ -18,11 +18,13 @@ import { Food } from "./food";
 import { Waste } from "./waste";
 
 const maxHunger = 2000;
-const eggCost = 1000;
+const eggCost = 1200;
 const initialHunger = maxHunger - eggCost * 0.9;
-const eatingRate = 40;
+const eatingRate = 10;
+const droppedWasteValue = 550;
 
 export interface CutieSimInput {
+  iteration: number;
   nearestFood: PolarPoint;
 }
 
@@ -56,6 +58,10 @@ export class Cutie extends Entity {
     this.wasteStored = 0;
   }
 
+  die = () => {
+    this.shouldDelete = true;
+  };
+
   sim = (simInput: CutieSimInput | null): void => {
     if (simInput) {
       const input: CutieInput = {
@@ -87,7 +93,11 @@ export class Cutie extends Entity {
     this.wasteStored += energy;
 
     if (this.hunger > maxHunger) {
-      this.shouldDelete = true;
+      this.die();
+    }
+
+    if (simInput.iteration - this.createdAt > 10000 && Math.random() < 0.001) {
+      this.die();
     }
   };
 
@@ -116,12 +126,13 @@ export class Cutie extends Entity {
     return egg;
   };
 
-  shouldDumpWaste = (): boolean => this.wasteStored > 1000;
+  shouldDumpWaste = (): boolean => this.wasteStored > droppedWasteValue;
 
   dumpWaste = (id: number, it: number): Waste => {
-    this.wasteStored -= 1000;
+    this.wasteStored -= droppedWasteValue;
     return new Waste(id, it, {
       position: this.position,
+      value: droppedWasteValue,
     });
   };
 }

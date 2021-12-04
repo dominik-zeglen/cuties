@@ -1,29 +1,30 @@
 import type { Sim } from ".";
 import type { CutieSimInput } from "../entities/cutie";
+import { Flower } from "../entities/flowers";
 import { Waste } from "../entities/waste";
 import { sub, toPolar } from "../r2";
 
 export function simCuties(sim: Sim) {
   sim.entityLoader.cuties.forEach((cutie) => {
     let simInput: CutieSimInput | null = null;
-    if (sim.entityLoader.food.length && sim.iteration % 2 === 0) {
-      const nearestFood = sim.getNearestFood(cutie.position, 400);
-      if (nearestFood) {
-        const nearestFoodPolarPosition = toPolar(
-          sub(cutie.position, nearestFood.position)
-        );
+    const nearestFood = sim.getNearestFood(cutie.position, 400);
+    if (nearestFood) {
+      const nearestFoodPolarPosition = toPolar(
+        sub(cutie.position, nearestFood.position)
+      );
 
-        if (nearestFoodPolarPosition.r < 10 && cutie.wantsToEat()) {
-          cutie.eat(nearestFood);
-        }
-        simInput = {
-          nearestFood: nearestFoodPolarPosition,
-        };
-      } else {
-        simInput = {
-          nearestFood: { angle: 0, r: 0 },
-        };
+      if (nearestFoodPolarPosition.r < 10 && cutie.wantsToEat()) {
+        cutie.eat(nearestFood);
       }
+      simInput = {
+        iteration: sim.iteration,
+        nearestFood: nearestFoodPolarPosition,
+      };
+    } else {
+      simInput = {
+        iteration: sim.iteration,
+        nearestFood: { angle: 0, r: 0 },
+      };
     }
 
     cutie.sim(simInput);
@@ -46,22 +47,30 @@ export function simCuties(sim: Sim) {
   });
 }
 
+function simFlower(flower: Flower, sim: Sim) {
+  flower.sim({
+    iteration: sim.iteration,
+    waste: sim.getNearestWaste(flower.position, 80),
+  });
+
+  if (flower.canProduce(sim.iteration)) {
+    flower
+      .produce(sim.entityCounter, sim.iteration)
+      .forEach(sim.registerEntity);
+  }
+
+  if (flower.canSpawnFood()) {
+    sim.registerEntity(flower.spawnFood(sim.entityCounter, sim.iteration));
+  }
+}
+
 export function simFlowers(sim: Sim) {
-  sim.entityLoader.flowers.forEach((flower) => {
-    flower.sim({
-      iteration: sim.iteration,
-      waste: sim.getNearestWaste(flower.position, 70),
+  sim.entityLoader.flowerRoots.forEach((root) => {
+    simFlower(root, sim);
+    root.next.forEach((node) => {
+      simFlower(node, sim);
+      node.next.forEach((nextNode) => simFlower(nextNode, sim));
     });
-
-    if (flower.canProduce(sim.iteration)) {
-      flower
-        .produce(sim.entityCounter, sim.iteration)
-        .forEach(sim.registerEntity);
-    }
-
-    if (flower.canSpawnFood()) {
-      sim.registerEntity(flower.spawnFood(sim.entityCounter, sim.iteration));
-    }
   });
 }
 

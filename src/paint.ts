@@ -43,18 +43,16 @@ export function drawIndicator(
 }
 
 export function drawFlower(context: CanvasRenderingContext2D, flower: Flower) {
-  if (!flower.next.length && !flower.parent) {
-    context.beginPath();
-    context.rect(flower.position.x - 2, flower.position.y - 2, 5, 5);
-    context.stroke();
-  } else {
-    flower.next.forEach((node) => {
-      context.beginPath();
-      context.moveTo(flower.position.x, flower.position.y);
-      context.lineTo(node.position.x, node.position.y);
-      context.stroke();
+  context.beginPath();
+  context.rect(flower.position.x - 2, flower.position.y - 2, 5, 5);
+  context.stroke();
 
-      drawFlower(context, node);
-    });
-  }
+  flower.next.forEach((node) => {
+    context.beginPath();
+    context.moveTo(flower.position.x, flower.position.y);
+    context.lineTo(node.position.x, node.position.y);
+    context.stroke();
+
+    drawFlower(context, node);
+  });
 }

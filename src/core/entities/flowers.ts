@@ -11,7 +11,7 @@ import { Waste } from "./waste";
 import { Food } from "./food";
 
 const maxHunger = 2000;
-const produceCost = 400;
+const produceCost = 700;
 const initialHunger = maxHunger - produceCost * 0.9;
 const eatingRate = 0.5;
 const foodValue = 400;
@@ -51,6 +51,10 @@ export class Flower extends Entity {
 
   die = () => {
     this.shouldDelete = true;
+    if (this.parent) {
+      this.parent.next = this.parent.next.filter((node) => node.id !== this.id);
+    }
+
     if (this.next) {
       this.next.forEach((node) => {
         node.parent = null;
@@ -58,9 +62,6 @@ export class Flower extends Entity {
           node.die();
         }
       });
-    }
-    if (this.parent) {
-      this.parent.next = this.parent.next.filter((node) => node.id !== this.id);
     }
   };
 
@@ -72,7 +73,7 @@ export class Flower extends Entity {
 
   sim = (simInput: FlowerSimInput | null): void => {
     simInput.waste.forEach((waste) => this.eat(waste, null));
-    this.hunger += eatingRate * 0.45;
+    this.hunger += eatingRate * 0.3;
     this.sunlightStored += 0.45;
 
     if (this.hunger > maxHunger) {
