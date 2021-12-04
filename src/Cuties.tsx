@@ -53,7 +53,11 @@ export const Cuties: React.FC<CutiesProps> = () => {
 
     context.strokeStyle = theme.primary.string();
     sim.current.entityLoader.food.forEach((food) => {
-      const size = (food.value / defaultInitialFoodValue) * 3 + 1;
+      if (food.value < 0) {
+        return;
+      }
+
+      const size = (food.value / defaultInitialFoodValue) * 3;
 
       context.beginPath();
       context.ellipse(
@@ -87,7 +91,11 @@ export const Cuties: React.FC<CutiesProps> = () => {
 
     context.fillStyle = theme.entities.dump.string();
     sim.current.entityLoader.waste.forEach((waste) => {
-      const size = (waste.value / maxValue) * 3 + 1;
+      if (waste.value < 0) {
+        return;
+      }
+
+      const size = (waste.value / maxValue) * 3;
 
       context.beginPath();
       context.ellipse(

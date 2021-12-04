@@ -28,6 +28,7 @@ export interface CutieSimInput {
 
 export interface InitialCutieInput extends InitialEntityInput {
   ai: CutieAi;
+  angle: number;
   ancestors: number;
 }
 
@@ -42,9 +43,8 @@ export class Cutie extends Entity {
 
   constructor(id: number, it: number, initial: InitialCutieInput) {
     super(id, it, initial);
-    this.angle = 0;
+    this.angle = initial.angle;
     this.hunger = initialHunger;
-    this.lastEggLaying = it;
     this.thoughts = {
       angle: 0,
       speed: 0,
@@ -80,8 +80,8 @@ export class Cutie extends Entity {
     );
     const energy =
       (0.25 + distance ** 2) *
-      (this.wantsToEat() ? 2 : 1) *
-      (this.wantsToLayEgg() ? 1.5 : 1);
+      (this.wantsToEat() ? 1 : 0.5) *
+      (this.wantsToLayEgg() ? 1 : 0.5);
 
     this.hunger += energy;
     this.wasteStored += energy;
@@ -105,8 +105,7 @@ export class Cutie extends Entity {
 
   wantsToLayEgg = (): boolean => this.thoughts.layEgg > -0.5;
 
-  canLayEgg = (it: number): boolean =>
-    this.hunger + eggCost * 1.1 < maxHunger && it - this.lastEggLaying > 1000;
+  canLayEgg = (): boolean => this.hunger + eggCost * 1.1 < maxHunger;
 
   layEgg = (id: number, it: number): Egg => {
     const egg = new Egg(id, it, this);
@@ -129,6 +128,7 @@ export class Cutie extends Entity {
 
 export function getRandomCutie(id: number, it: number, bounds: Point[]): Cutie {
   const cutie = new Cutie(id, it, {
+    angle: (Math.random() - 0.5) * Math.PI * 2,
     ancestors: 0,
     ai: getRandomCutieAi(),
     position: getRandomPositionInBounds(bounds),

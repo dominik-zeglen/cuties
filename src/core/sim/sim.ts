@@ -27,7 +27,7 @@ export function simCuties(sim: Sim) {
     }
 
     cutie.sim(simInput);
-    if (cutie.wantsToLayEgg() && cutie.canLayEgg(sim.iteration)) {
+    if (cutie.wantsToLayEgg() && cutie.canLayEgg()) {
       sim.registerEntity(cutie.layEgg(sim.entityCounter, sim.iteration));
     }
 

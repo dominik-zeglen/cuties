@@ -19,25 +19,33 @@ export class EntityLoader {
   width: number;
   height: number;
 
-  qtrees: Record<"food" | "waste", Quadtree | null>;
+  qtrees: Record<"food" | "waste", QuadTree | null>;
 
   constructor(width: number, height: number) {
     this.entities = [];
     this.width = width;
     this.height = height;
     this.qtrees = {
-      food: new QuadTree({
-        height: this.height,
-        width: this.width,
-        x: 0,
-        y: 0,
-      }),
-      waste: new QuadTree({
-        height: this.height,
-        width: this.width,
-        x: 0,
-        y: 0,
-      }),
+      food: new QuadTree(
+        {
+          height: this.height,
+          width: this.width,
+          x: 0,
+          y: 0,
+        },
+        35,
+        6
+      ),
+      waste: new QuadTree(
+        {
+          height: this.height,
+          width: this.width,
+          x: 0,
+          y: 0,
+        },
+        35,
+        6
+      ),
     };
   }
 
@@ -52,7 +60,9 @@ export class EntityLoader {
     this.cachedFlowerRoots = null;
 
     this.qtrees.food.clear();
+    this.food.forEach((food) => this.qtrees.food.insert(food));
     this.qtrees.waste.clear();
+    this.waste.forEach((waste) => this.qtrees.waste.insert(waste));
   };
 
   get food(): Food[] {
@@ -63,14 +73,6 @@ export class EntityLoader {
     }
 
     return this.cachedFood;
-  }
-
-  get foodQTree(): QuadTree {
-    if (this.qtrees.food.objects.length === 0) {
-      this.food.forEach((food) => this.qtrees.food.insert(food));
-    }
-
-    return this.qtrees.food;
   }
 
   get cuties(): Cutie[] {
@@ -97,7 +99,7 @@ export class EntityLoader {
       this.cachedFlowerRoots = this.flowers.filter((flower) => !flower.parent);
     }
 
-    return this.cachedFlowers;
+    return this.cachedFlowerRoots;
   }
 
   get eggs(): Egg[] {
@@ -118,13 +120,5 @@ export class EntityLoader {
     }
 
     return this.cachedWaste;
-  }
-
-  get wasteQTree(): QuadTree {
-    if (this.qtrees.waste.objects.length === 0) {
-      this.waste.forEach((waste) => this.qtrees.waste.insert(waste));
-    }
-
-    return this.qtrees.waste;
   }
 }

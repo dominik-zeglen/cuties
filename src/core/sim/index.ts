@@ -1,4 +1,5 @@
 import minBy from "lodash/minBy";
+import Quadtree from "@timohausmann/quadtree-js";
 import { Food } from "../entities/food";
 import { len, Point, sub } from "../r2";
 import { Entity } from "../entities/entity";
@@ -20,7 +21,6 @@ import {
   simFood,
   simWaste,
 } from "./sim";
-import { Constructor } from "../../../tsUtils";
 import { Waste } from "../entities/waste";
 
 export class Sim {
@@ -78,7 +78,7 @@ export class Sim {
   shouldSpawnRandomCutie = () =>
     shouldSpawnRandomCutie(this.iteration, this.entityLoader);
 
-  shouldSpawnFood = () => shouldSpawnFood(this.iteration, this.entityLoader);
+  shouldSpawnFood = () => shouldSpawnFood(this.entityLoader);
 
   shouldSpawnFlower = () =>
     shouldSpawnFlower(this.iteration, this.entityLoader);
@@ -99,12 +99,12 @@ export class Sim {
 
   getNearestFood = (point: Point, radius: number): Food | undefined =>
     minBy(
-      this.getNearest(this.entityLoader.foodQTree, point, radius),
+      this.getNearest(this.entityLoader.qtrees.food, point, radius),
       (entity) => len(sub(entity.position, point))
     );
 
   getNearestWaste = (point: Point, radius: number): Waste[] | undefined =>
-    this.getNearest(this.entityLoader.wasteQTree, point, radius);
+    this.getNearest(this.entityLoader.qtrees.waste, point, radius);
 
   clean = () => {
     cleanDepletedPellets(this.entityLoader.food);

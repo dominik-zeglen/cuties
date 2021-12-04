@@ -1,3 +1,4 @@
+import sum from "lodash/sum";
 import type { Sim } from ".";
 import { getRandomCutie } from "../entities/cutie";
 import { getRandomFlower } from "../entities/flowers";
@@ -9,11 +10,14 @@ export function shouldSpawnRandomCutie(
   it: number,
   loader: EntityLoader
 ): boolean {
-  return it % 40 === 0 && loader.cuties.length < 15;
+  return it % 40 === 0 && loader.cuties.length < 20;
 }
 
-export function shouldSpawnFood(it: number, loader: EntityLoader): boolean {
-  return it % 30 === 0 && loader.food.length < 800 - loader.cuties.length * 15;
+export function shouldSpawnFood(loader: EntityLoader): boolean {
+  return (
+    sum(loader.food.map((pellet) => pellet.value)) <
+    5e5 - loader.cuties.length * 2e4
+  );
 }
 
 export function shouldSpawnFlower(it: number, loader: EntityLoader): boolean {

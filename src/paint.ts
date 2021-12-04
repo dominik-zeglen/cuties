@@ -43,8 +43,10 @@ export function drawIndicator(
 }
 
 export function drawFlower(context: CanvasRenderingContext2D, flower: Flower) {
-  if (!flower.next && !flower.parent) {
+  if (!flower.next.length && !flower.parent) {
+    context.beginPath();
     context.rect(flower.position.x - 2, flower.position.y - 2, 5, 5);
+    context.stroke();
   } else {
     flower.next.forEach((node) => {
       context.beginPath();

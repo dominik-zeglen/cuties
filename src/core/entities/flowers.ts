@@ -15,7 +15,7 @@ const produceCost = 400;
 const initialHunger = maxHunger - produceCost * 0.9;
 const eatingRate = 0.5;
 const foodValue = 400;
-const foodEnergyCostRatio = 0.25;
+const foodEnergyCostRatio = 0.35;
 
 export type EatDirection = "forward" | "backward" | null;
 
@@ -54,7 +54,7 @@ export class Flower extends Entity {
     if (this.next) {
       this.next.forEach((node) => {
         node.parent = null;
-        if (Math.random() < 0.05) {
+        if (Math.random() < 0.5) {
           node.die();
         }
       });
@@ -65,17 +65,14 @@ export class Flower extends Entity {
   };
 
   applyForce = (forceVec?: PolarPoint) => {
-    const force = forceVec ?? { angle: this.angle, r: 0.01 };
+    const force = forceVec ?? { angle: this.angle, r: 0.02 };
     this.position = add(this.position, toCartesian(force));
-    this.getChildren().forEach((node) => node.applyForce(force));
+    this.next.forEach((node) => node.applyForce(force));
   };
-
-  getChildren = (): Flower[] =>
-    this.next.reduce((acc, node) => [...acc, ...node.getChildren()], []);
 
   sim = (simInput: FlowerSimInput | null): void => {
     simInput.waste.forEach((waste) => this.eat(waste, null));
-    this.hunger += eatingRate / 3;
+    this.hunger += eatingRate * 0.45;
     this.sunlightStored += 0.45;
 
     if (this.hunger > maxHunger) {
@@ -88,6 +85,10 @@ export class Flower extends Entity {
   };
 
   eat = (waste: Waste, direction: EatDirection): boolean => {
+    if (!waste.value) {
+      return false;
+    }
+
     if (this.hunger > 0) {
       waste.value -= eatingRate;
       this.hunger -= eatingRate * 0.9;

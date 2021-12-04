@@ -10,7 +10,7 @@ export class Egg extends Entity {
   constructor(id: number, it: number, parent: Cutie) {
     super(id, it, { position: parent.position });
     this.spawnTime = 800;
-    this.ai = Math.random() < 0.25 ? mutate(parent.ai) : parent.ai;
+    this.ai = Math.random() < 0.4 ? mutate(parent.ai) : parent.ai;
     this.ancestors = parent.ancestors + 1;
   }
 
@@ -18,6 +18,7 @@ export class Egg extends Entity {
 
   hatch = (id: number, it: number): Cutie => {
     const cutie = new Cutie(id, it, {
+      angle: (Math.random() - 0.5) * Math.PI * 2,
       position: this.position,
       ai: this.ai,
       ancestors: this.ancestors,
