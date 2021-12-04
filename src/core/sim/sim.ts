@@ -65,13 +65,7 @@ function simFlower(flower: Flower, sim: Sim) {
 }
 
 export function simFlowers(sim: Sim) {
-  sim.entityLoader.flowerRoots.forEach((root) => {
-    simFlower(root, sim);
-    root.next.forEach((node) => {
-      simFlower(node, sim);
-      node.next.forEach((nextNode) => simFlower(nextNode, sim));
-    });
-  });
+  sim.entityLoader.flowers.forEach((root) => simFlower(root, sim));
 }
 
 export function simFlowerRoots(sim: Sim) {
