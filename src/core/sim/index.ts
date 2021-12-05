@@ -23,6 +23,8 @@ import {
 } from "./sim";
 import { Waste } from "../entities/waste";
 
+const __DEBUG = true;
+
 export class Sim {
   bounds: Point[];
   entities: Entity[];
@@ -155,6 +157,19 @@ export class Sim {
     spawnRandoms(this);
 
     this.regenerate();
+
+    if (__DEBUG) {
+      this.entityLoader.flowers.forEach((flower) => {
+        if (
+          flower.parent &&
+          !flower.parent.next.find((next) => next.id === flower.id)
+        ) {
+          throw new Error(
+            `Bad link between ${flower.parent.id} and ${flower.id}`
+          );
+        }
+      });
+    }
 
     this.clean();
     this.getStats();
