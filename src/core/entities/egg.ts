@@ -23,8 +23,10 @@ export class Egg extends Entity {
       ai: this.ai,
       ancestors: this.ancestors,
     });
-    this.shouldDelete = true;
+    this.die();
 
     return cutie;
   };
+
+  die = this.markToDelete;
 }

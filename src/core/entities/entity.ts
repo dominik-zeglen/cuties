@@ -35,4 +35,11 @@ export class Entity implements Rect {
     this.shouldDelete = false;
     this.size = { x: 1, y: 1 };
   }
+
+  markToDelete = () => {
+    this.shouldDelete = true;
+  };
+
+  // eslint-disable-next-line class-methods-use-this
+  die(): void {}
 }

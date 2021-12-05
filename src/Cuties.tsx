@@ -95,7 +95,7 @@ export const Cuties: React.FC<CutiesProps> = () => {
         return;
       }
 
-      const size = (waste.value / maxValue) * 3;
+      const size = (waste.value / maxValue) * 4;
 
       context.beginPath();
       context.ellipse(

@@ -21,7 +21,7 @@ const maxHunger = 2000;
 const eggCost = 1200;
 const initialHunger = maxHunger - eggCost * 0.9;
 const eatingRate = 10;
-const droppedWasteValue = 550;
+const droppedWasteValue = 250;
 
 export interface CutieSimInput {
   iteration: number;
@@ -58,9 +58,7 @@ export class Cutie extends Entity {
     this.wasteStored = 0;
   }
 
-  die = () => {
-    this.shouldDelete = true;
-  };
+  die = this.markToDelete;
 
   sim = (simInput: CutieSimInput | null): void => {
     if (simInput) {

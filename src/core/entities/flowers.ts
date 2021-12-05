@@ -50,19 +50,17 @@ export class Flower extends Entity {
   }
 
   die = () => {
-    this.shouldDelete = true;
+    this.markToDelete();
     if (this.parent) {
       this.parent.next = this.parent.next.filter((node) => node.id !== this.id);
     }
 
-    if (this.next) {
-      this.next.forEach((node) => {
-        node.parent = null;
-        if (Math.random() < 0.5) {
-          node.die();
-        }
-      });
-    }
+    this.next.forEach((node) => {
+      node.parent = null;
+      if (Math.random() < 0.5) {
+        node.die();
+      }
+    });
   };
 
   applyForce = (forceVec?: PolarPoint) => {
@@ -97,17 +95,15 @@ export class Flower extends Entity {
     }
 
     if (direction === null) {
-      if (this.next.length) {
-        for (let node = 0; node < this.next.length; node++) {
-          if (this.next[node].eat(waste, direction)) {
-            return true;
-          }
+      for (let node = 0; node < this.next.length; node++) {
+        if (this.next[node].eat(waste, direction)) {
+          return true;
         }
       }
       return this.parent && this.parent.eat(waste, "backward");
     }
 
-    if (this.next && direction === "forward") {
+    if (direction === "forward") {
       for (let node = 0; node < this.next.length; node++) {
         if (this.next[node].eat(waste, direction)) {
           return true;

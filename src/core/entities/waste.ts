@@ -18,4 +18,6 @@ export class Waste extends Entity {
   sim = () => {
     this.value -= valueLossRate;
   };
+
+  die = this.markToDelete;
 }

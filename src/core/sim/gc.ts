@@ -6,7 +6,7 @@ import { Point } from "../r2";
 export function cleanDepletedPellets(pellets: Array<Food | Waste>) {
   pellets.forEach((pellet) => {
     if (pellet.value <= 0) {
-      pellet.shouldDelete = true;
+      pellet.die();
     }
   });
 }
@@ -14,17 +14,17 @@ export function cleanDepletedPellets(pellets: Array<Food | Waste>) {
 export function cleanOutOfBounds(entities: Entity[], bounds: Point[]) {
   entities.forEach((ent) => {
     if (ent.position.x > bounds[1].x) {
-      ent.shouldDelete = true;
+      ent.die();
     }
     if (ent.position.y > bounds[1].y) {
-      ent.shouldDelete = true;
+      ent.die();
     }
 
     if (ent.position.x < bounds[0].x) {
-      ent.shouldDelete = true;
+      ent.die();
     }
     if (ent.position.y < bounds[0].y) {
-      ent.shouldDelete = true;
+      ent.die();
     }
   });
 }
