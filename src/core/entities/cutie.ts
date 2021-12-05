@@ -43,8 +43,8 @@ export class Cutie extends Entity {
   ancestors: number;
   wasteStored: number;
 
-  constructor(id: number, it: number, initial: InitialCutieInput) {
-    super(id, it, initial);
+  constructor(initial: InitialCutieInput) {
+    super(initial);
     this.angle = initial.angle;
     this.hunger = initialHunger;
     this.thoughts = {
@@ -115,8 +115,8 @@ export class Cutie extends Entity {
 
   canLayEgg = (): boolean => this.hunger + eggCost * 1.1 < maxHunger;
 
-  layEgg = (id: number, it: number): Egg => {
-    const egg = new Egg(id, it, this);
+  layEgg = (it: number): Egg => {
+    const egg = new Egg(this);
     this.lastEggLaying = it;
     this.hunger += eggCost;
     this.wasteStored += eggCost;
@@ -126,17 +126,17 @@ export class Cutie extends Entity {
 
   shouldDumpWaste = (): boolean => this.wasteStored > droppedWasteValue;
 
-  dumpWaste = (id: number, it: number): Waste => {
+  dumpWaste = (): Waste => {
     this.wasteStored -= droppedWasteValue;
-    return new Waste(id, it, {
+    return new Waste({
       position: this.position,
       value: droppedWasteValue,
     });
   };
 }
 
-export function getRandomCutie(id: number, it: number, bounds: Point[]): Cutie {
-  const cutie = new Cutie(id, it, {
+export function getRandomCutie(bounds: Point[]): Cutie {
+  const cutie = new Cutie({
     angle: (Math.random() - 0.5) * Math.PI * 2,
     ancestors: 0,
     ai: getRandomCutieAi(),

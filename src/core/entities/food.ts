@@ -10,8 +10,8 @@ export interface InitialFoodInput extends InitialEntityInput {
 export class Food extends Entity {
   value: number;
 
-  constructor(id: number, it: number, initial: InitialFoodInput) {
-    super(id, it, initial);
+  constructor(initial: InitialFoodInput) {
+    super(initial);
     this.value = initial.value || defaultInitialFoodValue;
   }
 

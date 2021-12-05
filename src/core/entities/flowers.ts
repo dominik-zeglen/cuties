@@ -39,8 +39,8 @@ export class Flower extends Entity {
   wasteStored: number;
   sunlightStored: number;
 
-  constructor(id: number, it: number, initial: InitialFlowerInput) {
-    super(id, it, initial);
+  constructor(initial: InitialFlowerInput) {
+    super(initial);
     this.angle = initial.angle;
     this.next = [];
     this.parent = initial.parent;
@@ -129,7 +129,7 @@ export class Flower extends Entity {
     this.next.length === 0 &&
     it - this.createdAt > 1000;
 
-  produce = (id: number, it: number): Flower[] => {
+  produce = (): Flower[] => {
     let { angle } = this;
 
     const system = new LSystem({
@@ -167,7 +167,7 @@ export class Flower extends Entity {
       finals: {
         N: () => {
           this.next.push(
-            new Flower(id, it, {
+            new Flower({
               angle,
               parent: this,
               position: add(
@@ -197,8 +197,8 @@ export class Flower extends Entity {
     return this.next;
   };
 
-  spawnFood = (id: number, it: number): Food => {
-    const food = new Food(id, it, {
+  spawnFood = (): Food => {
+    const food = new Food({
       position: add(this.position, {
         x: (Math.random() - 0.5) * 40,
         y: (Math.random() - 0.5) * 40,
@@ -212,12 +212,8 @@ export class Flower extends Entity {
   };
 }
 
-export function getRandomFlower(
-  id: number,
-  it: number,
-  bounds: Point[]
-): Flower {
-  const cutie = new Flower(id, it, {
+export function getRandomFlower(bounds: Point[]): Flower {
+  const cutie = new Flower({
     angle: (Math.random() - 0.5) * Math.PI * 2,
     parent: null,
     position: getRandomPositionInBounds(bounds),

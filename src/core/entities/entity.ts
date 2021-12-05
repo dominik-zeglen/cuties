@@ -28,10 +28,8 @@ export class Entity implements Rect {
     return this.size.y;
   }
 
-  constructor(id: number, it: number, initial: InitialEntityInput) {
+  constructor(initial: InitialEntityInput) {
     this.position = { ...initial.position };
-    this.id = id;
-    this.createdAt = it;
     this.shouldDelete = false;
     this.size = { x: 1, y: 1 };
   }

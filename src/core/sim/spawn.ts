@@ -27,19 +27,19 @@ export function shouldSpawnFlower(it: number, loader: EntityLoader): boolean {
 }
 
 export function spawnRandomFood(sim: Sim) {
-  const food = new Food(sim.entityCounter, sim.iteration, {
+  const food = new Food({
     position: getRandomPositionInBounds(sim.bounds),
   });
   sim.registerEntity(food);
 }
 
 export function spawnRandomFlower(sim: Sim) {
-  const flower = getRandomFlower(sim.entityCounter, sim.iteration, sim.bounds);
+  const flower = getRandomFlower(sim.bounds);
   sim.registerEntity(flower);
 }
 
 export function spawnRandomCutie(sim: Sim) {
-  const cutie = getRandomCutie(sim.entityCounter, sim.iteration, sim.bounds);
+  const cutie = getRandomCutie(sim.bounds);
   cutie.position = getRandomPositionInBounds(sim.bounds);
   sim.registerEntity(cutie);
 }

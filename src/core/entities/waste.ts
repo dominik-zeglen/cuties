@@ -10,8 +10,8 @@ export interface InitialWasteInput extends InitialEntityInput {
 export class Waste extends Entity {
   value: number;
 
-  constructor(id: number, it: number, initial: InitialWasteInput) {
-    super(id, it, initial);
+  constructor(initial: InitialWasteInput) {
+    super(initial);
     this.value = initial.value ?? maxValue;
   }
 

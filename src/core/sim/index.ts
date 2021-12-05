@@ -128,6 +128,8 @@ export class Sim {
   };
 
   registerEntity = (entity: Entity) => {
+    entity.id = this.entityCounter;
+    entity.createdAt = this.iteration;
     this.entities.push(entity);
     this.entityCounter++;
   };

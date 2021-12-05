@@ -29,16 +29,16 @@ export function simCuties(sim: Sim) {
 
     cutie.sim(simInput);
     if (cutie.wantsToLayEgg() && cutie.canLayEgg()) {
-      sim.registerEntity(cutie.layEgg(sim.entityCounter, sim.iteration));
+      sim.registerEntity(cutie.layEgg(sim.iteration));
     }
 
     if (cutie.shouldDumpWaste()) {
-      const waste = cutie.dumpWaste(sim.entityCounter, sim.iteration);
+      const waste = cutie.dumpWaste();
       sim.registerEntity(waste);
     }
 
     if (cutie.shouldDelete) {
-      const remains = new Waste(sim.entityCounter, sim.iteration, {
+      const remains = new Waste({
         position: cutie.position,
       });
       remains.value = 100;
@@ -54,13 +54,11 @@ function simFlower(flower: Flower, sim: Sim) {
   });
 
   if (flower.canProduce(sim.iteration)) {
-    flower
-      .produce(sim.entityCounter, sim.iteration)
-      .forEach(sim.registerEntity);
+    flower.produce().forEach(sim.registerEntity);
   }
 
   if (flower.canSpawnFood()) {
-    sim.registerEntity(flower.spawnFood(sim.entityCounter, sim.iteration));
+    sim.registerEntity(flower.spawnFood());
   }
 }
 
@@ -75,7 +73,7 @@ export function simFlowerRoots(sim: Sim) {
 export function simEggs(sim: Sim) {
   sim.entityLoader.eggs.forEach((egg) => {
     if (egg.shouldHatch(sim.iteration)) {
-      sim.registerEntity(egg.hatch(sim.entityCounter, sim.iteration));
+      sim.registerEntity(egg.hatch());
     }
   });
 }
