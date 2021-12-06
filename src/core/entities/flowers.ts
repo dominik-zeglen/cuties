@@ -11,10 +11,10 @@ import { Waste } from "./waste";
 import { Food } from "./food";
 
 const maxHunger = 2000;
-const produceCost = 700;
-const initialHunger = maxHunger - produceCost * 0.9;
-const eatingRate = 0.5;
-const foodValue = 400;
+const produceCost = 1200;
+const initialHunger = maxHunger - produceCost * 0.3;
+const eatingRate = 0.4;
+const foodValue = 200;
 const foodEnergyCostRatio = 0.35;
 
 export type EatDirection = "forward" | "backward" | null;
@@ -71,14 +71,14 @@ export class Flower extends Entity {
 
   sim = (simInput: FlowerSimInput | null): void => {
     simInput.waste.forEach((waste) => this.eat(waste, null));
-    this.hunger += eatingRate * 0.3;
+    this.hunger += eatingRate * 0.87;
     this.sunlightStored += 0.45;
 
     if (this.hunger > maxHunger) {
       this.die();
     }
 
-    if (simInput.iteration - this.createdAt > 10000 && Math.random() < 0.0001) {
+    if (simInput.iteration - this.createdAt > 2e4 && Math.random() < 1e-1) {
       this.die();
     }
   };
@@ -120,9 +120,7 @@ export class Flower extends Entity {
   };
 
   canSpawnFood = (): boolean =>
-    this.hunger / maxHunger < 0.3 &&
-    !!this.next &&
-    (1 - foodEnergyCostRatio) * foodValue < this.sunlightStored;
+    !!this.next && (1 - foodEnergyCostRatio) * foodValue < this.sunlightStored;
 
   canProduce = (it: number): boolean =>
     this.hunger + produceCost + 100 < maxHunger &&

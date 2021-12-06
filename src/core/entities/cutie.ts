@@ -94,7 +94,7 @@ export class Cutie extends Entity {
       this.die();
     }
 
-    if (simInput.iteration - this.createdAt > 10000 && Math.random() < 0.001) {
+    if (simInput.iteration - this.createdAt > 3e3 && Math.random() < 1e-2) {
       this.die();
     }
   };

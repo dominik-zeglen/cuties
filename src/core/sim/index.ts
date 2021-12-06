@@ -22,6 +22,7 @@ import {
   simWaste,
 } from "./sim";
 import { Waste } from "../entities/waste";
+import { Flower } from "../entities/flowers";
 
 export class Sim {
   bounds: Point[];
@@ -128,6 +129,13 @@ export class Sim {
   registerEntity = (entity: Entity) => {
     entity.id = this.entityCounter;
     entity.createdAt = this.iteration;
+    if (entity instanceof Flower && this.entityLoader.flowers.length > 350) {
+      entity.shouldDelete = true;
+    }
+    if (entity instanceof Waste && this.entityLoader.waste.length > 500) {
+      entity.shouldDelete = true;
+    }
+
     this.entities.push(entity);
     this.entityCounter++;
   };
