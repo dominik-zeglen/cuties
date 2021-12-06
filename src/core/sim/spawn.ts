@@ -15,8 +15,9 @@ export function shouldSpawnRandomCutie(
 
 export function shouldSpawnFood(loader: EntityLoader): boolean {
   return (
+    loader.cuties.length < 5 &&
     sum(loader.food.map((pellet) => pellet.value)) <
-    5e5 - loader.cuties.length * 2e4
+      5e5 - loader.cuties.length * 2e4
   );
 }
 

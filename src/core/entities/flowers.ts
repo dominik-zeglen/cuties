@@ -10,12 +10,12 @@ import {
 import { Waste } from "./waste";
 import { Food } from "./food";
 
-const maxHunger = 2000;
-const produceCost = 1200;
+export const maxHunger = 2000;
+const produceCost = 1100;
 const initialHunger = maxHunger - produceCost * 0.3;
 const eatingRate = 0.4;
 const foodValue = 200;
-const foodEnergyCostRatio = 0.35;
+const foodEnergyCostRatio = 0.1;
 
 export type EatDirection = "forward" | "backward" | null;
 
@@ -72,7 +72,7 @@ export class Flower extends Entity {
   sim = (simInput: FlowerSimInput | null): void => {
     simInput.waste.forEach((waste) => this.eat(waste, null));
     this.hunger += eatingRate * 0.87;
-    this.sunlightStored += 0.45;
+    this.sunlightStored += 0.6;
 
     if (this.hunger > maxHunger) {
       this.die();
@@ -83,20 +83,20 @@ export class Flower extends Entity {
     }
   };
 
-  eat = (waste: Waste, direction: EatDirection): boolean => {
+  eat = (waste: Waste, direction: EatDirection, chainLevel = 1): boolean => {
     if (!waste.value) {
       return false;
     }
 
     if (this.hunger > 0) {
       waste.value -= eatingRate;
-      this.hunger -= eatingRate * 0.9;
+      this.hunger -= eatingRate * 0.9 ** chainLevel;
       return true;
     }
 
     if (direction === null) {
       for (let node = 0; node < this.next.length; node++) {
-        if (this.next[node].eat(waste, direction)) {
+        if (this.next[node].eat(waste, direction, chainLevel + 1)) {
           return true;
         }
       }
@@ -105,7 +105,7 @@ export class Flower extends Entity {
 
     if (direction === "forward") {
       for (let node = 0; node < this.next.length; node++) {
-        if (this.next[node].eat(waste, direction)) {
+        if (this.next[node].eat(waste, direction, chainLevel + 1)) {
           return true;
         }
       }
@@ -113,14 +113,15 @@ export class Flower extends Entity {
     }
 
     if (this.parent && direction === "backward") {
-      return this.parent.eat(waste, direction);
+      return this.parent.eat(waste, direction, chainLevel + 1);
     }
 
     return false;
   };
 
   canSpawnFood = (): boolean =>
-    !!this.next && (1 - foodEnergyCostRatio) * foodValue < this.sunlightStored;
+    !!this.next.length &&
+    (1 - foodEnergyCostRatio) * foodValue < this.sunlightStored;
 
   canProduce = (it: number): boolean =>
     this.hunger + produceCost + 100 < maxHunger &&

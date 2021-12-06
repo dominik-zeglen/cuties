@@ -57,22 +57,25 @@ export const Cuties: React.FC<CutiesProps> = () => {
     const context = canvas.current.getContext("2d");
     context.clearRect(0, 0, canvas.current.width, canvas.current.height);
 
-    context.fillStyle = theme.primary.string();
     sim.current.entityLoader.food.forEach((food) =>
       drawPellet(context, {
+        color: theme.primary.string(),
         maxValue: defaultInitialFoodValue,
         pellet: food,
       })
     );
 
-    context.fillStyle = theme.entities.egg.string();
     sim.current.entityLoader.eggs.forEach((egg) =>
-      drawStaticPellet(context, egg)
+      drawStaticPellet(context, {
+        color: theme.entities.egg.string(),
+        pellet: egg,
+        size: 3,
+      })
     );
 
-    context.fillStyle = theme.entities.dump.string();
     sim.current.entityLoader.waste.forEach((waste) =>
       drawPellet(context, {
+        color: theme.entities.dump.string(),
         pellet: waste,
         maxValue,
       })

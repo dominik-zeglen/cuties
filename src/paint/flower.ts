@@ -1,12 +1,15 @@
+import { drawStaticPellet } from ".";
 import { theme } from "../components/theme";
-import { Flower } from "../core/entities/flowers";
+import { Flower, maxHunger } from "../core/entities/flowers";
 
 export function drawFlower(context: CanvasRenderingContext2D, flower: Flower) {
   context.strokeStyle = theme.primary.string();
 
-  context.beginPath();
-  context.rect(flower.position.x - 2, flower.position.y - 2, 5, 5);
-  context.stroke();
+  drawStaticPellet(context, {
+    color: theme.primary.string(),
+    pellet: flower,
+    size: (1 - flower.hunger / maxHunger) * 2 + 0.5,
+  });
 
   flower.next.forEach((node) => {
     context.beginPath();

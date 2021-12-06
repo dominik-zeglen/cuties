@@ -2,21 +2,28 @@ import { Entity } from "../core/entities/entity";
 
 type Pellet = Entity & { value: number };
 
-export interface DrawPelletOpts {
-  pellet: Pellet;
+export interface DrawStaticPelletOpts {
+  color: string;
+  pellet: Entity;
+  size: number;
+}
+
+export interface DrawPelletOpts extends Omit<DrawStaticPelletOpts, "size"> {
   maxValue: number;
+  pellet: Pellet;
 }
 
 export function drawStaticPellet(
   context: CanvasRenderingContext2D,
-  pellet: Entity
+  { color, pellet, size }: DrawStaticPelletOpts
 ) {
+  context.fillStyle = color;
   context.beginPath();
   context.ellipse(
     pellet.position.x,
     pellet.position.y,
-    4,
-    4,
+    size,
+    size,
     -1,
     0,
     2 * Math.PI,
@@ -27,7 +34,7 @@ export function drawStaticPellet(
 
 export function drawPellet(
   context: CanvasRenderingContext2D,
-  { pellet, maxValue }: DrawPelletOpts
+  { pellet, maxValue, ...rest }: DrawPelletOpts
 ) {
   if (pellet.value < 0) {
     return;
@@ -35,16 +42,9 @@ export function drawPellet(
 
   const size = (pellet.value / maxValue) * 4;
 
-  context.beginPath();
-  context.ellipse(
-    pellet.position.x,
-    pellet.position.y,
+  drawStaticPellet(context, {
+    ...rest,
+    pellet,
     size,
-    size,
-    -1,
-    0,
-    2 * Math.PI,
-    false
-  );
-  context.fill();
+  });
 }

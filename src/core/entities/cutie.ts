@@ -18,7 +18,7 @@ import { Food } from "./food";
 import { Waste } from "./waste";
 
 const maxHunger = 2000;
-const eggCost = 1200;
+const eggCost = 900;
 const initialHunger = maxHunger - eggCost * 0.9;
 const eatingRate = 10;
 const droppedWasteValue = 250;
