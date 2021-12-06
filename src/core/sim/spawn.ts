@@ -30,6 +30,7 @@ export function spawnRandomFood(sim: Sim) {
   const food = new Food({
     position: getRandomPositionInBounds(sim.bounds),
   });
+  food.value *= Math.random() / 2 + 0.5;
   sim.registerEntity(food);
 }
 

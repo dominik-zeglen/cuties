@@ -5,7 +5,13 @@ import minBy from "lodash/minBy";
 import { Sim } from "./core/sim";
 import { theme } from "./components/theme";
 import { len, sub } from "./core/r2";
-import { drawFlower, drawIndicator } from "./paint";
+import {
+  drawCutie,
+  drawFlower,
+  drawIndicator,
+  drawPellet,
+  drawStaticPellet,
+} from "./paint";
 import { maxValue } from "./core/entities/waste";
 import { defaultInitialFoodValue } from "./core/entities/food";
 
@@ -51,77 +57,34 @@ export const Cuties: React.FC<CutiesProps> = () => {
     const context = canvas.current.getContext("2d");
     context.clearRect(0, 0, canvas.current.width, canvas.current.height);
 
-    context.strokeStyle = theme.primary.string();
-    sim.current.entityLoader.food.forEach((food) => {
-      if (food.value < 0) {
-        return;
-      }
+    context.fillStyle = theme.primary.string();
+    sim.current.entityLoader.food.forEach((food) =>
+      drawPellet(context, {
+        maxValue: defaultInitialFoodValue,
+        pellet: food,
+      })
+    );
 
-      const size = (food.value / defaultInitialFoodValue) * 3;
-
-      context.beginPath();
-      context.ellipse(
-        food.position.x,
-        food.position.y,
-        size,
-        size,
-        -1,
-        0,
-        2 * 3.141,
-        false
-      );
-      context.stroke();
-    });
-
-    context.strokeStyle = theme.tertiary.string();
-    sim.current.entityLoader.eggs.forEach((egg) => {
-      context.beginPath();
-      context.ellipse(
-        egg.position.x,
-        egg.position.y,
-        3,
-        3,
-        -1,
-        0,
-        2 * 3.141,
-        false
-      );
-      context.stroke();
-    });
+    context.fillStyle = theme.entities.egg.string();
+    sim.current.entityLoader.eggs.forEach((egg) =>
+      drawStaticPellet(context, egg)
+    );
 
     context.fillStyle = theme.entities.dump.string();
-    sim.current.entityLoader.waste.forEach((waste) => {
-      if (waste.value < 0) {
-        return;
-      }
+    sim.current.entityLoader.waste.forEach((waste) =>
+      drawPellet(context, {
+        pellet: waste,
+        maxValue,
+      })
+    );
 
-      const size = (waste.value / maxValue) * 4;
-
-      context.beginPath();
-      context.ellipse(
-        waste.position.x,
-        waste.position.y,
-        size,
-        size,
-        -1,
-        0,
-        2 * Math.PI,
-        false
-      );
-      context.fill();
-    });
-
-    context.strokeStyle = theme.primary.string();
     sim.current.entityLoader.flowerRoots.forEach((flower) =>
       drawFlower(context, flower)
     );
 
-    context.strokeStyle = theme.secondary.string();
-    sim.current.entityLoader.cuties.forEach((cutie) => {
-      context.beginPath();
-      context.rect(cutie.position.x - 2, cutie.position.y - 2, 5, 5);
-      context.stroke();
-    });
+    sim.current.entityLoader.cuties.forEach((cutie) =>
+      drawCutie(context, cutie)
+    );
 
     if (window.cuties.selected) {
       if (window.cuties.selected.shouldDelete) {

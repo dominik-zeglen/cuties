@@ -7,6 +7,7 @@ export const theme = {
   background: Color.rgb(0, 0, 0),
   entities: {
     dump: Color.rgb(128, 87, 0),
+    egg: Color.rgb(255, 255, 255).darken(0.4),
   },
   spacing: 8,
   transition: "200ms",

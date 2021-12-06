@@ -1,7 +1,6 @@
-import { theme } from "./components/theme";
-import { Entity } from "./core/entities/entity";
-import { Flower } from "./core/entities/flowers";
-import { add, toCartesian } from "./core/r2";
+import { theme } from "../components/theme";
+import { Entity } from "../core/entities/entity";
+import { add, toCartesian } from "../core/r2";
 
 interface DrawIndicatorOpts {
   entity: Entity & { angle?: number };
@@ -40,19 +39,4 @@ export function drawIndicator(
     context.lineTo(angleIndicator.x, angleIndicator.y);
     context.stroke();
   }
-}
-
-export function drawFlower(context: CanvasRenderingContext2D, flower: Flower) {
-  context.beginPath();
-  context.rect(flower.position.x - 2, flower.position.y - 2, 5, 5);
-  context.stroke();
-
-  flower.next.forEach((node) => {
-    context.beginPath();
-    context.moveTo(flower.position.x, flower.position.y);
-    context.lineTo(node.position.x, node.position.y);
-    context.stroke();
-
-    drawFlower(context, node);
-  });
 }
