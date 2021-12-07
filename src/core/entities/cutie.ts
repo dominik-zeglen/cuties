@@ -73,7 +73,7 @@ export class Cutie extends Entity {
     }
 
     const distance = this.thoughts.speed * 2;
-    this.angle += ((this.thoughts.angle * Math.PI) / 180) * 60;
+    this.angle += ((this.thoughts.angle * Math.PI) / 180) * 10;
 
     this.position = add(
       this.position,
