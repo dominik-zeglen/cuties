@@ -22,6 +22,7 @@ const eggCost = 900;
 const initialHunger = maxHunger - eggCost * 0.9;
 const eatingRate = 10;
 const droppedWasteValue = 250;
+export const rangeRadius = 300;
 
 export interface CutieSimInput {
   iteration: number;
@@ -72,8 +73,8 @@ export class Cutie extends Entity {
       this.thoughts = think(input, this.ai);
     }
 
-    const distance = this.thoughts.speed * 2;
-    this.angle += ((this.thoughts.angle * Math.PI) / 180) * 10;
+    const distance = this.thoughts.speed * (this.thoughts.speed > 0 ? 2 : 0.25);
+    this.angle += ((this.thoughts.angle * Math.PI) / 180) * 30;
 
     this.position = add(
       this.position,
@@ -83,7 +84,7 @@ export class Cutie extends Entity {
       })
     );
     const energy =
-      (0.25 + distance ** 2) *
+      (0.25 + distance ** 2 + Math.abs(this.thoughts.angle) / 2) *
       (this.wantsToEat() ? 1 : 0.5) *
       (this.wantsToLayEgg() ? 1 : 0.5);
 

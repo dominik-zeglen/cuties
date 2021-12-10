@@ -1,12 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
-import { Home, Stat } from "./views";
+import { Home, Stat, Train } from "./views";
 
 const App: React.FC = () => (
   <BrowserRouter>
     <Switch>
       <Route path="/stat" component={Stat} />
+      <Route path="/train" component={Train} />
       <Route path="/" component={Home} />
     </Switch>
   </BrowserRouter>

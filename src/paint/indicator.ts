@@ -1,4 +1,5 @@
 import { theme } from "../components/theme";
+import { Cutie, rangeRadius } from "../core/entities/cutie";
 import { Entity } from "../core/entities/entity";
 import { add, toCartesian } from "../core/r2";
 
@@ -37,6 +38,22 @@ export function drawIndicator(
       opts.entity.position
     );
     context.lineTo(angleIndicator.x, angleIndicator.y);
+    context.stroke();
+  }
+
+  if (opts.entity instanceof Cutie) {
+    context.strokeStyle = theme.tertiary.string();
+    context.beginPath();
+    context.ellipse(
+      opts.entity.position.x,
+      opts.entity.position.y,
+      rangeRadius,
+      rangeRadius,
+      -1,
+      0,
+      2 * 3.141,
+      false
+    );
     context.stroke();
   }
 }

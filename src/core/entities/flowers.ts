@@ -78,7 +78,7 @@ export class Flower extends Entity {
       this.die();
     }
 
-    if (simInput.iteration - this.createdAt > 2e4 && Math.random() < 1e-1) {
+    if (simInput.iteration - this.createdAt > 1e4 && Math.random() < 1e-3) {
       this.die();
     }
   };

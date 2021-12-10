@@ -14,6 +14,7 @@ import {
 } from "./paint";
 import { maxValue } from "./core/entities/waste";
 import { defaultInitialFoodValue } from "./core/entities/food";
+import { TrainingSim } from "./core/sim/training";
 
 function createColormap(nshades: number): string[] {
   return Array<Color>(nshades)
@@ -34,7 +35,10 @@ const speed = 100;
 
 export const Cuties: React.FC<CutiesProps> = () => {
   const interval = React.useRef<number>(null);
-  const sim = React.useRef<Sim>(new Sim(width, height));
+  const sim = React.useRef<Sim>(
+    new Sim(width, height)
+    // new TrainingSim(400, 400, JSON.parse(localStorage.getItem("best")))
+  );
   const canvas = React.useRef<HTMLCanvasElement>(null);
   const colormap = React.useRef(createColormap(2));
   const styles = React.useMemo(

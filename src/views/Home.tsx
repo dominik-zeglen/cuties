@@ -20,9 +20,21 @@ export const Home: React.FC = () => {
         }}
       >
         <Button onClick={() => history.push("/stat")}>Stats</Button>
+        <Button onClick={() => history.push("/train")}>Train</Button>
         <Button onClick={() => setKey(+new Date())}>Restart</Button>
         <Button onClick={() => window.cuties.sim.pause()}>Pause</Button>
         <Button onClick={() => window.cuties.sim.run()}>Run</Button>
+        <Button
+          onClick={() =>
+            (window.cuties.sim.current as any).entityLoader.cuties.forEach(
+              (cutie) => {
+                cutie.ai = JSON.parse(localStorage.getItem("best"));
+              }
+            )
+          }
+        >
+          Load
+        </Button>
       </div>
     </Container>
   );

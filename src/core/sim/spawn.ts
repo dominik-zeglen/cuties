@@ -10,21 +10,19 @@ export function shouldSpawnRandomCutie(
   it: number,
   loader: EntityLoader
 ): boolean {
-  return it % 40 === 0 && loader.cuties.length < 20;
+  return it % 40 === 0 && loader.cuties.length < 5;
 }
 
 export function shouldSpawnFood(loader: EntityLoader): boolean {
   return (
     loader.cuties.length < 5 &&
     sum(loader.food.map((pellet) => pellet.value)) <
-      5e5 - loader.cuties.length * 2e4
+      1e5 - loader.cuties.length * 5e3
   );
 }
 
 export function shouldSpawnFlower(it: number, loader: EntityLoader): boolean {
-  return (
-    it % 30 === 0 && loader.flowers.length < 10 && loader.waste.length > 20
-  );
+  return it % 30 === 0 && loader.flowers.length < 5 && loader.waste.length > 20;
 }
 
 export function spawnRandomFood(sim: Sim) {

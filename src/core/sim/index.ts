@@ -24,6 +24,8 @@ import {
 import { Waste } from "../entities/waste";
 import { Flower } from "../entities/flowers";
 
+const isNode = typeof window === "undefined";
+
 export class Sim {
   bounds: Point[];
   entities: Entity[];
@@ -52,20 +54,22 @@ export class Sim {
       spawnRandomCutie(this);
     }
 
-    window.cuties = {
-      sim: {
-        current: this,
-        pause: this.pause,
-        run: this.run,
-      },
-      lastReload: Date.now(),
-      started: Date.now(),
-      iteration: 0,
-      stats: {
-        itPerSecond: 0,
-      },
-      selected: undefined,
-    };
+    if (!isNode) {
+      window.cuties = {
+        sim: {
+          current: this,
+          pause: this.pause,
+          run: this.run,
+        },
+        lastReload: Date.now(),
+        started: Date.now(),
+        iteration: 0,
+        stats: {
+          itPerSecond: 0,
+        },
+        selected: undefined,
+      };
+    }
   }
 
   pause = () => {
@@ -92,10 +96,10 @@ export class Sim {
     radius: number
   ): T[] =>
     qtree.retrieve({
-      height: radius,
-      width: radius,
-      x: point.x - radius / 2,
-      y: point.y - radius / 2,
+      height: radius * 2,
+      width: radius * 2,
+      x: point.x - radius,
+      y: point.y - radius,
     }) as T[];
 
   getNearestFood = (point: Point, radius: number): Food | undefined =>
@@ -117,7 +121,7 @@ export class Sim {
   };
 
   getStats = () => {
-    if (this.iteration % 120 === 0) {
+    if (this.iteration % 120 === 0 && !isNode) {
       window.cuties.stats = {
         itPerSecond: 120000 / (Date.now() - window.cuties.lastReload),
       };
@@ -165,8 +169,8 @@ export class Sim {
     spawnRandoms(this);
 
     this.regenerate();
-
     this.clean();
+
     this.getStats();
 
     this.iteration++;

@@ -42,7 +42,7 @@ export function sub(a: Point, b: Point): Point {
 
 export function getRandomPositionInBounds(bounds: Point[]): Point {
   return {
-    x: Math.random() * bounds[1].x * 2 + bounds[0].x,
-    y: Math.random() * bounds[1].y * 2 + bounds[0].y,
+    x: Math.random() * bounds[1].x,
+    y: Math.random() * bounds[1].y,
   };
 }
