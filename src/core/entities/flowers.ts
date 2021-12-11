@@ -64,14 +64,14 @@ export class Flower extends Entity {
   };
 
   applyForce = (forceVec?: PolarPoint) => {
-    const force = forceVec ?? { angle: this.angle, r: 0.02 };
+    const force = forceVec ?? { angle: this.angle, r: 5e-3 };
     this.position = add(this.position, toCartesian(force));
     this.next.forEach((node) => node.applyForce(force));
   };
 
   sim = (simInput: FlowerSimInput | null): void => {
     simInput.waste.forEach((waste) => this.eat(waste, null));
-    this.hunger += eatingRate * 0.87;
+    this.hunger += eatingRate * 0.77;
     this.sunlightStored += 0.6;
 
     if (this.hunger > maxHunger) {
