@@ -17,7 +17,7 @@ import {
 import { Food } from "./food";
 import { Waste } from "./waste";
 
-const maxHunger = 2000;
+export const maxHunger = 2000;
 const eggCost = 900;
 const initialHunger = maxHunger - eggCost * 0.9;
 const eatingRate = 10;
@@ -84,7 +84,9 @@ export class Cutie extends Entity {
       })
     );
     const energy =
-      (0.25 + distance ** 2 + Math.abs(this.thoughts.angle) / 2) *
+      (0.25 +
+        (1 + Math.abs(distance)) ** 2 / 4 +
+        Math.abs(this.thoughts.angle) / 2) *
       (this.wantsToEat() ? 1 : 0.5) *
       (this.wantsToLayEgg() ? 1 : 0.5);
 

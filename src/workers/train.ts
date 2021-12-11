@@ -58,13 +58,13 @@ self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
 
     if (momentumCounter > 40) {
       iteration = event.data.generations;
+    } else {
+      iteration++;
     }
 
     self.postMessage({
       iteration,
       scores: populationData,
     });
-
-    iteration++;
   }
 };
