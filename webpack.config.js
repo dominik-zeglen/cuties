@@ -3,9 +3,17 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
 const config = {
-  entry: "./src/index.tsx",
+  entry: ["./src/index.tsx"],
   module: {
     rules: [
+      {
+        test: /Train\.tsx$/,
+        loader: "string-replace-loader",
+        options: {
+          search: /import_meta\.url/,
+          replace: "import.meta.url",
+        },
+      },
       {
         test: /\.tsx?$/,
         loader: "esbuild-loader",
