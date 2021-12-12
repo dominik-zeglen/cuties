@@ -1,4 +1,5 @@
 import sum from "lodash/sum";
+import { clone } from "mathjs";
 import { CutieAi } from "./core/ai";
 import { Sim } from "./core/sim";
 import { TrainingSim } from "./core/sim/training";
@@ -7,28 +8,28 @@ export function transpose<T>(array: T[][]): T[][] {
   return array[0].map((_, colIndex) => array.map((row) => row[colIndex]));
 }
 
-export function getSim(iterations: number): Promise<number[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const sim = new Sim(500, 500);
-      const population = Array(iterations / 100).fill(0);
-      let oldest = 0;
-      for (let it = 0; it < iterations; it++) {
-        sim.next();
-        sim.entityLoader.cuties.forEach((cutie) => {
-          if (it - cutie.createdAt > oldest) {
-            oldest = it - cutie.createdAt;
-          }
-        });
-
-        if (it % 100 === 0) {
-          population[it / 100] = sim.entityLoader.cuties.length;
-        }
-      }
-
-      resolve(population);
-    }, 0);
+export function getSim(
+  iterations: number,
+  points: number,
+  initialAi: CutieAi
+): number[] {
+  const sim = new Sim(4000, 4000);
+  sim.randomSpawns = false;
+  sim.entityLoader.cuties.forEach((cutie) => {
+    cutie.ai = clone(initialAi);
   });
+  const retention = iterations / points;
+  const population = Array(points).fill(0);
+
+  for (let it = 0; it < iterations; it++) {
+    sim.next();
+
+    if (it % retention === 0) {
+      population[it / retention] = sim.entityLoader.cuties.length;
+    }
+  }
+
+  return population;
 }
 
 export interface SimPopulationOpts {

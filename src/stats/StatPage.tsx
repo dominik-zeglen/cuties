@@ -6,10 +6,19 @@ import { PopulationChart } from "./PopulationChart";
 export interface StatPageProps {
   data: number[][] | undefined;
   progress: number;
+  ratio: number;
 }
 
-export const StatPage: React.FC<StatPageProps> = ({ data, progress }) => (
+export const StatPage: React.FC<StatPageProps> = ({
+  data,
+  progress,
+  ratio,
+}) => (
   <PageContainer>
-    {data ? <PopulationChart data={data} /> : <Loader progress={progress} />}
+    {progress === 1 ? (
+      <PopulationChart data={data} ratio={ratio} />
+    ) : (
+      <Loader progress={progress} />
+    )}
   </PageContainer>
 );

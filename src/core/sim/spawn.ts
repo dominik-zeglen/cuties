@@ -13,11 +13,13 @@ export function shouldSpawnRandomCutie(
   return it % 40 === 0 && loader.cuties.length < 5;
 }
 
-export function shouldSpawnFood(loader: EntityLoader): boolean {
+export function shouldSpawnFood(sim: Sim): boolean {
+  const area = (sim.bounds[1].x * sim.bounds[1].y) / 1e6;
+
   return (
-    loader.cuties.length < 5 &&
-    sum(loader.food.map((pellet) => pellet.value)) <
-      1e5 - loader.cuties.length * 5e3
+    sim.entityLoader.cuties.length < 5 &&
+    sum(sim.entityLoader.food.map((pellet) => pellet.value)) <
+      1e5 * area - sim.entityLoader.cuties.length * 5e3 * area
   );
 }
 

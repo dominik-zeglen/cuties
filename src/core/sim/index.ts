@@ -9,6 +9,7 @@ import {
   shouldSpawnFood,
   shouldSpawnRandomCutie,
   spawnRandomCutie,
+  spawnRandomFlower,
   spawnRandomFood,
   spawnRandoms,
 } from "./spawn";
@@ -22,7 +23,6 @@ import {
   simWaste,
 } from "./sim";
 import { Waste } from "../entities/waste";
-import { Flower } from "../entities/flowers";
 
 const isNode = typeof window === "undefined";
 
@@ -34,6 +34,7 @@ export class Sim {
   selected: string | null;
   entityLoader: EntityLoader;
   entityCounter: number;
+  randomSpawns: boolean;
 
   constructor(width: number, height: number) {
     this.entities = [];
@@ -45,6 +46,7 @@ export class Sim {
     ];
     this.entityLoader = new EntityLoader(width, height);
     this.selected = null;
+    this.randomSpawns = true;
 
     while (this.shouldSpawnFood()) {
       spawnRandomFood(this);
@@ -53,6 +55,11 @@ export class Sim {
     for (let cutieIndex = 0; cutieIndex < 15; cutieIndex++) {
       spawnRandomCutie(this);
     }
+    for (let flowerIndex = 0; flowerIndex < 8; flowerIndex++) {
+      spawnRandomFlower(this);
+    }
+
+    this.entityLoader.init(this.entities);
 
     if (!isNode) {
       window.cuties = {
@@ -83,7 +90,7 @@ export class Sim {
   shouldSpawnRandomCutie = () =>
     shouldSpawnRandomCutie(this.iteration, this.entityLoader);
 
-  shouldSpawnFood = () => shouldSpawnFood(this.entityLoader);
+  shouldSpawnFood = () => shouldSpawnFood(this);
 
   shouldSpawnFlower = () =>
     shouldSpawnFlower(this.iteration, this.entityLoader);
@@ -133,12 +140,6 @@ export class Sim {
   registerEntity = (entity: Entity) => {
     entity.id = this.entityCounter;
     entity.createdAt = this.iteration;
-    if (entity instanceof Flower && this.entityLoader.flowers.length > 350) {
-      entity.shouldDelete = true;
-    }
-    if (entity instanceof Waste && this.entityLoader.waste.length > 500) {
-      entity.shouldDelete = true;
-    }
 
     this.entities.push(entity);
     this.entityCounter++;
@@ -166,7 +167,9 @@ export class Sim {
     simWaste(this);
     simFood(this);
 
-    spawnRandoms(this);
+    if (this.randomSpawns) {
+      spawnRandoms(this);
+    }
 
     this.regenerate();
     this.clean();

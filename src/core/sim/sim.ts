@@ -1,6 +1,6 @@
 import type { Sim } from ".";
 import { CutieSimInput, rangeRadius } from "../entities/cutie";
-import { Flower } from "../entities/flowers";
+import { Flower, rangeRadius as flowerRangeRadius } from "../entities/flowers";
 import { Waste } from "../entities/waste";
 import { sub, toPolar } from "../r2";
 
@@ -50,7 +50,7 @@ export function simCuties(sim: Sim) {
 function simFlower(flower: Flower, sim: Sim) {
   flower.sim({
     iteration: sim.iteration,
-    waste: sim.getNearestWaste(flower.position, 80),
+    waste: sim.getNearestWaste(flower.position, flowerRangeRadius).slice(0, 3),
   });
 
   if (flower.canProduce(sim.iteration)) {

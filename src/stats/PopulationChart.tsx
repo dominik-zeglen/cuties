@@ -8,10 +8,12 @@ Chart.register(...registerables);
 
 export interface PopulationChartProps {
   data: number[][];
+  ratio: number;
 }
 
 export const PopulationChart: React.FC<PopulationChartProps> = ({
   data: populationData,
+  ratio,
 }) => {
   const canvas = React.useRef<HTMLCanvasElement>(null);
 
@@ -46,12 +48,12 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({
           ],
           labels: Array(populationData[0].length)
             .fill(0)
-            .map((_, index) => (index + 1).toString()),
+            .map((_, index) => Math.floor((index + 1) * ratio).toString()),
         },
         type: "line",
       });
     }
-  }, [populationData]);
+  }, []);
 
-  return <canvas height="800" width="1200" ref={canvas} />;
+  return <canvas height="800" width="1024" ref={canvas} />;
 };

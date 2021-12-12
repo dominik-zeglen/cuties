@@ -16,6 +16,7 @@ const initialHunger = maxHunger - produceCost * 0.3;
 const eatingRate = 0.4;
 const foodValue = 200;
 const foodEnergyCostRatio = 0.1;
+export const rangeRadius = 80;
 
 export type EatDirection = "forward" | "backward" | null;
 
@@ -71,7 +72,7 @@ export class Flower extends Entity {
 
   sim = (simInput: FlowerSimInput | null): void => {
     simInput.waste.forEach((waste) => this.eat(waste, null));
-    this.hunger += eatingRate * 0.77;
+    this.hunger += eatingRate * 0.7;
     this.sunlightStored += 0.6;
 
     if (this.hunger > maxHunger) {

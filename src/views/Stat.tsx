@@ -1,32 +1,43 @@
 import React from "react";
 import { StatPage } from "../stats/StatPage";
-import { getSim } from "../utils";
+import { PopulationSimInitMsg, PopulationSimMsg } from "../workers/population";
 
-const sims = 10;
-const iterations = 1e4;
+const opts: PopulationSimInitMsg = {
+  sims: 5,
+  maxIterations: 4e4,
+  initialAi: JSON.parse(localStorage.getItem("best")),
+  points: 200,
+};
 
 export const Stat: React.FC = () => {
   const [progress, setProgress] = React.useState(0);
-  const [data, setData] = React.useState<number[][]>();
-  const interval = React.useRef<number>(null);
+  const [data, setData] = React.useState<number[][]>([]);
+  const worker = React.useRef<Worker>(null);
 
   React.useEffect(() => {
-    interval.current = setTimeout(async () => {
-      const newData: number[][] = Array(sims).fill([]);
+    worker.current = new Worker(
+      new URL("../workers/population.ts", import.meta.url)
+    );
 
-      for (let index = 0; index < sims; index++) {
-        // TODO: fix this
-        // eslint-disable-next-line
-        newData[index] = await getSim(iterations);
-        setProgress((index + 1) / sims);
+    worker.current.postMessage(opts);
+
+    worker.current.addEventListener(
+      "message",
+      (event: MessageEvent<PopulationSimMsg>) => {
+        setData((prevData) => [...prevData, event.data.populationSizes]);
+        setProgress(event.data.simIndex / opts.sims);
       }
+    );
 
-      setData(newData);
-    }, 0) as unknown as number;
-
-    return () => clearInterval(interval.current);
+    return () => worker.current.terminate();
   }, []);
 
-  return <StatPage data={data} progress={progress} />;
+  return (
+    <StatPage
+      data={data}
+      progress={progress}
+      ratio={opts.maxIterations / opts.points}
+    />
+  );
 };
 Stat.displayName = "Stat";
