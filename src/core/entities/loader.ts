@@ -4,6 +4,7 @@ import { Egg } from "./egg";
 import { Entity } from "./entity";
 import { Flower } from "./flowers";
 import { Food } from "./food";
+import { Remains } from "./remains";
 import { Waste } from "./waste";
 
 export class EntityLoader {
@@ -15,11 +16,12 @@ export class EntityLoader {
   cachedEggs: Egg[] | null;
   cachedWaste: Waste[] | null;
   cachedFlowerRoots: Flower[] | null;
+  cachedRemains: Remains[] | null;
 
   width: number;
   height: number;
 
-  qtrees: Record<"food" | "waste", QuadTree | null>;
+  qtrees: Record<"food" | "waste" | "cuties" | "remains", QuadTree | null>;
 
   constructor(width: number, height: number) {
     this.entities = [];
@@ -46,6 +48,26 @@ export class EntityLoader {
         35,
         6
       ),
+      cuties: new QuadTree(
+        {
+          height: this.height,
+          width: this.width,
+          x: 0,
+          y: 0,
+        },
+        35,
+        5
+      ),
+      remains: new QuadTree(
+        {
+          height: this.height,
+          width: this.width,
+          x: 0,
+          y: 0,
+        },
+        35,
+        6
+      ),
     };
   }
 
@@ -58,11 +80,16 @@ export class EntityLoader {
     this.cachedEggs = null;
     this.cachedWaste = null;
     this.cachedFlowerRoots = null;
+    this.cachedRemains = null;
 
     this.qtrees.food.clear();
     this.food.forEach((food) => this.qtrees.food.insert(food));
     this.qtrees.waste.clear();
     this.waste.forEach((waste) => this.qtrees.waste.insert(waste));
+    this.qtrees.cuties.clear();
+    this.cuties.forEach((cutie) => this.qtrees.cuties.insert(cutie));
+    this.qtrees.remains.clear();
+    this.remains.forEach((remains) => this.qtrees.remains.insert(remains));
   };
 
   get food(): Food[] {
@@ -120,5 +147,15 @@ export class EntityLoader {
     }
 
     return this.cachedWaste;
+  }
+
+  get remains(): Remains[] {
+    if (!this.cachedRemains) {
+      this.cachedRemains = this.entities.filter(
+        (entity) => entity instanceof Remains
+      ) as Remains[];
+    }
+
+    return this.cachedRemains;
   }
 }

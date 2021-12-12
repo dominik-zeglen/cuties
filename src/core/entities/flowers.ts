@@ -1,4 +1,5 @@
 import LSystem from "lindenmayer";
+import max from "lodash/max";
 import { Entity, InitialEntityInput } from "./entity";
 import {
   add,
@@ -12,8 +13,8 @@ import { Food } from "./food";
 
 export const maxHunger = 2000;
 const produceCost = 1100;
-const initialHunger = maxHunger - produceCost * 0.3;
-const eatingRate = 0.4;
+const initialHunger = maxHunger - produceCost * 0.6;
+const eatingRate = 0.6;
 const foodValue = 200;
 const foodEnergyCostRatio = 0.1;
 export const rangeRadius = 80;
@@ -39,6 +40,7 @@ export class Flower extends Entity {
   produces: string | null;
   wasteStored: number;
   sunlightStored: number;
+  degree: number;
 
   constructor(initial: InitialFlowerInput) {
     super(initial);
@@ -48,38 +50,37 @@ export class Flower extends Entity {
     this.produces = initial.produces;
     this.hunger = initialHunger;
     this.sunlightStored = 0;
+    this.degree = 1;
   }
 
   die = () => {
     this.markToDelete();
     if (this.parent) {
       this.parent.next = this.parent.next.filter((node) => node.id !== this.id);
+      this.parent.updateDegree();
     }
 
     this.next.forEach((node) => {
       node.parent = null;
-      if (Math.random() < 0.5) {
+      if (Math.random() < 0.75) {
         node.die();
       }
     });
   };
 
   applyForce = (forceVec?: PolarPoint) => {
-    const force = forceVec ?? { angle: this.angle, r: 5e-3 };
+    const force = forceVec ?? { angle: this.angle, r: 1e-2 };
     this.position = add(this.position, toCartesian(force));
     this.next.forEach((node) => node.applyForce(force));
   };
 
   sim = (simInput: FlowerSimInput | null): void => {
     simInput.waste.forEach((waste) => this.eat(waste, null));
-    this.hunger += eatingRate * 0.7;
+    this.hunger +=
+      eatingRate * (0.7 + (simInput.iteration - this.createdAt) / 2e4);
     this.sunlightStored += 0.6;
 
     if (this.hunger > maxHunger) {
-      this.die();
-    }
-
-    if (simInput.iteration - this.createdAt > 1e4 && Math.random() < 1e-3) {
       this.die();
     }
   };
@@ -127,7 +128,7 @@ export class Flower extends Entity {
   canProduce = (it: number): boolean =>
     this.hunger + produceCost + 100 < maxHunger &&
     this.next.length === 0 &&
-    it - this.createdAt > 1000;
+    it - this.createdAt > 1500;
 
   produce = (): Flower[] => {
     let { angle } = this;
@@ -146,7 +147,7 @@ export class Flower extends Entity {
               successor: "-N",
             },
             {
-              weight: 0.5,
+              weight: 0.35,
               successor: "N",
             },
             {
@@ -154,12 +155,16 @@ export class Flower extends Entity {
               successor: "++N",
             },
             {
-              weight: 0.05,
+              weight: 0.1,
               successor: "++N---N",
             },
             {
-              weight: 0.05,
+              weight: 0.1,
               successor: "++N--N",
+            },
+            {
+              weight: 0.05,
+              successor: "++N-N--N",
             },
           ],
         },
@@ -194,6 +199,11 @@ export class Flower extends Entity {
 
     this.hunger += produceCost;
 
+    this.next.forEach((node) => {
+      node.hunger = maxHunger - (maxHunger - node.hunger) / this.next.length;
+    });
+    this.updateDegree();
+
     return this.next;
   };
 
@@ -209,6 +219,16 @@ export class Flower extends Entity {
     this.sunlightStored -= (1 - foodEnergyCostRatio) * foodValue;
 
     return food;
+  };
+
+  updateDegree = () => {
+    this.degree = this.next.length
+      ? max(this.next.map((node) => node.degree)) + 1
+      : 1;
+
+    if (this.parent) {
+      this.parent.updateDegree();
+    }
   };
 }
 

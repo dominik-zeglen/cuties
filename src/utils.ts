@@ -12,7 +12,7 @@ export function getSim(
   points: number,
   initialAi: CutieAi
 ): number[] {
-  const sim = new Sim(4000, 4000);
+  const sim = new Sim(1000, 1000);
   sim.randomSpawns = false;
   sim.entityLoader.cuties.forEach((cutie) => {
     cutie.ai = clone(initialAi);

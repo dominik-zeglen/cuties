@@ -1,6 +1,8 @@
 import { Sim } from ".";
+import { getRandomCutieAi } from "../ai";
 import { Cutie } from "../entities/cutie";
 import { Food } from "../entities/food";
+import { Remains } from "../entities/remains";
 
 test("Gets nearest food", () => {
   const sim = new Sim(10, 10);
@@ -17,6 +19,49 @@ test("Gets nearest food", () => {
 
   sim.entityLoader.init(sim.entities);
   const nearest = sim.getNearestFood({ x: 3, y: 1 }, 10);
+
+  expect(nearest.id).toBe(1);
+});
+
+test("Gets nearest cutie", () => {
+  const sim = new Sim(10, 10);
+  sim.clear();
+
+  sim.registerEntity(
+    new Cutie({
+      ai: getRandomCutieAi(),
+      ancestors: 0,
+      angle: 0,
+      position: {
+        x: -5,
+        y: -5,
+      },
+    })
+  );
+
+  sim.entityLoader.init(sim.entities);
+  const nearest = sim.getNearestCutie({ x: -5, y: -5 }, 10, () => true);
+
+  expect(nearest.id).toBe(0);
+});
+
+test("Gets nearest remains", () => {
+  const sim = new Sim(10, 10);
+  sim.clear();
+
+  [
+    new Remains({
+      position: { x: -1, y: 1 },
+      value: 1,
+    }),
+    new Remains({
+      position: { x: 2, y: 1 },
+      value: 1,
+    }),
+  ].forEach((food) => sim.registerEntity(food));
+
+  sim.entityLoader.init(sim.entities);
+  const nearest = sim.getNearestRemains({ x: 3, y: 1 }, 10);
 
   expect(nearest.id).toBe(1);
 });

@@ -20,9 +20,14 @@ import {
   simFlowerRoots,
   simFlowers,
   simFood,
+  simRemains,
   simWaste,
 } from "./sim";
 import { Waste } from "../entities/waste";
+import { Cutie } from "../entities/cutie";
+import { Remains } from "../entities/remains";
+import { Flower } from "../entities/flowers";
+import { Egg } from "../entities/egg";
 
 const isNode = typeof window === "undefined";
 
@@ -124,12 +129,36 @@ export class Sim {
       (entity) => len(sub(entity.position, point))
     );
 
+  getNearestRemains = (point: Point, radius: number): Remains | undefined =>
+    minBy(
+      this.getNearest(this.entityLoader.qtrees.remains, point, radius),
+      (entity) => len(sub(entity.position, point))
+    );
+
+  getNearestCutie = (
+    point: Point,
+    radius: number,
+    // eslint-disable-next-line no-unused-vars
+    filter: (cutie: Cutie) => boolean
+  ): Cutie | undefined =>
+    minBy(
+      (
+        this.getNearest(
+          this.entityLoader.qtrees.cuties,
+          point,
+          radius
+        ) as Cutie[]
+      ).filter(filter),
+      (entity) => len(sub(entity.position, point))
+    );
+
   getNearestWaste = (point: Point, radius: number): Waste[] | undefined =>
     this.getNearest(this.entityLoader.qtrees.waste, point, radius);
 
   clean = () => {
     cleanDepletedPellets(this.entityLoader.food);
     cleanDepletedPellets(this.entityLoader.waste);
+    cleanDepletedPellets(this.entityLoader.remains);
     if (this.iteration % 5) {
       cleanOutOfBounds(this.entities, this.bounds);
     }
@@ -147,6 +176,26 @@ export class Sim {
   };
 
   registerEntity = (entity: Entity) => {
+    if (entity instanceof Flower && this.entityLoader.flowers.length > 200) {
+      return;
+    }
+
+    if (entity instanceof Cutie && this.entityLoader.flowers.length > 300) {
+      return;
+    }
+
+    if (entity instanceof Waste && this.entityLoader.waste.length > 400) {
+      return;
+    }
+
+    if (entity instanceof Remains && this.entityLoader.remains.length > 200) {
+      return;
+    }
+
+    if (entity instanceof Egg && this.entityLoader.eggs.length > 100) {
+      return;
+    }
+
     entity.id = this.entityCounter;
     entity.createdAt = this.iteration;
 
@@ -175,6 +224,7 @@ export class Sim {
     simEggs(this);
     simWaste(this);
     simFood(this);
+    simRemains(this);
 
     if (this.randomSpawns) {
       spawnRandoms(this);

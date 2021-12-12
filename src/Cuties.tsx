@@ -15,6 +15,7 @@ import {
 import { maxValue } from "./core/entities/waste";
 import { defaultInitialFoodValue } from "./core/entities/food";
 import { TrainingSim } from "./core/sim/training";
+import { maxHunger } from "./core/entities/cutie";
 
 function createColormap(nshades: number): string[] {
   return Array<Color>(nshades)
@@ -90,6 +91,14 @@ export const Cuties: React.FC<CutiesProps> = () => {
         color: theme.entities.dump.string(),
         pellet: waste,
         maxValue,
+      })
+    );
+
+    sim.current.entityLoader.remains.forEach((remains) =>
+      drawPellet(context, {
+        color: theme.secondary.string(),
+        pellet: remains,
+        maxValue: maxHunger / 2,
       })
     );
 

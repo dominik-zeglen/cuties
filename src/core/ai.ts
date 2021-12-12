@@ -2,14 +2,26 @@ import { add, multiply, map, zeros, derivative, matrix, Matrix } from "mathjs";
 import cloneDeep from "lodash/cloneDeep";
 
 export type CutieInput = Record<
-  "hunger" | "foundFood" | "angleToFood" | "distanceToFood",
+  | "hunger"
+  | "foundFood"
+  | "angleToFood"
+  | "distanceToFood"
+  | "foundCutie"
+  | "angleToCutie"
+  | "distanceToCutie"
+  | "foundRemains"
+  | "angleToRemains"
+  | "distanceToRemains",
   number
 >;
-const inputs = 4;
-const outputs = 4;
+const inputs = 10;
+const outputs = 5;
 const hidden = 8;
 type Matrix2d = number[][];
-export type CutieOutput = Record<"speed" | "angle" | "eat" | "layEgg", number>;
+export type CutieOutput = Record<
+  "speed" | "angle" | "eat" | "layEgg" | "attack",
+  number
+>;
 export interface CutieAiLayer {
   biases: Matrix2d;
   weights: Matrix2d;
@@ -26,6 +38,9 @@ export const baseSystem: CutieAi = [
   //   weights: zeros([hidden, outputs]) as Matrix2d,
   // },
 ];
+
+baseSystem[0].biases[0][1] = 0.2;
+baseSystem[0].weights[2][0] = -0.5;
 
 function getMultiplicationProductFormula(n: number, index: number): string {
   return Array(n)
@@ -77,8 +92,8 @@ export function sgd(
     l1Variables[`b_${outputIndex}`] = ai[0].biases[0][outputIndex];
     l1Variables[`y_${outputIndex}`] = output[outputIndex];
     for (let inputIndex = 0; inputIndex < inputs; inputIndex++) {
-      l1Variables[`a_${outputIndex}_${inputIndex}`] =
-        ai[0].weights[outputIndex][inputIndex];
+      l1Variables[`a_${inputIndex}_${outputIndex}`] =
+        ai[0].weights[inputIndex][outputIndex];
     }
   }
   for (let inputIndex = 0; inputIndex < inputs; inputIndex++) {
@@ -148,7 +163,18 @@ export function getRandomCutieAi(): CutieAi {
 
 export function getInputMatrix(input: CutieInput): Matrix2d {
   return [
-    [input.hunger, input.foundFood, input.angleToFood, input.distanceToFood],
+    [
+      input.hunger,
+      input.foundFood,
+      input.angleToFood,
+      input.distanceToFood,
+      input.foundCutie,
+      input.angleToCutie,
+      input.distanceToCutie,
+      input.foundRemains,
+      input.angleToRemains,
+      input.distanceToRemains,
+    ],
   ];
 }
 
@@ -163,7 +189,6 @@ export function feed(input: Matrix2d, ai: CutieAi): Matrix2d {
   );
 }
 
-// 1 x 5 . 5 x 8 . 8 x 4 => 1 x 4
 export function think(input: CutieInput, ai: CutieAi): CutieOutput {
   const inputMatrix = getInputMatrix(input);
 
@@ -174,6 +199,7 @@ export function think(input: CutieInput, ai: CutieAi): CutieOutput {
     speed: output[1],
     eat: output[2],
     layEgg: output[3],
+    attack: output[4],
   };
 }
 

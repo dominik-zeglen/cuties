@@ -1,36 +1,112 @@
 import type { Sim } from ".";
-import { Cutie, CutieSimInput, rangeRadius } from "../entities/cutie";
+import {
+  Cutie,
+  CutieSimInput,
+  maxHunger,
+  rangeRadius,
+} from "../entities/cutie";
 import { Flower, rangeRadius as flowerRangeRadius } from "../entities/flowers";
-import { Waste } from "../entities/waste";
-import { sub, toPolar } from "../r2";
+import { Remains } from "../entities/remains";
+import { PolarPoint, sub, toPolar } from "../r2";
 
-export function getCutieInput(cutie: Cutie, sim: Sim): CutieSimInput {
-  let simInput: CutieSimInput | null = null;
-  const nearestFood = sim.getNearestFood(cutie.position, rangeRadius);
-  if (nearestFood) {
-    const nearestFoodPolarPosition = toPolar(
-      sub(nearestFood.position, cutie.position)
-    );
+export function getCutieInput(
+  cutie: Cutie,
+  sim: Sim,
+  nearestFoodPolarPosition: PolarPoint | undefined,
+  nearestCutiePolarPosition: PolarPoint | undefined,
+  nearestRemainsPolarPosition: PolarPoint | undefined
+): CutieSimInput {
+  const simInput: CutieSimInput = {
+    iteration: sim.iteration,
+    nearestFood: null,
+    nearestCutie: null,
+    nearestRemains: null,
+  };
 
-    if (nearestFoodPolarPosition.r < 10 && cutie.wantsToEat()) {
-      cutie.eat(nearestFood);
-    }
-    simInput = {
-      iteration: sim.iteration,
-      nearestFood: nearestFoodPolarPosition,
-    };
-  } else {
-    simInput = {
-      iteration: sim.iteration,
-      nearestFood: null,
-    };
+  if (nearestFoodPolarPosition) {
+    simInput.nearestFood = nearestFoodPolarPosition;
+  }
+
+  if (nearestCutiePolarPosition) {
+    simInput.nearestCutie = nearestCutiePolarPosition;
+  }
+
+  if (nearestRemainsPolarPosition) {
+    simInput.nearestRemains = nearestRemainsPolarPosition;
   }
 
   return simInput;
 }
 
-export function simCutie(cutie: Cutie, sim: Sim): void {
-  cutie.sim(Math.random() > 0.5 ? getCutieInput(cutie, sim) : null);
+export function simCutie(cutie: Cutie, sim: Sim, think: boolean): void {
+  const nearestFood = sim.getNearestFood(cutie.position, rangeRadius);
+  let nearestFoodPolarPosition: PolarPoint | null = null;
+  let actionTaken = false;
+
+  if (nearestFood && cutie.wantsToEat()) {
+    nearestFoodPolarPosition = toPolar(
+      sub(nearestFood.position, cutie.position)
+    );
+
+    if (nearestFoodPolarPosition.r < 10 && cutie.wantsToEat()) {
+      cutie.eat(nearestFood);
+      actionTaken = true;
+    }
+  }
+
+  const nearestCutie = sim.getNearestCutie(
+    cutie.position,
+    rangeRadius,
+    (candidateCutie) => candidateCutie.id !== cutie.id
+  );
+  let nearestCutiePolarPosition: PolarPoint | null = null;
+
+  if (nearestCutie && cutie.wantsToEat()) {
+    nearestCutiePolarPosition = toPolar(
+      sub(nearestCutie.position, cutie.position)
+    );
+
+    if (
+      !actionTaken &&
+      nearestCutiePolarPosition.r < 10 &&
+      cutie.canAttack(sim.iteration) &&
+      cutie.wantsToAttack()
+    ) {
+      cutie.attack(sim.iteration, nearestCutie);
+      actionTaken = true;
+    }
+  }
+
+  const nearestRemains = sim.getNearestRemains(cutie.position, rangeRadius);
+  let nearestRemainsPolarPosition: PolarPoint | null = null;
+
+  if (nearestRemains && cutie.wantsToEat()) {
+    nearestRemainsPolarPosition = toPolar(
+      sub(nearestRemains.position, cutie.position)
+    );
+
+    if (
+      !actionTaken &&
+      nearestRemainsPolarPosition.r < 10 &&
+      cutie.wantsToAttack()
+    ) {
+      cutie.eat(nearestRemains);
+      actionTaken = true;
+    }
+  }
+
+  cutie.sim(
+    think
+      ? getCutieInput(
+          cutie,
+          sim,
+          nearestFoodPolarPosition,
+          nearestCutiePolarPosition,
+          nearestRemainsPolarPosition
+        )
+      : null
+  );
+
   if (cutie.wantsToLayEgg() && cutie.canLayEgg()) {
     sim.registerEntity(cutie.layEgg(sim.iteration));
   }
@@ -41,16 +117,16 @@ export function simCutie(cutie: Cutie, sim: Sim): void {
   }
 
   if (cutie.shouldDelete) {
-    const remains = new Waste({
+    const remains = new Remains({
       position: cutie.position,
+      value: 100 + maxHunger - cutie.hunger,
     });
-    remains.value = 100;
     sim.registerEntity(remains);
   }
 }
 
 export function simCuties(sim: Sim) {
-  sim.entityLoader.cuties.forEach((cutie) => simCutie(cutie, sim));
+  sim.entityLoader.cuties.forEach((cutie) => simCutie(cutie, sim, true));
 }
 
 function simFlower(flower: Flower, sim: Sim) {
@@ -90,4 +166,8 @@ export function simWaste(sim: Sim) {
 
 export function simFood(sim: Sim) {
   sim.entityLoader.food.forEach((food) => food.sim());
+}
+
+export function simRemains(sim: Sim) {
+  sim.entityLoader.remains.forEach((remains) => remains.sim());
 }

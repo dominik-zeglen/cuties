@@ -9,8 +9,8 @@ export class Egg extends Entity {
 
   constructor(parent: Cutie) {
     super({ position: parent.position });
-    this.spawnTime = 800;
-    this.ai = Math.random() < 0.2 ? mutate(parent.ai, 1e3) : parent.ai;
+    this.spawnTime = 700;
+    this.ai = Math.random() < 0.1 ? mutate(parent.ai, 1e3) : parent.ai;
     this.ancestors = parent.ancestors + 1;
   }
 

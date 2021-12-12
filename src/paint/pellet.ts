@@ -17,6 +17,10 @@ export function drawStaticPellet(
   context: CanvasRenderingContext2D,
   { color, pellet, size }: DrawStaticPelletOpts
 ) {
+  if (size < 0) {
+    return;
+  }
+
   context.fillStyle = color;
   context.beginPath();
   context.ellipse(
@@ -36,10 +40,6 @@ export function drawPellet(
   context: CanvasRenderingContext2D,
   { pellet, maxValue, ...rest }: DrawPelletOpts
 ) {
-  if (pellet.value < 0) {
-    return;
-  }
-
   const size = (pellet.value / maxValue) * 4;
 
   drawStaticPellet(context, {

@@ -1,9 +1,10 @@
 import { Entity } from "../entities/entity";
 import { Food } from "../entities/food";
+import { Remains } from "../entities/remains";
 import { Waste } from "../entities/waste";
 import { Point } from "../r2";
 
-export function cleanDepletedPellets(pellets: Array<Food | Waste>) {
+export function cleanDepletedPellets(pellets: Array<Food | Waste | Remains>) {
   pellets.forEach((pellet) => {
     if (pellet.value <= 0) {
       pellet.die();

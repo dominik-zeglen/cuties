@@ -1,13 +1,12 @@
 /* eslint-disable no-restricted-globals */
 
 import maxBy from "lodash/maxBy";
-import { shuffle } from "lodash";
+import shuffle from "lodash/shuffle";
 import { baseSystem, CutieAi, getInputMatrix, sgd } from "../core/ai";
 import { pelletValue, Score, TrainingSim } from "../core/sim/training";
-import { Cutie, getInput } from "../core/entities/cutie";
-import { Sim } from "../core/sim";
-import { Waste } from "../core/entities/waste";
+import { Cutie, getInput, rangeRadius } from "../core/entities/cutie";
 import { getCutieInput } from "../core/sim/sim";
+import { toPolar } from "../core/r2";
 
 export interface GenerationSimData {
   ai: CutieAi;
@@ -24,36 +23,10 @@ const simStep = 1;
 const simNextIterations = 1;
 const batchSize = 200;
 
-function simCutieWithoutInput(cutie: Cutie, sim: Sim): void {
-  cutie.sim(null);
-  if (cutie.wantsToLayEgg() && cutie.canLayEgg()) {
-    sim.registerEntity(cutie.layEgg(sim.iteration));
-  }
-
-  if (cutie.shouldDumpWaste()) {
-    const waste = cutie.dumpWaste();
-    sim.registerEntity(waste);
-  }
-
-  if (cutie.shouldDelete) {
-    const remains = new Waste({
-      position: cutie.position,
-    });
-    remains.value = 100;
-    sim.registerEntity(remains);
-  }
-}
-
 function getScore(score: Score): number {
   const scoreForDistance = (-2 * score.distance) / (400 * 1.41);
   const scoreForEggs = score.eggs;
   const scoreForEatenPellets = score.eaten * 10;
-  // const scoreForSpeed =
-  //   -sum(
-  //     score.speed.map((it, i) =>
-  //       i === 0 ? it : it - score.speed[i - 1] / 500
-  //     )
-  //   ) / 2;
   const scoreForCurrentPellet =
     ((pelletValue - score.currentFood) / pelletValue) * 7;
 
@@ -61,7 +34,6 @@ function getScore(score: Score): number {
     scoreForDistance +
     scoreForEggs +
     scoreForEatenPellets +
-    // scoreForSpeed +
     scoreForCurrentPellet
   );
 }
@@ -70,6 +42,7 @@ self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
   let ai = baseSystem;
   let simIndex = 0;
   let sim = new TrainingSim(ai, simIndex);
+  let trainData: Array<Record<"input" | "output", number[]>> = [];
 
   for (let i = 0; i <= event.data.maxIterations; i++) {
     const cutie: Cutie = sim.getById(0);
@@ -79,8 +52,6 @@ self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
       sim = new TrainingSim(ai, simIndex % 4);
       continue;
     }
-
-    const trainData: Array<Record<"input" | "output", number[]>> = [];
 
     if (sim.iteration % simStep === 0) {
       const simData = Array(5)
@@ -101,7 +72,7 @@ self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
                       const layEggOutput = layEggIndex ? 1 : -1;
 
                       const branchedSim = sim.copy();
-                      branchedSim.simCutie = simCutieWithoutInput;
+                      branchedSim.enableThinking = false;
                       branchedSim.getById<Cutie>(0).thoughts.angle =
                         angleOutput;
                       branchedSim.getById<Cutie>(0).thoughts.eat = eatOutput;
@@ -133,21 +104,38 @@ self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
         .flat();
 
       const best = maxBy(simData, "score");
+      const nearestFood = sim.getNearestFood(cutie.position, rangeRadius);
+      const nearestFoodPosition = nearestFood ? toPolar(nearestFood) : null;
       trainData.push({
-        input: getInputMatrix(getInput(cutie, getCutieInput(cutie, sim)))[0],
+        input: getInputMatrix(
+          getInput(
+            cutie,
+            getCutieInput(
+              cutie,
+              sim,
+              nearestFoodPosition,
+              { angle: Math.random() - 0.5, r: Math.random() - 0.5 },
+              { angle: Math.random() - 0.5, r: Math.random() - 0.5 }
+            )
+          )
+        )[0],
         output: [
           best.angleOutput,
           best.speedOutput,
           best.eatOutput,
           best.layEggOutput,
+          cutie.thoughts.attack,
         ],
       });
     }
 
     if (sim.iteration % batchSize === 0) {
-      shuffle(trainData).forEach((data) => {
-        ai = sgd(ai, data.input, data.output, 1e-1);
-      });
+      shuffle(trainData)
+        .slice(0, trainData.length / 5)
+        .forEach((data) => {
+          ai = sgd(ai, data.input, data.output, 1e-3);
+        });
+      trainData = [];
 
       cutie.ai = ai;
 

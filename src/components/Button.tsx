@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
     letterSpacing: "0.1rem",
     color: theme.primary.toString(),
     transition: theme.transition,
+    userSelect: "none",
   },
 });
 

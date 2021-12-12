@@ -1,6 +1,6 @@
 import { baseSystem } from "../ai";
-import { Point, rotate, sub, toCartesian, toPolar } from "../r2";
-import { Cutie, getInput } from "./cutie";
+import { Point, sub, toPolar } from "../r2";
+import { Cutie, getAngleInput } from "./cutie";
 
 interface TestCase {
   cutie: Cutie;
@@ -73,13 +73,11 @@ const testCases: TestCase[] = [
 describe("getInput", () => {
   const t = test.each(testCases);
   t("Properly calculates input angle", (testCase) => {
-    const nearestFood = toPolar(sub(testCase.food, testCase.cutie.position));
-    const input = getInput(testCase.cutie, {
-      iteration: 0,
-      nearestFood,
-    });
+    const nearestFoodPos = toPolar(sub(testCase.food, testCase.cutie.position));
+    const angle = getAngleInput(nearestFoodPos, testCase.cutie.angle);
 
-    expect(input.angleToFood).toBeGreaterThan(testCase.expectedAngle - 1e-3);
-    expect(input.angleToFood).toBeLessThan(testCase.expectedAngle + 1e-3);
+    expect(Math.sqrt(angle ** 2 - testCase.expectedAngle ** 2)).toBeLessThan(
+      1e-5
+    );
   });
 });

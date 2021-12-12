@@ -4,7 +4,7 @@ import { PopulationSimInitMsg, PopulationSimMsg } from "../workers/population";
 
 const opts: PopulationSimInitMsg = {
   sims: 5,
-  maxIterations: 4e4,
+  maxIterations: 2e4,
   initialAi: JSON.parse(localStorage.getItem("best")),
   points: 200,
 };

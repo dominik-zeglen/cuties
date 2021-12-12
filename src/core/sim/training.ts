@@ -1,12 +1,10 @@
-import { sum } from "simple-statistics";
-import cloneDeep from "lodash/cloneDeep";
 import { Sim } from ".";
 import { CutieAi } from "../ai";
-import { Cutie, maxHunger } from "../entities/cutie";
+import { Cutie } from "../entities/cutie";
+import { sub, len } from "../r2";
 import { Food } from "../entities/food";
-import { add, sub, toCartesian, len } from "../r2";
 import { cleanDepletedPellets, cleanOutOfBounds } from "./gc";
-import { simCutie, simCuties } from "./sim";
+import { simCutie } from "./sim";
 import foods from "../../mapAssets/training.json";
 
 const size = 400;
@@ -26,8 +24,7 @@ export class TrainingSim extends Sim {
   pelletsEaten: number[];
   traveled: number;
   foodOffset: number;
-  // eslint-disable-next-line no-unused-vars
-  simCutie: (cutie: Cutie, sim: Sim) => void;
+  enableThinking: boolean;
 
   constructor(ai: CutieAi, foodOffset: number) {
     super(size, size);
@@ -58,7 +55,7 @@ export class TrainingSim extends Sim {
     this.eggs = 0;
     this.pelletsEaten = [];
     this.newPelletCooldown = 0;
-    this.simCutie = simCutie;
+    this.enableThinking = true;
   }
 
   clean = (): void => {
@@ -103,7 +100,7 @@ export class TrainingSim extends Sim {
 
     const cutie: Cutie = this.getById(0);
     if (cutie) {
-      this.simCutie(cutie, this);
+      simCutie(cutie, this, this.enableThinking);
     }
 
     this.regenerate();
