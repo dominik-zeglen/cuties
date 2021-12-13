@@ -112,9 +112,9 @@ export class Cutie extends Entity {
     }
   };
 
-  wantsToEat = (): boolean => this.thoughts.eat > -0.5;
+  wantsToEat = (): boolean => this.thoughts.eat > 0;
 
-  wantsToLayEgg = (): boolean => this.thoughts.layEgg > -0.5;
+  wantsToLayEgg = (): boolean => this.thoughts.layEgg > 0;
 
   canLayEgg = (): boolean => this.hunger + eggCost * 1.1 < maxHunger;
 

@@ -6,17 +6,19 @@ export type CutieInput = Record<
   "hunger" | "angleToFood" | "angle" | "distanceToFood",
   number
 >;
-const inputs = 5;
+const inputs = 4;
+const outputs = 4;
+const hidden = 8;
 export type CutieOutput = Record<"speed" | "angle" | "eat" | "layEgg", number>;
 export type CutieAi = Matrix[];
 
 const baseSystem: CutieAi = [
-  Array(inputs)
+  Array(inputs + 1)
     .fill(0)
-    .map(() => Array(8).fill(0)),
-  Array(8)
+    .map(() => Array(hidden).fill(0)),
+  Array(hidden + 1)
     .fill(0)
-    .map(() => Array(inputs).fill(0)),
+    .map(() => Array(outputs).fill(0)),
 ];
 
 function getRandomSystem(divide: number): Matrix[] {
@@ -28,7 +30,7 @@ function getRandomSystem(divide: number): Matrix[] {
     for (let index = 0; index < mutations; index++) {
       system[layer][Math.floor(Math.random() * inputs)][
         Math.floor(Math.random() * inputs)
-      ] = Math.random() > 0.5 ? 1 : -1 / divide;
+      ] = (Math.random() > 0.5 ? 1 : -1) / divide;
     }
   }
 
@@ -43,14 +45,21 @@ export function getRandomCutieAi(): CutieAi {
   return addSystems(baseSystem, getRandomSystem(1));
 }
 
-// 1 x 5 . 5 x 5 . 5 x 5 => 1 x 5
+// 1 x inputs + 1 . inputs + 1 x hidden + 1 . hidden + 1 x outputs => 1 x outputs
 export function think(input: CutieInput, ai: CutieAi): CutieOutput {
   const inputMatrix = [
-    [input.angle, input.angleToFood, input.distanceToFood, input.hunger, 1],
+    [input.angle, input.angleToFood, input.distanceToFood, input.hunger],
   ];
 
   const output = ai.reduce(
-    (prevLayer, layer) => map(multiply(prevLayer, layer), Math.tanh),
+    (prevLayer, layer) =>
+      map(
+        multiply(
+          prevLayer.map((row) => [...row, 1]),
+          layer
+        ),
+        Math.tanh
+      ),
     inputMatrix
   );
 

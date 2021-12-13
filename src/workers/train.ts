@@ -38,6 +38,7 @@ self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
       .sort((a, b) => (a.score < b.score ? 1 : -1));
 
     const best = populationData.slice(0, event.data.elite);
+    console.log(best[0].score);
 
     if (lastHighScore === populationData[0].score) {
       momentumCounter++;

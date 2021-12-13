@@ -26,8 +26,11 @@ export const Train: React.FC = () => {
     worker.current.addEventListener(
       "message",
       (event: MessageEvent<CheckResponse>) => {
+        const best = event.data.scores[0];
+
         setProgress(event.data.iteration / opts.generations);
-        setData((prevData) => [...prevData, event.data.scores[0].score]);
+        setData((prevData) => [...prevData, best.score]);
+        localStorage.setItem("best", JSON.stringify(best.ai));
       }
     );
 
