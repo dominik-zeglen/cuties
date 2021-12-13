@@ -4,15 +4,16 @@ import { Food } from "../entities/food";
 
 test("Gets nearest food", () => {
   const sim = new Sim(10, 10);
+  sim.clear();
 
-  sim.entities = [
+  [
     new Food({
       position: { x: -1, y: 1 },
     }),
     new Food({
       position: { x: 2, y: 1 },
     }),
-  ];
+  ].forEach(sim.registerEntity);
 
   sim.entityLoader.init(sim.entities);
   const nearest = sim.getNearestFood({ x: 3, y: 1 }, 10);

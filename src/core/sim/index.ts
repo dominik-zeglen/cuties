@@ -79,6 +79,12 @@ export class Sim {
     }
   }
 
+  clear = () => {
+    this.entities = [];
+    this.entityLoader.init(this.entities);
+    this.entityCounter = 0;
+  };
+
   pause = () => {
     this.paused = true;
   };
