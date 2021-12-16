@@ -26,7 +26,7 @@ export const rangeRadius = 300;
 
 export interface CutieSimInput {
   iteration: number;
-  nearestFood: PolarPoint;
+  nearestFood: PolarPoint | null;
 }
 
 export interface InitialCutieInput extends InitialEntityInput {
@@ -65,9 +65,12 @@ export class Cutie extends Entity {
     if (simInput) {
       const input: CutieInput = {
         angle: this.angle / Math.PI,
-        angleToFood: simInput.nearestFood.angle / Math.PI,
         hunger: this.hunger / maxHunger,
-        distanceToFood: simInput.nearestFood.r / 200,
+        foundFood: simInput.nearestFood ? 1 : 0,
+        angleToFood: simInput.nearestFood
+          ? simInput.nearestFood.angle / Math.PI
+          : 0,
+        distanceToFood: simInput.nearestFood ? simInput.nearestFood.r / 200 : 0,
       };
 
       this.thoughts = think(input, this.ai);

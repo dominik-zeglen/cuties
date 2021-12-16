@@ -1,49 +1,50 @@
-import sum from "lodash/sum";
 import { Sim } from ".";
 import { CutieAi } from "../ai";
-import { Cutie } from "../entities/cutie";
-import { Food, valueLossRate } from "../entities/food";
+import { Cutie, maxHunger } from "../entities/cutie";
+import { Food } from "../entities/food";
+import { add, sub, toCartesian, len } from "../r2";
 import { cleanDepletedPellets, cleanOutOfBounds } from "./gc";
 import { simCuties } from "./sim";
+import foods from "../../mapAssets/training.json";
+
+const size = 400;
+
+export type Score = Record<"distance" | "eaten" | "eggs", number>;
 
 export class TrainingSim extends Sim {
   eggs: number;
-  initialFood: number;
+  newPelletCooldown: number;
+  pelletsEaten: number;
+  closestInRound: number;
 
-  constructor(width: number, height: number, ai: CutieAi) {
-    super(width, height);
-    this.entities = [];
+  constructor(ai: CutieAi) {
+    super(size, size);
+    this.clear();
 
-    for (let x = 0; x < width / 80; x++) {
-      for (let y = 0; y < width / 80; y++) {
-        this.entities.push(
-          new Food({
-            position: {
-              x: x * 80 + Math.sin(x + y) * 40,
-              y: y * 80 + Math.cos(x * y) * 40,
-            },
-            value: 500,
-          })
-        );
-      }
-    }
-
-    this.entities.push(
+    this.registerEntity(
       new Cutie({
         ai,
         ancestors: 0,
         angle: 0,
         position: {
-          x: width / 2,
-          y: height / 2,
+          x: size / 2,
+          y: size / 2,
         },
       })
     );
-    this.entityLoader.init(this.entities);
-    this.initialFood = sum(
-      this.entityLoader.food.map((pellet) => pellet.value)
+    (this.entities.at(-1) as Cutie).hunger = 0;
+    this.registerEntity(
+      new Food({
+        position: foods[0],
+        value: 500,
+      })
     );
+
+    this.entityLoader.init(this.entities);
     this.eggs = 0;
+    this.pelletsEaten = 0;
+    this.newPelletCooldown = 0;
+    this.closestInRound = size * 1.41;
   }
 
   clean = (): void => {
@@ -62,15 +63,59 @@ export class TrainingSim extends Sim {
   };
 
   next = (): void => {
+    if (this.entityLoader.food.length === 0) {
+      if (this.newPelletCooldown === 0) {
+        this.pelletsEaten++;
+        this.newPelletCooldown = 15;
+        this.closestInRound = size * 1.41;
+      } else {
+        this.newPelletCooldown--;
+      }
+
+      if (this.newPelletCooldown === 0) {
+        this.registerEntity(
+          new Food({
+            position: foods[this.pelletsEaten],
+            value: 500,
+          })
+        );
+      }
+    }
+
     this.entityLoader.init(this.entities);
 
     simCuties(this);
-    this.entityLoader.food.forEach((food) => food.value + valueLossRate);
+    const distance = this.getDistanceToFood();
+    if (distance < this.closestInRound) {
+      this.closestInRound = distance;
+    }
 
     this.regenerate();
     this.clean();
     this.getStats();
 
     this.iteration++;
+  };
+
+  getDistanceToFood = (): number => {
+    if (this.entityLoader.cuties.length && this.entityLoader.food.length) {
+      return len(
+        sub(
+          this.entityLoader.cuties[0].position,
+          this.entityLoader.food[0].position
+        )
+      );
+    }
+
+    return size * 1.41;
+  };
+
+  getScore = (): Score => {
+    const scoreForDistance = 1 - this.closestInRound / (size * 1.41);
+    return {
+      distance: scoreForDistance,
+      eaten: this.pelletsEaten * 500,
+      eggs: this.eggs ** 2 / 10,
+    };
   };
 }

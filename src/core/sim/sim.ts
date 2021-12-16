@@ -22,7 +22,7 @@ export function getCutieInput(cutie: Cutie, sim: Sim): CutieSimInput {
   } else {
     simInput = {
       iteration: sim.iteration,
-      nearestFood: { angle: 0, r: 0 },
+      nearestFood: null,
     };
   }
 

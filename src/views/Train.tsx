@@ -4,11 +4,11 @@ import { TrainPage } from "../pages/Train";
 import type { CheckResponse, TrainInitMsg } from "../workers/train";
 
 const opts: TrainInitMsg = {
-  elite: 10,
-  generations: 100,
+  elite: 5,
+  generations: 100000,
   maxIterations: 8e3,
-  momentumLimit: 20,
-  populationSize: 100,
+  momentumLimit: 200,
+  populationSize: 50,
 };
 
 export const Train: React.FC = () => {
@@ -29,7 +29,7 @@ export const Train: React.FC = () => {
         const best = event.data.scores[0];
 
         setProgress(event.data.iteration / opts.generations);
-        setData((prevData) => [...prevData, best.score]);
+        setData((prevData) => [...prevData, best.endScore]);
         localStorage.setItem("best", JSON.stringify(best.ai));
       }
     );

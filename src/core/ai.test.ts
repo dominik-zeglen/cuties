@@ -5,9 +5,10 @@ test("Inputs work correctly", () => {
 
   const input: CutieInput = {
     angle: -Math.PI / 4,
+    hunger: 100,
+    foundFood: 1,
     angleToFood: 0,
     distanceToFood: 100,
-    hunger: 100,
   };
 
   const output = think(input, ai);

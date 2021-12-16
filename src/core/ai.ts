@@ -2,10 +2,10 @@ import { add, multiply, map, zeros } from "mathjs";
 import cloneDeep from "lodash/cloneDeep";
 
 export type CutieInput = Record<
-  "hunger" | "angleToFood" | "angle" | "distanceToFood",
+  "hunger" | "angle" | "foundFood" | "angleToFood" | "distanceToFood",
   number
 >;
-const inputs = 4;
+const inputs = 5;
 const outputs = 4;
 const hidden = 8;
 type Matrix2d = number[][];
@@ -62,7 +62,13 @@ export function getRandomCutieAi(): CutieAi {
 
 export function think(input: CutieInput, ai: CutieAi): CutieOutput {
   const inputMatrix = [
-    [input.angle, input.angleToFood, input.distanceToFood, input.hunger],
+    [
+      input.angle,
+      input.hunger,
+      input.foundFood,
+      input.angleToFood,
+      input.distanceToFood,
+    ],
   ];
 
   const output = ai.reduce(

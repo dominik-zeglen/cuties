@@ -1,8 +1,7 @@
-import sum from "lodash/sum";
 import { clone } from "mathjs";
 import { CutieAi } from "./core/ai";
 import { Sim } from "./core/sim";
-import { TrainingSim } from "./core/sim/training";
+import { Score, TrainingSim } from "./core/sim/training";
 
 export function transpose<T>(array: T[][]): T[][] {
   return array[0].map((_, colIndex) => array.map((row) => row[colIndex]));
@@ -34,14 +33,11 @@ export function getSim(
 
 export interface SimPopulationOpts {
   maxIterations: number;
-  seed: number;
-  // eslint-disable-next-line no-unused-vars
-  onCutieSimFinish: (index: number) => void;
 }
 
 export interface SimPopulation {
   iterations: number;
-  score: number;
+  score: Score;
 }
 
 export function simPopulation(
@@ -49,28 +45,20 @@ export function simPopulation(
   opts: SimPopulationOpts
 ): SimPopulation[] {
   return population.map((ai) => {
-    const sim = new TrainingSim(400, 400, ai);
+    const sim = new TrainingSim(ai);
 
     let it = 0;
     for (; it < opts.maxIterations; it++) {
       sim.next();
       if (
-        sim.entityLoader.food.length === 0 ||
-        sim.entityLoader.cuties.length === 0
+        sim.entityLoader.cuties.length === 0 ||
+        ((sim.pelletsEaten + 1) * 500) / (sim.iteration + 1) < 1
       ) {
         break;
       }
     }
 
-    const leftFood = sum(sim.entityLoader.food.map((pellet) => pellet.value));
-
-    const scoreForFood = sim.initialFood - leftFood;
-    const scoreForIts = leftFood === 0 ? opts.maxIterations - it : 0;
-    const scoreForEggs = sim.eggs ** 2 * 100;
-
-    const score = scoreForFood + scoreForIts + scoreForEggs;
-
-    opts.onCutieSimFinish(score);
+    const score = sim.getScore();
 
     return {
       iterations: it,
