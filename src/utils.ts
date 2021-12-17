@@ -43,26 +43,30 @@ export interface SimPopulation {
 export function simPopulation(
   population: CutieAi[],
   opts: SimPopulationOpts
-): SimPopulation[] {
-  return population.map((ai) => {
-    const sim = new TrainingSim(ai);
+): SimPopulation[][] {
+  return population.map((ai) =>
+    Array(4)
+      .fill(0)
+      .map((_, index) => {
+        const sim = new TrainingSim(ai, index * 5);
 
-    let it = 0;
-    for (; it < opts.maxIterations; it++) {
-      sim.next();
-      if (
-        sim.entityLoader.cuties.length === 0 ||
-        ((sim.pelletsEaten + 1) * 500) / (sim.iteration + 1) < 1
-      ) {
-        break;
-      }
-    }
+        let it = 0;
+        for (; it < opts.maxIterations; it++) {
+          sim.next();
+          if (
+            sim.entityLoader.cuties.length === 0 ||
+            ((sim.pelletsEaten.length + 1) * 500) / (sim.iteration + 1) < 1
+          ) {
+            break;
+          }
+        }
 
-    const score = sim.getScore();
+        const score = sim.getScore();
 
-    return {
-      iterations: it,
-      score,
-    };
-  });
+        return {
+          iterations: it,
+          score,
+        };
+      })
+  );
 }

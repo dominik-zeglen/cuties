@@ -35,10 +35,10 @@ const speed = 100;
 
 export const Cuties: React.FC<CutiesProps> = () => {
   const interval = React.useRef<number>(null);
-  // const sim = React.useRef<Sim>(new Sim(width, height));
-  const sim = React.useRef<Sim>(
-    new TrainingSim(JSON.parse(localStorage.getItem("best")))
-  );
+  const sim = React.useRef<Sim>(new Sim(width, height));
+  // const sim = React.useRef<Sim>(
+  //   new TrainingSim(JSON.parse(localStorage.getItem("best")), 0)
+  // );
   const canvas = React.useRef<HTMLCanvasElement>(null);
   const colormap = React.useRef(createColormap(2));
   const styles = React.useMemo(

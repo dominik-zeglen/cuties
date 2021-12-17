@@ -18,21 +18,15 @@ export type CutieAi = CutieAiLayer[];
 
 const baseSystem: CutieAi = [
   {
-    biases: zeros([1, hidden]) as Matrix2d,
-    weights: zeros([inputs, hidden]) as Matrix2d,
-  },
-  {
     biases: zeros([1, outputs]) as Matrix2d,
-    weights: zeros([hidden, outputs]) as Matrix2d,
+    weights: zeros([inputs, outputs]) as Matrix2d,
   },
 ];
 
-function getRandomSystem(divide: number): CutieAi {
+function getRandomSystem(divide: number, mutations = 1): CutieAi {
   const system = cloneDeep(baseSystem);
 
   for (let layer = 0; layer < system.length; layer++) {
-    const mutations = 1;
-
     for (let index = 0; index < mutations; index++) {
       const xw = Math.floor(Math.random() * system[layer].weights.length);
       const yw = Math.floor(Math.random() * system[layer].weights[xw].length);
@@ -57,9 +51,10 @@ function addSystems(a: CutieAi, b: CutieAi): CutieAi {
 }
 
 export function getRandomCutieAi(): CutieAi {
-  return addSystems(baseSystem, getRandomSystem(1));
+  return addSystems(baseSystem, getRandomSystem(1e2, 20));
 }
 
+// 1 x 5 . 5 x 8 . 8 x 4 => 1 x 4
 export function think(input: CutieInput, ai: CutieAi): CutieOutput {
   const inputMatrix = [
     [
@@ -88,6 +83,6 @@ export function think(input: CutieInput, ai: CutieAi): CutieOutput {
   };
 }
 
-export function mutate(ai: CutieAi, factor: number): CutieAi {
-  return addSystems(ai, getRandomSystem(factor));
+export function mutate(ai: CutieAi, factor: number, mutations = 1): CutieAi {
+  return addSystems(ai, getRandomSystem(factor, mutations));
 }

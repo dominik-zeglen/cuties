@@ -70,7 +70,9 @@ export class Cutie extends Entity {
         angleToFood: simInput.nearestFood
           ? simInput.nearestFood.angle / Math.PI
           : 0,
-        distanceToFood: simInput.nearestFood ? simInput.nearestFood.r / 200 : 0,
+        distanceToFood: simInput.nearestFood
+          ? simInput.nearestFood.r / rangeRadius
+          : 0,
       };
 
       this.thoughts = think(input, this.ai);
