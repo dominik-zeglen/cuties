@@ -103,6 +103,9 @@ export class Sim {
 
   shouldCleanupOutOfBounds = (): boolean => this.iteration % 60 === 0;
 
+  getById = <T extends Entity>(id: number): T | undefined =>
+    this.entities.find((entity) => entity.id === id) as T;
+
   getNearest = <T extends Entity>(
     qtree: Quadtree,
     point: Point,
