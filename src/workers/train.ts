@@ -1,8 +1,13 @@
 /* eslint-disable no-restricted-globals */
 
 import { sum } from "simple-statistics";
+import cloneDeep from "lodash/cloneDeep";
 import { getRandomCutieAi, mutate } from "../core/ai";
+import { Score, TrainingSim } from "../core/sim/training";
 import { simPopulation, SimPopulation } from "../utils";
+import { Cutie } from "../core/entities/cutie";
+import { Sim } from "../core/sim";
+import { Waste } from "../core/entities/waste";
 
 export interface GenerationSimData {
   scores: Array<SimPopulation & { ai: number[][][]; endScore: number }>;
@@ -10,101 +15,88 @@ export interface GenerationSimData {
 }
 
 export type CheckResponse = GenerationSimData;
-export interface TrainInitMsg {
-  elite: number;
-  generations: number;
-  maxIterations: number;
-  momentumLimit: number;
-  populationSize: number;
+export interface TrainInitMsg {}
+
+const simStep = 50;
+const simNextIterations = 100;
+
+function simCutieWithoutInput(cutie: Cutie, sim: Sim): void {
+  cutie.sim(null);
+  if (cutie.wantsToLayEgg() && cutie.canLayEgg()) {
+    sim.registerEntity(cutie.layEgg(sim.iteration));
+  }
+
+  if (cutie.shouldDumpWaste()) {
+    const waste = cutie.dumpWaste();
+    sim.registerEntity(waste);
+  }
+
+  if (cutie.shouldDelete) {
+    const remains = new Waste({
+      position: cutie.position,
+    });
+    remains.value = 100;
+    sim.registerEntity(remains);
+  }
 }
 
-let population = null;
-let iteration = 0;
-let momentumCounter = 0;
-let lastHighScore = 0;
-let populationData = null;
+function getScore(score: Score): number {
+  const scoreForDistance = -(score.distance * 2) / 400 / 1.41;
+  const scoreForEggs = score.eggs;
+  const scoreForEatenPellets = score.eaten * 10;
+  // const scoreForSpeed =
+  //   -sum(
+  //     score.speed.map((it, i) =>
+  //       i === 0 ? it : it - score.speed[i - 1] / 500
+  //     )
+  //   ) / 2;
+  const scoreForCurrentPellet = ((500 - score.currentFood) / 500) * 7;
+
+  return (
+    scoreForDistance +
+    scoreForEggs +
+    scoreForEatenPellets +
+    // scoreForSpeed +
+    scoreForCurrentPellet
+  );
+}
 
 self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
-  population = Array(event.data.populationSize).fill(0).map(getRandomCutieAi);
-  while (iteration < event.data.generations) {
-    populationData = simPopulation(population, {
-      maxIterations: event.data.maxIterations,
-    })
-      .map((aiScoreData, index) => {
-        const endScore =
-          sum(
-            aiScoreData.map((aiScore) => {
-              const scoreForDistance =
-                -(aiScore.score.distance * 2) / 400 / 1.41;
-              const scoreForEggs = aiScore.score.eggs;
-              const scoreForEatenPellets = aiScore.score.eaten * 10;
-              // const scoreForSpeed =
-              //   -sum(
-              //     aiScore.score.speed.map((it, i) =>
-              //       i === 0 ? it : it - aiScore.score.speed[i - 1] / 500
-              //     )
-              //   ) / 2;
-              const scoreForCurrentPellet =
-                ((500 - aiScore.score.currentFood) / 500) * 7;
+  const ai = getRandomCutieAi();
+  let simIndex = 0;
+  let sim = new TrainingSim(ai, simIndex);
 
-              return (
-                scoreForDistance +
-                scoreForEggs +
-                scoreForEatenPellets +
-                // scoreForSpeed +
-                scoreForCurrentPellet
-              );
-            })
-          ) / aiScoreData.length;
+  for (let i = 0; i < 1e7; i++) {
+    if (!sim.getById(0)) {
+      simIndex++;
+      sim = new TrainingSim(ai, simIndex);
+      continue;
+    }
 
-        return {
-          ai: population[index],
-          endScore,
-          scores: aiScoreData,
-        };
-      })
-      .sort((a, b) => (a.endScore < b.endScore ? 1 : -1));
+    if (sim.iteration % simStep === 0) {
+      const scoresForAngleOutputs = Array(8)
+        .fill(0)
+        .map((_, index) => {
+          console.log(sim.getById(0));
+          const angleOutput = index / 4 - 1;
 
-    const best = populationData.slice(0, event.data.elite);
-    console.log(best[0].endScore, best[0]);
+          const branchedSim = cloneDeep(sim);
+          branchedSim.simCutie = simCutieWithoutInput;
+          branchedSim.getById<Cutie>(0).thoughts.angle = angleOutput;
 
-    if (lastHighScore === populationData[0].endScore) {
-      momentumCounter++;
+          for (let it = 0; it < simNextIterations; i++) {
+            if (!branchedSim.getById(0)) {
+              break;
+            }
+            branchedSim.next();
+          }
+
+          return getScore(branchedSim.getScore());
+        });
+
+      console.log(scoresForAngleOutputs);
     } else {
-      momentumCounter = 0;
+      sim.next();
     }
-    lastHighScore = populationData[0].endScore;
-
-    population = best.map((aiScoreData) => aiScoreData.ai);
-    population.push(...best.map(getRandomCutieAi));
-
-    if (momentumCounter === 5) {
-      // population.push(
-      //   ...best.map((aiScoreData) => mutate(aiScoreData.ai, 1e1))
-      // );
-      population.push(
-        ...best.map((aiScoreData) => mutate(aiScoreData.ai, 1e3, 4))
-      );
-      population.push(
-        ...best.map((aiScoreData) => mutate(aiScoreData.ai, 1e5, 4))
-      );
-    }
-
-    while (population.length !== event.data.populationSize) {
-      population.push(
-        ...best.map((aiScoreData) => mutate(aiScoreData.ai, 1e4))
-      );
-    }
-
-    // if (momentumCounter > event.data.momentumLimit) {
-    //   iteration = event.data.generations;
-    // } else {
-    iteration++;
-    // }
-
-    self.postMessage({
-      iteration,
-      scores: populationData,
-    });
   }
 };

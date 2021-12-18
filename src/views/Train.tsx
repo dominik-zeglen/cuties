@@ -28,7 +28,7 @@ export const Train: React.FC = () => {
       (event: MessageEvent<CheckResponse>) => {
         const best = event.data.scores[0];
 
-        setProgress(event.data.iteration / opts.generations);
+        // setProgress(event.data.iteration / opts.generations);
         setData((prevData) => [...prevData, best.endScore]);
         localStorage.setItem("best", JSON.stringify(best.ai));
       }

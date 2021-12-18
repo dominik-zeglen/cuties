@@ -5,7 +5,7 @@ import { Cutie, maxHunger } from "../entities/cutie";
 import { Food } from "../entities/food";
 import { add, sub, toCartesian, len } from "../r2";
 import { cleanDepletedPellets, cleanOutOfBounds } from "./gc";
-import { simCuties } from "./sim";
+import { simCutie, simCuties } from "./sim";
 import foods from "../../mapAssets/training.json";
 
 const size = 400;
@@ -24,6 +24,8 @@ export class TrainingSim extends Sim {
   closestInRound: number;
   traveled: number;
   foodOffset: number;
+  // eslint-disable-next-line no-unused-vars
+  simCutie: (cutie: Cutie, sim: Sim) => void;
 
   constructor(ai: CutieAi, foodOffset: number) {
     super(size, size);
@@ -54,6 +56,7 @@ export class TrainingSim extends Sim {
     this.newPelletCooldown = 0;
     this.closestInRound = size * 1.41;
     this.foodOffset = foodOffset;
+    this.simCutie = simCutie;
   }
 
   clean = (): void => {
@@ -97,7 +100,7 @@ export class TrainingSim extends Sim {
 
     this.entityLoader.init(this.entities);
 
-    simCuties(this);
+    this.simCutie(this.getById(0), this);
     const distance = this.getDistanceToFood();
     if (distance < this.closestInRound) {
       this.closestInRound = distance;
