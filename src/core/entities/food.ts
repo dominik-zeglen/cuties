@@ -1,3 +1,4 @@
+import cloneDeep from "lodash/cloneDeep";
 import { Entity, InitialEntityInput } from "./entity";
 
 export const defaultInitialFoodValue = 1000;
@@ -20,4 +21,17 @@ export class Food extends Entity {
   };
 
   die = this.markToDelete;
+
+  copy = (): Food => {
+    const newFood = new Food({
+      position: cloneDeep(this.position),
+      value: this.value,
+    });
+
+    newFood.createdAt = this.createdAt;
+    newFood.id = this.id;
+    newFood.shouldDelete = this.shouldDelete;
+
+    return newFood;
+  };
 }

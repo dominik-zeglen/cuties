@@ -9,7 +9,7 @@ export function getCutieInput(cutie: Cutie, sim: Sim): CutieSimInput {
   const nearestFood = sim.getNearestFood(cutie.position, rangeRadius);
   if (nearestFood) {
     const nearestFoodPolarPosition = toPolar(
-      sub(cutie.position, nearestFood.position)
+      sub(nearestFood.position, cutie.position)
     );
 
     if (nearestFoodPolarPosition.r < 10 && cutie.wantsToEat()) {
@@ -30,7 +30,7 @@ export function getCutieInput(cutie: Cutie, sim: Sim): CutieSimInput {
 }
 
 export function simCutie(cutie: Cutie, sim: Sim): void {
-  cutie.sim(getCutieInput(cutie, sim));
+  cutie.sim(Math.random() > 0.5 ? getCutieInput(cutie, sim) : null);
   if (cutie.wantsToLayEgg() && cutie.canLayEgg()) {
     sim.registerEntity(cutie.layEgg(sim.iteration));
   }

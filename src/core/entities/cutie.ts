@@ -1,3 +1,4 @@
+import cloneDeep from "lodash/cloneDeep";
 import {
   CutieAi,
   CutieInput,
@@ -23,6 +24,23 @@ const initialHunger = maxHunger - eggCost * 0.9;
 const eatingRate = 10;
 const droppedWasteValue = 250;
 export const rangeRadius = 300;
+
+export function getInput(cutie: Cutie, simInput: CutieSimInput): CutieInput {
+  const angle = simInput.nearestFood
+    ? cutie.angle - simInput.nearestFood.angle
+    : 0;
+
+  return {
+    hunger: cutie.hunger / maxHunger,
+    foundFood: simInput.nearestFood ? 1 : 0,
+    angleToFood: simInput.nearestFood
+      ? Math.atan2(Math.sin(angle), Math.cos(angle)) / Math.PI
+      : 0,
+    distanceToFood: simInput.nearestFood
+      ? simInput.nearestFood.r / rangeRadius
+      : 0,
+  };
+}
 
 export interface CutieSimInput {
   iteration: number;
@@ -63,19 +81,7 @@ export class Cutie extends Entity {
 
   sim = (simInput: CutieSimInput | null): void => {
     if (simInput) {
-      const input: CutieInput = {
-        angle: this.angle / Math.PI,
-        hunger: this.hunger / maxHunger,
-        foundFood: simInput.nearestFood ? 1 : 0,
-        angleToFood: simInput.nearestFood
-          ? simInput.nearestFood.angle / Math.PI
-          : 0,
-        distanceToFood: simInput.nearestFood
-          ? simInput.nearestFood.r / rangeRadius
-          : 0,
-      };
-
-      this.thoughts = think(input, this.ai);
+      this.thoughts = think(getInput(this, simInput), this.ai);
     }
 
     const distance = this.thoughts.speed * (this.thoughts.speed > 0 ? 2 : 0.25);
@@ -102,8 +108,8 @@ export class Cutie extends Entity {
       this.die();
     }
 
-    if (simInput.iteration - this.createdAt > 3e3 && Math.random() < 1e-2) {
-      this.die();
+    if (simInput && simInput.iteration - this.createdAt > 3e3) {
+      this.hunger += 1;
     }
   };
 
@@ -117,7 +123,7 @@ export class Cutie extends Entity {
     }
   };
 
-  wantsToEat = (): boolean => this.thoughts.eat > 0;
+  wantsToEat = (): boolean => true;
 
   wantsToLayEgg = (): boolean => this.thoughts.layEgg > 0;
 
@@ -140,6 +146,25 @@ export class Cutie extends Entity {
       position: this.position,
       value: droppedWasteValue,
     });
+  };
+
+  copy = (): Cutie => {
+    const newCutie = new Cutie({
+      ai: cloneDeep(this.ai),
+      ancestors: this.ancestors,
+      angle: this.angle,
+      position: cloneDeep(this.position),
+    });
+
+    newCutie.createdAt = this.createdAt;
+    newCutie.hunger = this.hunger;
+    newCutie.id = this.id;
+    newCutie.lastEggLaying = this.lastEggLaying;
+    newCutie.shouldDelete = this.shouldDelete;
+    newCutie.thoughts = cloneDeep(this.thoughts);
+    newCutie.wasteStored = this.wasteStored;
+
+    return newCutie;
   };
 }
 

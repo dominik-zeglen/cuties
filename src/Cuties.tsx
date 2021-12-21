@@ -31,7 +31,15 @@ export interface CutiesProps {}
 
 const width = 1024;
 const height = 800;
-const speed = 100;
+const speed = 10;
+
+function handlePause(event: KeyboardEvent) {
+  if (event.key === " ") {
+    (window.cuties.sim.current as any).paused = !(
+      window.cuties.sim.current as any
+    ).paused;
+  }
+}
 
 export const Cuties: React.FC<CutiesProps> = () => {
   const interval = React.useRef<number>(null);
@@ -114,8 +122,12 @@ export const Cuties: React.FC<CutiesProps> = () => {
       1000 / 60 / speed
     ) as unknown as number;
     paint();
+    document.addEventListener("keydown", handlePause);
 
-    return () => clearInterval(interval.current);
+    return () => {
+      clearInterval(interval.current);
+      document.removeEventListener("keydown", handlePause);
+    };
   }, []);
 
   const handleClick: MouseEventHandler<HTMLCanvasElement> = React.useCallback(

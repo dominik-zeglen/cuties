@@ -40,6 +40,13 @@ export function sub(a: Point, b: Point): Point {
   };
 }
 
+export function rotate(point: Point, angle: number): Point {
+  return {
+    x: Math.cos(angle) * point.x - Math.sin(angle) * point.y,
+    y: Math.sin(angle) * point.x + Math.cos(angle) * point.y,
+  };
+}
+
 export function getRandomPositionInBounds(bounds: Point[]): Point {
   return {
     x: Math.random() * bounds[1].x,

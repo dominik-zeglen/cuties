@@ -40,4 +40,9 @@ export class Entity implements Rect {
 
   // eslint-disable-next-line class-methods-use-this
   die(): void {}
+
+  // eslint-disable-next-line class-methods-use-this
+  copy(): Entity {
+    throw new Error("Not implemented");
+  }
 }

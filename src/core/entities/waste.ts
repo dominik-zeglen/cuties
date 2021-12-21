@@ -1,3 +1,4 @@
+import cloneDeep from "lodash/cloneDeep";
 import { Entity, InitialEntityInput } from "./entity";
 
 export const maxValue = 900;
@@ -20,4 +21,17 @@ export class Waste extends Entity {
   };
 
   die = this.markToDelete;
+
+  copy = (): Waste => {
+    const newWaste = new Waste({
+      position: cloneDeep(this.position),
+      value: this.value,
+    });
+
+    newWaste.createdAt = this.createdAt;
+    newWaste.id = this.id;
+    newWaste.shouldDelete = this.shouldDelete;
+
+    return newWaste;
+  };
 }

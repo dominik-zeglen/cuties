@@ -4,11 +4,7 @@ import { TrainPage } from "../pages/Train";
 import type { CheckResponse, TrainInitMsg } from "../workers/train";
 
 const opts: TrainInitMsg = {
-  elite: 5,
-  generations: 100000,
-  maxIterations: 8e3,
-  momentumLimit: 200,
-  populationSize: 50,
+  maxIterations: 1e5,
 };
 
 export const Train: React.FC = () => {
@@ -26,11 +22,11 @@ export const Train: React.FC = () => {
     worker.current.addEventListener(
       "message",
       (event: MessageEvent<CheckResponse>) => {
-        const best = event.data.scores[0];
+        setProgress(event.data.iteration / opts.maxIterations);
+        // setData((prevData) => [...prevData, best.endScore]);
+        console.log(event.data.score);
 
-        // setProgress(event.data.iteration / opts.generations);
-        setData((prevData) => [...prevData, best.endScore]);
-        localStorage.setItem("best", JSON.stringify(best.ai));
+        localStorage.setItem("best", JSON.stringify(event.data.ai));
       }
     );
 

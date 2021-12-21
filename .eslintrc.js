@@ -36,5 +36,7 @@ module.exports = {
     "@typescript-eslint/no-use-before-define": ["error"],
     "react/jsx-props-no-spreading": "off",
     "no-continue": "off",
+    "no-restricted-syntax": "off",
+    "no-labels": "off",
   },
 };
