@@ -26,8 +26,6 @@ export const baseSystem: CutieAi = [
   //   weights: zeros([hidden, outputs]) as Matrix2d,
   // },
 ];
-// baseSystem[0].weights[2][0] = -0.1;
-// baseSystem[0].biases[0][1] = 0.2;
 
 function getMultiplicationProductFormula(n: number, index: number): string {
   return Array(n)
