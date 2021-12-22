@@ -3,7 +3,7 @@ import { Cutie, maxHunger } from "../core/entities/cutie";
 import { add, toCartesian } from "../core/r2";
 
 export function drawCutie(context: CanvasRenderingContext2D, cutie: Cutie) {
-  context.strokeStyle = theme.secondary.string();
+  context.strokeStyle = theme.entities.cutie.string();
 
   const r = 12 - (cutie.hunger / maxHunger) * 9;
   const head = add(cutie.position, toCartesian({ r, angle: cutie.angle }));

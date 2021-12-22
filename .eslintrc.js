@@ -38,5 +38,6 @@ module.exports = {
     "no-continue": "off",
     "no-restricted-syntax": "off",
     "no-labels": "off",
+    "prefer-destructuring": "off",
   },
 };

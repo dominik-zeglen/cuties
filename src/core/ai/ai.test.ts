@@ -1,16 +1,9 @@
-import cloneDeep from "lodash/cloneDeep";
 import { subtract } from "mathjs";
-import { rootMeanSquare } from "simple-statistics";
-import {
-  baseSystem,
-  CutieAi,
-  CutieInput,
-  feed,
-  getRandomCutieAi,
-  sgd,
-  think,
-  mutate,
-} from "./ai";
+import { rootMeanSquare, shuffle } from "simple-statistics";
+import { createEmptyNetwork } from ".";
+import { feed, sgd, think } from "./ai";
+import { getRandomCutieAi, mutate } from "./mutate";
+import { CutieAi, CutieInput } from "./types";
 
 test("Inputs work correctly", () => {
   // Given
@@ -69,13 +62,13 @@ test("Properly mutates", () => {
 });
 
 describe("SGD", () => {
-  it("works", () => {
-    const ai: CutieAi = cloneDeep(baseSystem);
-    const input = [[0, 1, 0, 1, 0, 0]];
+  it("descends in valid gradient", () => {
+    const ai: CutieAi = createEmptyNetwork(2, 6, 1);
+    const input = [[0, 1]];
     const output = feed(input, ai);
-    const desiredOutput = [[1, 0, 0, 0, 0]];
+    const desiredOutput = [[1]];
 
-    const newAi = sgd(ai, input[0], desiredOutput[0]);
+    const newAi = sgd(ai, input[0], desiredOutput[0], 1);
     const newOutput = feed(input, newAi);
 
     expect(newOutput).not.toBe(output);
@@ -84,18 +77,43 @@ describe("SGD", () => {
     );
   });
 
-  it("descends in valid gradient", () => {
-    const ai: CutieAi = cloneDeep(baseSystem);
-    const input = [[0, 1, 0, 1, 0, 0]];
-    const output = feed(input, ai);
-    const desiredOutput = [[1, 0, 0, 1, 0]];
+  it("properly solves XOR problem", () => {
+    let net = createEmptyNetwork(2, 6, 1);
+    const dataset = shuffle([
+      {
+        x: [-1, -1],
+        y: -1,
+      },
+      {
+        x: [1, 1],
+        y: -1,
+      },
+      {
+        x: [-1, 1],
+        y: 1,
+      },
+      {
+        x: [1, -1],
+        y: 1,
+      },
+    ]);
+    const train = dataset;
+    const test = dataset;
 
-    const newAi = sgd(ai, input[0], desiredOutput[0], 1);
-    const newOutput = feed(input, newAi);
+    for (let i = 0; i < 1e4; i++) {
+      const sample = train[Math.floor(Math.random() * train.length)];
+      const label = [sample.y];
+      net = sgd(net, sample.x, label, 1e-1);
+    }
 
-    expect(output).toEqual([[0, 0, 0, 0, 0]]);
-    expect(
-      rootMeanSquare(subtract(newOutput[0], desiredOutput[0]) as number[])
-    ).toBeLessThan(1e-5);
+    const predictions = test.map((sample) => {
+      const output = feed([sample.x], net)[0][0];
+
+      return (output > 0.5 ? 1 : -1) === sample.y;
+    });
+
+    const acc = predictions.filter(Boolean).length / test.length;
+
+    expect(acc).toBeGreaterThan(0.99);
   });
 });

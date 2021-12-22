@@ -41,7 +41,12 @@
     "testEnvironment": "jsdom",
     "resetMocks": false,
     "transform": {
-      "^.+\\.(jsx?|tsx?)$": "esbuild-jest"
+      "^.+\\.(jsx?|tsx?)$": [
+        "esbuild-jest",
+        {
+          "sourcemap": true
+        }
+      ]
     },
     "testRegex": ".*\\.test\\.tsx?$",
     "moduleFileExtensions": [

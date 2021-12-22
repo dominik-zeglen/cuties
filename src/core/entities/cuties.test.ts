@@ -1,4 +1,4 @@
-import { baseSystem } from "../ai";
+import { getRandomCutieAi } from "../ai";
 import { Point, sub, toPolar } from "../r2";
 import { Cutie, getAngleInput } from "./cutie";
 
@@ -10,7 +10,7 @@ interface TestCase {
 const testCases: TestCase[] = [
   {
     cutie: new Cutie({
-      ai: baseSystem,
+      ai: getRandomCutieAi(),
       ancestors: 0,
       angle: Math.PI / 2,
       position: { x: 2, y: 0 },
@@ -20,7 +20,7 @@ const testCases: TestCase[] = [
   },
   {
     cutie: new Cutie({
-      ai: baseSystem,
+      ai: getRandomCutieAi(),
       ancestors: 0,
       angle: -Math.PI / 2,
       position: { x: 2, y: 0 },
@@ -30,7 +30,7 @@ const testCases: TestCase[] = [
   },
   {
     cutie: new Cutie({
-      ai: baseSystem,
+      ai: getRandomCutieAi(),
       ancestors: 0,
       angle: Math.PI,
       position: { x: 2, y: 0 },
@@ -40,7 +40,7 @@ const testCases: TestCase[] = [
   },
   {
     cutie: new Cutie({
-      ai: baseSystem,
+      ai: getRandomCutieAi(),
       ancestors: 0,
       angle: 0,
       position: { x: 2, y: 0 },
@@ -50,7 +50,7 @@ const testCases: TestCase[] = [
   },
   {
     cutie: new Cutie({
-      ai: baseSystem,
+      ai: getRandomCutieAi(),
       ancestors: 0,
       angle: 0,
       position: { x: -2, y: 0 },
@@ -60,7 +60,7 @@ const testCases: TestCase[] = [
   },
   {
     cutie: new Cutie({
-      ai: baseSystem,
+      ai: getRandomCutieAi(),
       ancestors: 0,
       angle: -Math.PI / 2,
       position: { x: -2, y: 0 },

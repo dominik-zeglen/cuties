@@ -54,50 +54,39 @@ self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
     }
 
     if (sim.iteration % simStep === 0) {
-      const simData = Array(5)
+      const simData = Array(3)
         .fill(0)
         .map((_, angleIndex) =>
-          Array(2)
+          Array(3)
             .fill(0)
-            .map((__, eatIndex) =>
-              Array(5)
+            .map((___, speedIndex) =>
+              Array(3)
                 .fill(0)
-                .map((___, speedIndex) =>
-                  Array(3)
-                    .fill(0)
-                    .map((____, layEggIndex) => {
-                      const angleOutput = (angleIndex / 2 - 1) / 4;
-                      const eatOutput = eatIndex ? 1 : -1;
-                      const speedOutput = speedIndex / 2 - 1;
-                      const layEggOutput = layEggIndex ? 1 : -1;
+                .map((____, layEggIndex) => {
+                  const angleOutput = (angleIndex - 1) / 4;
+                  const speedOutput = speedIndex - 1;
+                  const layEggOutput = layEggIndex ? 1 : -1;
 
-                      const branchedSim = sim.copy();
-                      branchedSim.enableThinking = false;
-                      branchedSim.getById<Cutie>(0).thoughts.angle =
-                        angleOutput;
-                      branchedSim.getById<Cutie>(0).thoughts.eat = eatOutput;
-                      branchedSim.getById<Cutie>(0).thoughts.speed =
-                        speedOutput;
-                      branchedSim.getById<Cutie>(0).thoughts.layEgg =
-                        layEggOutput;
+                  const branchedSim = sim.copy();
+                  branchedSim.enableThinking = false;
+                  branchedSim.getById<Cutie>(0).thoughts.angle = angleOutput;
+                  branchedSim.getById<Cutie>(0).thoughts.speed = speedOutput;
+                  branchedSim.getById<Cutie>(0).thoughts.layEgg = layEggOutput;
 
-                      for (let it = 0; it < simNextIterations; it++) {
-                        if (!branchedSim.getById(0)) {
-                          break;
-                        }
-                        branchedSim.next();
-                      }
+                  for (let it = 0; it < simNextIterations; it++) {
+                    if (!branchedSim.getById(0)) {
+                      break;
+                    }
+                    branchedSim.next();
+                  }
 
-                      return {
-                        angleOutput,
-                        eatOutput,
-                        speedOutput,
-                        layEggOutput,
-                        score: getScore(branchedSim.getScore()),
-                      };
-                    })
-                )
-                .flat()
+                  return {
+                    angleOutput,
+                    speedOutput,
+                    layEggOutput,
+                    score: getScore(branchedSim.getScore()),
+                  };
+                })
             )
             .flat()
         )
@@ -122,7 +111,6 @@ self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
         output: [
           best.angleOutput,
           best.speedOutput,
-          best.eatOutput,
           best.layEggOutput,
           cutie.thoughts.attack,
         ],
@@ -133,7 +121,7 @@ self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
       shuffle(trainData)
         .slice(0, trainData.length / 5)
         .forEach((data) => {
-          ai = sgd(ai, data.input, data.output, 1e-3);
+          ai = sgd(ai, data.input, data.output, 1e-4);
         });
       trainData = [];
 

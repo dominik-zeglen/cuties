@@ -96,7 +96,7 @@ export const Cuties: React.FC<CutiesProps> = () => {
 
     sim.current.entityLoader.remains.forEach((remains) =>
       drawPellet(context, {
-        color: theme.secondary.string(),
+        color: theme.entities.remains.string(),
         pellet: remains,
         maxValue: maxHunger / 2,
       })

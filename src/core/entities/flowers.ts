@@ -77,7 +77,7 @@ export class Flower extends Entity {
   sim = (simInput: FlowerSimInput | null): void => {
     simInput.waste.forEach((waste) => this.eat(waste, null));
     this.hunger +=
-      eatingRate * (0.7 + (simInput.iteration - this.createdAt) / 2e4);
+      eatingRate * (0.5 + (simInput.iteration - this.createdAt) / 2e4);
     this.sunlightStored += 0.6;
 
     if (this.hunger > maxHunger) {

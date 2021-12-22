@@ -92,7 +92,6 @@ export class Cutie extends Entity {
     this.thoughts = {
       angle: 0,
       speed: 0,
-      eat: 0,
       layEgg: 0,
       attack: 0,
     };
