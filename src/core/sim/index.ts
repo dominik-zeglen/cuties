@@ -175,25 +175,25 @@ export class Sim {
     }
   };
 
-  registerEntity = (entity: Entity) => {
-    if (entity instanceof Flower && this.entityLoader.flowers.length > 200) {
-      return;
+  registerEntity = (entity: Entity): boolean => {
+    if (entity instanceof Flower && this.entityLoader.flowers.length > 300) {
+      entity.die();
     }
 
     if (entity instanceof Cutie && this.entityLoader.flowers.length > 300) {
-      return;
+      entity.die();
     }
 
     if (entity instanceof Waste && this.entityLoader.waste.length > 400) {
-      return;
+      entity.die();
     }
 
     if (entity instanceof Remains && this.entityLoader.remains.length > 200) {
-      return;
+      entity.die();
     }
 
     if (entity instanceof Egg && this.entityLoader.eggs.length > 100) {
-      return;
+      entity.die();
     }
 
     entity.id = this.entityCounter;
@@ -201,6 +201,8 @@ export class Sim {
 
     this.entities.push(entity);
     this.entityCounter++;
+
+    return true;
   };
 
   regenerate = () => {

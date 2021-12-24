@@ -17,6 +17,7 @@ const initialHunger = maxHunger - produceCost * 0.6;
 const eatingRate = 0.6;
 const foodValue = 200;
 const foodEnergyCostRatio = 0.1;
+const growDelay = 1800;
 export const rangeRadius = 80;
 
 export type EatDirection = "forward" | "backward" | null;
@@ -75,10 +76,20 @@ export class Flower extends Entity {
   };
 
   sim = (simInput: FlowerSimInput | null): void => {
+    const age = this.getAge(simInput.iteration);
     simInput.waste.forEach((waste) => this.eat(waste, null));
-    this.hunger +=
-      eatingRate * (0.5 + (simInput.iteration - this.createdAt) / 2e4);
+    this.hunger += eatingRate * (0.5 + (age / 2e4) ** 2);
     this.sunlightStored += 0.6;
+
+    if (this.parent && age < growDelay) {
+      this.position = add(
+        this.position,
+        toCartesian({
+          r: 40 / growDelay,
+          angle: this.angle,
+        })
+      );
+    }
 
     if (this.hunger > maxHunger) {
       this.die();
@@ -128,7 +139,7 @@ export class Flower extends Entity {
   canProduce = (it: number): boolean =>
     this.hunger + produceCost + 100 < maxHunger &&
     this.next.length === 0 &&
-    it - this.createdAt > 1500;
+    it - this.createdAt > growDelay;
 
   produce = (): Flower[] => {
     let { angle } = this;
@@ -179,7 +190,7 @@ export class Flower extends Entity {
                 this.position,
                 toCartesian({
                   angle,
-                  r: 30,
+                  r: 2,
                 })
               ),
               produces: null,
