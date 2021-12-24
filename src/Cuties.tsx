@@ -30,7 +30,7 @@ function createColormap(nshades: number): string[] {
 
 export interface CutiesProps {}
 
-const width = 1024;
+const width = theme.container.default;
 const height = 800;
 const speed = 10;
 
@@ -55,8 +55,8 @@ export const Cuties: React.FC<CutiesProps> = () => {
       StyleSheet.create({
         canvas: {
           backgroundColor: colormap.current[0],
-          height,
-          width,
+          height: 800,
+          width: theme.container.default,
         },
       }),
     []
@@ -164,8 +164,8 @@ export const Cuties: React.FC<CutiesProps> = () => {
   return (
     <canvas
       className={css(styles.canvas)}
-      height={height}
-      width={width}
+      height={800}
+      width={theme.container.default}
       ref={canvas}
       onClick={handleClick}
     />

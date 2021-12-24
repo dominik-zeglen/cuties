@@ -16,5 +16,8 @@ export const theme = {
     primary: Color.rgb(151, 255, 125),
     secondary: Color.rgb(255, 255, 255).darken(0.6),
   },
+  container: {
+    default: 1280,
+  },
   transition: "200ms",
 };
