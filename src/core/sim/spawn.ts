@@ -19,7 +19,7 @@ export function shouldSpawnFood(sim: Sim): boolean {
   return (
     sim.entityLoader.cuties.length < 5 &&
     sum(sim.entityLoader.food.map((pellet) => pellet.value)) <
-      1e5 * area - sim.entityLoader.cuties.length * 5e3 * area
+      2e5 * area - sim.entityLoader.cuties.length * 5e3 * area
   );
 }
 

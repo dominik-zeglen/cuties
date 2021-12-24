@@ -60,7 +60,7 @@ export class Sim {
     for (let cutieIndex = 0; cutieIndex < 15; cutieIndex++) {
       spawnRandomCutie(this);
     }
-    for (let flowerIndex = 0; flowerIndex < 8; flowerIndex++) {
+    for (let flowerIndex = 0; flowerIndex < 10; flowerIndex++) {
       spawnRandomFlower(this);
     }
 

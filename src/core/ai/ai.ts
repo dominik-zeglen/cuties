@@ -15,8 +15,10 @@ export function createEmptyNetwork(...size: number[]): CutieAi {
   }));
 }
 
-export const baseSystem: CutieAi = createEmptyNetwork(10, 8, 4);
-baseSystem[1].biases[0][1] = 0.06;
+export const baseSystem: CutieAi = createEmptyNetwork(10, 8, 5);
+baseSystem[1].biases[0][1] = 0.08;
+baseSystem[1].biases[0][2] = 0.2;
+baseSystem[1].biases[0][4] = 0.2;
 baseSystem[1].weights[0][0] = -0.6;
 baseSystem[0].weights[2][0] = 0.2;
 
@@ -104,5 +106,6 @@ export function think(input: CutieInput, ai: CutieAi): CutieOutput {
     speed: output[1],
     layEgg: output[2],
     attack: output[3],
+    eat: output[4],
   };
 }

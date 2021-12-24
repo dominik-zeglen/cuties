@@ -3,8 +3,8 @@ import { StatPage } from "../stats/StatPage";
 import { PopulationSimInitMsg, PopulationSimMsg } from "../workers/population";
 
 const opts: PopulationSimInitMsg = {
-  sims: 5,
-  maxIterations: 2e4,
+  sims: 7,
+  maxIterations: 1e5,
   initialAi: JSON.parse(localStorage.getItem("best")),
   points: 200,
 };

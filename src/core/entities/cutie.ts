@@ -91,6 +91,7 @@ export class Cutie extends Entity {
     this.hunger = initialHunger;
     this.thoughts = {
       angle: 0,
+      eat: 0,
       speed: 0,
       layEgg: 0,
       attack: 0,
@@ -167,7 +168,7 @@ export class Cutie extends Entity {
 
   wantsToAttack = (): boolean => this.thoughts.attack > 0;
 
-  wantsToEat = (): boolean => true;
+  wantsToEat = (): boolean => this.thoughts.eat > 0;
 
   wantsToLayEgg = (): boolean => this.thoughts.layEgg > 0;
 

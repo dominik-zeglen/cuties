@@ -1,26 +1,16 @@
-import { add } from "mathjs";
-import cloneDeep from "lodash/cloneDeep";
+import { add, matrix, random } from "mathjs";
 import { CutieAi, Matrix2d } from "./types";
 import { baseSystem } from "./ai";
 
-function getRandomSystem(divide: number, mutations = 1): CutieAi {
-  const system = cloneDeep(baseSystem);
-
-  for (let layer = 0; layer < system.length; layer++) {
-    for (let index = 0; index < mutations; index++) {
-      const xw = Math.floor(Math.random() * system[layer].weights.length);
-      const yw = Math.floor(Math.random() * system[layer].weights[xw].length);
-      system[layer].weights[xw][yw] = (Math.random() > 0.5 ? 1 : -1) / divide;
-
-      if (Math.random() > 0.8) {
-        const xb = Math.floor(Math.random() * system[layer].biases.length);
-        const yb = Math.floor(Math.random() * system[layer].biases[xb].length);
-        system[layer].biases[xb][yb] = (Math.random() > 0.5 ? 1 : -1) / divide;
-      }
-    }
-  }
-
-  return system;
+function getRandomSystem(divide: number): CutieAi {
+  return baseSystem.map((layer) => ({
+    biases: matrix(layer.biases)
+      .map(() => random(-divide, divide))
+      .toArray() as Matrix2d,
+    weights: matrix(layer.weights)
+      .map(() => random(-divide, divide))
+      .toArray() as Matrix2d,
+  }));
 }
 
 function addSystems(a: CutieAi, b: CutieAi): CutieAi {
@@ -30,10 +20,10 @@ function addSystems(a: CutieAi, b: CutieAi): CutieAi {
   }));
 }
 
-export function mutate(ai: CutieAi, factor: number, mutations = 1): CutieAi {
-  return addSystems(ai, getRandomSystem(factor, mutations));
+export function mutate(ai: CutieAi, factor: number): CutieAi {
+  return addSystems(ai, getRandomSystem(factor));
 }
 
 export function getRandomCutieAi(): CutieAi {
-  return addSystems(baseSystem, getRandomSystem(1e2, 20));
+  return addSystems(baseSystem, getRandomSystem(1e-2));
 }

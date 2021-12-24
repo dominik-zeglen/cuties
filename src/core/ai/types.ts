@@ -14,7 +14,7 @@ export type CutieInput = Record<
 
 export type Matrix2d = number[][];
 export type CutieOutput = Record<
-  "speed" | "angle" | "layEgg" | "attack",
+  "speed" | "angle" | "layEgg" | "attack" | "eat",
   number
 >;
 export interface CutieAiLayer {
