@@ -25,5 +25,5 @@ export function mutate(ai: CutieAi, factor: number): CutieAi {
 }
 
 export function getRandomCutieAi(): CutieAi {
-  return addSystems(baseSystem, getRandomSystem(1e-2));
+  return addSystems(baseSystem, getRandomSystem(1e-3));
 }

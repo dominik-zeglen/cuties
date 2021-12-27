@@ -15,7 +15,7 @@ export const maxHunger = 2000;
 const produceCost = 1100;
 const initialHunger = maxHunger - produceCost * 0.6;
 const eatingRate = 0.6;
-const foodValue = 200;
+const foodValue = 500;
 const foodEnergyCostRatio = 0.1;
 const growDelay = 1800;
 export const rangeRadius = 80;
@@ -63,7 +63,7 @@ export class Flower extends Entity {
 
     this.next.forEach((node) => {
       node.parent = null;
-      if (Math.random() < 0.75) {
+      if (Math.random() < 0.25) {
         node.die();
       }
     });
@@ -78,14 +78,14 @@ export class Flower extends Entity {
   sim = (simInput: FlowerSimInput | null): void => {
     const age = this.getAge(simInput.iteration);
     simInput.waste.forEach((waste) => this.eat(waste, null));
-    this.hunger += eatingRate * (0.5 + (age / 2e4) ** 2);
+    this.hunger += eatingRate * (0.5 + age / 6e4);
     this.sunlightStored += 0.6;
 
     if (this.parent && age < growDelay) {
       this.position = add(
         this.position,
         toCartesian({
-          r: 40 / growDelay,
+          r: 30 / growDelay,
           angle: this.angle,
         })
       );
@@ -158,15 +158,15 @@ export class Flower extends Entity {
               successor: "-N",
             },
             {
-              weight: 0.35,
+              weight: 0.45,
               successor: "N",
             },
             {
-              weight: 0.1,
+              weight: 0.05,
               successor: "++N",
             },
             {
-              weight: 0.1,
+              weight: 0.05,
               successor: "++N---N",
             },
             {
