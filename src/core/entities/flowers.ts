@@ -17,7 +17,7 @@ const initialHunger = maxHunger - produceCost * 0.6;
 const eatingRate = 0.6;
 const foodValue = 500;
 const foodEnergyCostRatio = 0.1;
-const growDelay = 1800;
+const growDelay = 5000;
 export const rangeRadius = 80;
 
 export type EatDirection = "forward" | "backward" | null;

@@ -36,7 +36,7 @@ export class EntityLoader {
           y: 0,
         },
         35,
-        6
+        7
       ),
       waste: new QuadTree(
         {
