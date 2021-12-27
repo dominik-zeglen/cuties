@@ -1,7 +1,7 @@
 import cloneDeep from "lodash/cloneDeep";
 import { Entity, InitialEntityInput } from "./entity";
 
-export const valueLossRate = 0.1;
+export const valueLossRate = 2e-2;
 
 export interface InitialRemainsInput extends InitialEntityInput {
   value: number;

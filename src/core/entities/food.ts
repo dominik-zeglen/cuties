@@ -2,7 +2,7 @@ import cloneDeep from "lodash/cloneDeep";
 import { Entity, InitialEntityInput } from "./entity";
 
 export const defaultInitialFoodValue = 1000;
-export const valueLossRate = 0.1;
+export const valueLossRate = 2e-2;
 
 export interface InitialFoodInput extends InitialEntityInput {
   value?: number;
