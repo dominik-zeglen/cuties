@@ -2,21 +2,10 @@ import React, { MouseEventHandler } from "react";
 import { StyleSheet, css } from "aphrodite";
 import Color from "color";
 import minBy from "lodash/minBy";
-import { e } from "mathjs";
 import { Sim } from "./core/sim";
 import { theme } from "./components/theme";
 import { len, sub } from "./core/r2";
-import {
-  drawCutie,
-  drawFlower,
-  drawIndicator,
-  drawPellet,
-  drawStaticPellet,
-} from "./paint";
-import { maxValue } from "./core/entities/waste";
-import { defaultInitialFoodValue } from "./core/entities/food";
-import { TrainingSim } from "./core/sim/training";
-import { maxHunger } from "./core/entities/cutie";
+import { paint as paintCuties } from "./paint";
 import { moveCamera } from "./paint/camera";
 
 function createColormap(nshades: number): string[] {
@@ -34,7 +23,6 @@ export interface CutiesProps {}
 
 const width = theme.container.default;
 const height = 800;
-const aspect = width / height;
 const speed = 10;
 
 function handlePause(event: KeyboardEvent) {
@@ -68,7 +56,6 @@ export const Cuties: React.FC<CutiesProps> = () => {
     height,
     sim,
     width,
-    zoom: 1,
     viewPort: {
       start: { x: 0, y: 0 },
       end: { x: width, y: height },
@@ -81,59 +68,11 @@ export const Cuties: React.FC<CutiesProps> = () => {
     }
 
     const context = canvas.current.getContext("2d");
-    context.clearRect(0, 0, sim.current.bounds[1].x, sim.current.bounds[1].y);
-
-    sim.current.entityLoader.food.forEach((food) =>
-      drawPellet(context, {
-        color: theme.primary.string(),
-        maxValue: defaultInitialFoodValue,
-        pellet: food,
-      })
-    );
-
-    sim.current.entityLoader.eggs.forEach((egg) =>
-      drawStaticPellet(context, {
-        color: theme.entities.egg.string(),
-        pellet: egg,
-        size: 3,
-      })
-    );
-
-    sim.current.entityLoader.waste.forEach((waste) =>
-      drawPellet(context, {
-        color: theme.entities.dump.string(),
-        pellet: waste,
-        maxValue,
-      })
-    );
-
-    sim.current.entityLoader.remains.forEach((remains) =>
-      drawPellet(context, {
-        color: theme.entities.remains.string(),
-        pellet: remains,
-        maxValue: maxHunger / 2,
-      })
-    );
-
-    sim.current.entityLoader.flowerRoots.forEach((flower) =>
-      drawFlower(context, flower)
-    );
-
-    sim.current.entityLoader.cuties.forEach((cutie) =>
-      drawCutie(context, cutie)
-    );
-
-    if (window.cuties.selected) {
-      if (window.cuties.selected.shouldDelete) {
-        window.cuties.selected = undefined;
-      } else {
-        drawIndicator(context, {
-          entity: window.cuties.selected,
-          width,
-          height,
-        });
-      }
-    }
+    paintCuties(context, {
+      sim: sim.current,
+      width,
+      height,
+    });
 
     window.requestAnimationFrame(paint);
   };
