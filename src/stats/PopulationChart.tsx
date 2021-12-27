@@ -55,5 +55,5 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({
     }
   }, []);
 
-  return <canvas height="800" width="1024" ref={canvas} />;
+  return <canvas height="800" width={theme.container.default} ref={canvas} />;
 };

@@ -1,6 +1,8 @@
 import { Rect } from "@timohausmann/quadtree-js";
 import { Point } from "../r2";
 
+const notImplemented = new Error("Not implemented");
+
 export interface InitialEntityInput {
   position: Point;
 }
@@ -39,10 +41,16 @@ export class Entity implements Rect {
   };
 
   // eslint-disable-next-line class-methods-use-this
-  die(): void {}
+  die(): void {
+    throw notImplemented;
+  }
 
   // eslint-disable-next-line class-methods-use-this
   copy(): Entity {
-    throw new Error("Not implemented");
+    throw notImplemented;
+  }
+
+  getAge(it: number): number {
+    return it - this.createdAt;
   }
 }

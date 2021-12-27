@@ -1,11 +1,12 @@
 import React from "react";
+import { baseSystem } from "../core/ai";
 import { StatPage } from "../stats/StatPage";
 import { PopulationSimInitMsg, PopulationSimMsg } from "../workers/population";
 
 const opts: PopulationSimInitMsg = {
-  sims: 7,
+  sims: 3,
   maxIterations: 1e5,
-  initialAi: JSON.parse(localStorage.getItem("best")),
+  initialAi: baseSystem,
   points: 200,
 };
 

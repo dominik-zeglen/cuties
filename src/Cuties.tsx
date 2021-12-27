@@ -5,17 +5,8 @@ import minBy from "lodash/minBy";
 import { Sim } from "./core/sim";
 import { theme } from "./components/theme";
 import { len, sub } from "./core/r2";
-import {
-  drawCutie,
-  drawFlower,
-  drawIndicator,
-  drawPellet,
-  drawStaticPellet,
-} from "./paint";
-import { maxValue } from "./core/entities/waste";
-import { defaultInitialFoodValue } from "./core/entities/food";
-import { TrainingSim } from "./core/sim/training";
-import { maxHunger } from "./core/entities/cutie";
+import { paint as paintCuties } from "./paint";
+import { moveCamera } from "./paint/camera";
 
 function createColormap(nshades: number): string[] {
   return Array<Color>(nshades)
@@ -30,7 +21,7 @@ function createColormap(nshades: number): string[] {
 
 export interface CutiesProps {}
 
-const width = 1024;
+const width = theme.container.default;
 const height = 800;
 const speed = 10;
 
@@ -44,7 +35,7 @@ function handlePause(event: KeyboardEvent) {
 
 export const Cuties: React.FC<CutiesProps> = () => {
   const interval = React.useRef<number>(null);
-  const sim = React.useRef<Sim>(new Sim(width, height));
+  const sim = React.useRef<Sim>(new Sim(2000, 2000));
   // const sim = React.useRef<Sim>(
   //   new TrainingSim(JSON.parse(localStorage.getItem("best")), 0)
   // );
@@ -61,6 +52,15 @@ export const Cuties: React.FC<CutiesProps> = () => {
       }),
     []
   );
+  const camera = React.useRef({
+    height,
+    sim,
+    width,
+    viewPort: {
+      start: { x: 0, y: 0 },
+      end: { x: width, y: height },
+    },
+  });
 
   const paint = () => {
     if (!canvas.current) {
@@ -68,59 +68,11 @@ export const Cuties: React.FC<CutiesProps> = () => {
     }
 
     const context = canvas.current.getContext("2d");
-    context.clearRect(0, 0, canvas.current.width, canvas.current.height);
-
-    sim.current.entityLoader.food.forEach((food) =>
-      drawPellet(context, {
-        color: theme.primary.string(),
-        maxValue: defaultInitialFoodValue,
-        pellet: food,
-      })
-    );
-
-    sim.current.entityLoader.eggs.forEach((egg) =>
-      drawStaticPellet(context, {
-        color: theme.entities.egg.string(),
-        pellet: egg,
-        size: 3,
-      })
-    );
-
-    sim.current.entityLoader.waste.forEach((waste) =>
-      drawPellet(context, {
-        color: theme.entities.dump.string(),
-        pellet: waste,
-        maxValue,
-      })
-    );
-
-    sim.current.entityLoader.remains.forEach((remains) =>
-      drawPellet(context, {
-        color: theme.entities.remains.string(),
-        pellet: remains,
-        maxValue: maxHunger / 2,
-      })
-    );
-
-    sim.current.entityLoader.flowerRoots.forEach((flower) =>
-      drawFlower(context, flower)
-    );
-
-    sim.current.entityLoader.cuties.forEach((cutie) =>
-      drawCutie(context, cutie)
-    );
-
-    if (window.cuties.selected) {
-      if (window.cuties.selected.shouldDelete) {
-        window.cuties.selected = undefined;
-      } else {
-        drawIndicator(context, {
-          entity: window.cuties.selected,
-          width,
-          height,
-        });
-      }
-    }
+    paintCuties(context, {
+      sim: sim.current,
+      width,
+      height,
+    });
 
     window.requestAnimationFrame(paint);
   };
@@ -143,23 +95,34 @@ export const Cuties: React.FC<CutiesProps> = () => {
     (event) => {
       const rect = event.currentTarget.getBoundingClientRect();
       const point = {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
+        x: event.clientX - rect.left + camera.current.viewPort.start.x,
+        y: event.clientY - rect.top + camera.current.viewPort.start.y,
       };
 
-      const { id } = minBy(
+      const { id, dist } = minBy(
         sim.current.entities.map((ent) => ({
           id: ent.id,
           dist: len(sub(ent.position, point)),
         })),
         "dist"
       );
-      window.cuties.selected = sim.current.entities.find(
-        (ent) => ent.id === id
-      );
+      if (dist < 20) {
+        window.cuties.selected = sim.current.entities.find(
+          (ent) => ent.id === id
+        );
+      } else {
+        window.cuties.selected = null;
+      }
     },
     []
   );
+
+  const handleMouseMove: MouseEventHandler<HTMLCanvasElement> = (event) => {
+    if (event.buttons === 1) {
+      const context = canvas.current.getContext("2d");
+      moveCamera(camera, context, -event.movementX, -event.movementY);
+    }
+  };
 
   return (
     <canvas
@@ -168,6 +131,8 @@ export const Cuties: React.FC<CutiesProps> = () => {
       width={width}
       ref={canvas}
       onClick={handleClick}
+      onMouseDown={handleClick}
+      onMouseMove={handleMouseMove}
     />
   );
 };

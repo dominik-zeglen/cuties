@@ -1,28 +1,29 @@
 import { theme } from "../components/theme";
 import { Cutie, maxHunger } from "../core/entities/cutie";
-import { add, toCartesian } from "../core/r2";
+import { add, sub, toCartesian } from "../core/r2";
 
 export function drawCutie(context: CanvasRenderingContext2D, cutie: Cutie) {
-  context.strokeStyle = theme.entities.cutie.string();
+  context.fillStyle = theme.entities.cutie.string();
 
   const r = 12 - (cutie.hunger / maxHunger) * 9;
   const head = add(cutie.position, toCartesian({ r, angle: cutie.angle }));
   const leftWing = add(
     cutie.position,
-    toCartesian({ r, angle: cutie.angle - (Math.PI * 11) / 12 })
+    toCartesian({ r, angle: cutie.angle - (Math.PI * 1) / 12 })
   );
   const rightWing = add(
     cutie.position,
-    toCartesian({ r, angle: cutie.angle + (Math.PI * 11) / 12 })
+    toCartesian({ r, angle: cutie.angle + (Math.PI * 1) / 12 })
   );
+  const tail = sub(cutie.position, toCartesian({ r, angle: cutie.angle }));
 
   context.beginPath();
 
-  context.moveTo(cutie.position.x, cutie.position.y);
+  context.moveTo(head.x, head.y);
   context.lineTo(leftWing.x, leftWing.y);
-  context.lineTo(head.x, head.y);
+  context.lineTo(tail.x, tail.y);
   context.lineTo(rightWing.x, rightWing.y);
-  context.lineTo(cutie.position.x, cutie.position.y);
+  context.lineTo(head.x, head.y);
 
-  context.stroke();
+  context.fill();
 }
