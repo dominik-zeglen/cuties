@@ -4,9 +4,10 @@ import maxBy from "lodash/maxBy";
 import shuffle from "lodash/shuffle";
 import { baseSystem, CutieAi, getTargetInputMatrix, sgd } from "../core/ai";
 import { pelletValue, Score, TrainingSim } from "../core/sim/training";
-import { Cutie, getInput, rangeRadius } from "../core/entities/cutie";
+import { Cutie, getInput } from "../core/entities/cutie";
 import { getCutieInput } from "../core/sim/sim";
 import { toPolar } from "../core/r2";
+import settings from "../core/settings";
 
 export interface GenerationSimData {
   ai: CutieAi;
@@ -93,7 +94,10 @@ self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
         .flat();
 
       const best = maxBy(simData, "score");
-      const nearestFood = sim.getNearestFood(cutie.position, rangeRadius);
+      const nearestFood = sim.getNearestFood(
+        cutie.position,
+        settings.cutie.range
+      );
       const nearestFoodPosition = nearestFood ? toPolar(nearestFood) : null;
       trainData.push({
         input: getTargetInputMatrix(

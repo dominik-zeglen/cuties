@@ -1,11 +1,12 @@
 import { theme } from "../components/theme";
-import { Cutie, rangeRadius } from "../core/entities/cutie";
+import { Cutie } from "../core/entities/cutie";
 import { Entity } from "../core/entities/entity";
 import {
   Flower,
   rangeRadius as flowerRangeRadius,
 } from "../core/entities/flowers";
 import { add, toCartesian } from "../core/r2";
+import settings from "../core/settings";
 
 interface DrawIndicatorOpts {
   entity: Entity & { angle?: number };
@@ -51,8 +52,8 @@ export function drawIndicator(
     context.ellipse(
       opts.entity.position.x,
       opts.entity.position.y,
-      rangeRadius,
-      rangeRadius,
+      settings.cutie.range,
+      settings.cutie.range,
       -1,
       0,
       2 * 3.141,

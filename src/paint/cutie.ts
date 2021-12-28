@@ -1,10 +1,11 @@
-import { Cutie, maxHunger } from "../core/entities/cutie";
+import { Cutie } from "../core/entities/cutie";
 import { add, sub, toCartesian } from "../core/r2";
+import settings from "../core/settings";
 
 export function drawCutie(context: CanvasRenderingContext2D, cutie: Cutie) {
   context.fillStyle = cutie.color;
 
-  const r = 12 - (cutie.hunger / maxHunger) * 9;
+  const r = 12 - (cutie.hunger / settings.cutie.maxHunger) * 9;
   const head = add(cutie.position, toCartesian({ r, angle: cutie.angle }));
   const leftWing = add(
     cutie.position,

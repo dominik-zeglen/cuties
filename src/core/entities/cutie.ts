@@ -19,14 +19,9 @@ import { Food } from "./food";
 import { Waste } from "./waste";
 import { Remains } from "./remains";
 import { theme } from "../../components/theme";
+import settings from "../settings";
 
-export const maxHunger = 2000;
-const eggCost = 900;
-const initialHunger = maxHunger - eggCost * 0.9;
-const eatingRate = 10;
-const droppedWasteValue = 500;
-export const attackCooldown = 60;
-export const rangeRadius = 300;
+const initialHunger = settings.cutie.maxHunger - settings.cutie.eggCost * 0.9;
 
 export function getAngleInput(
   point: PolarPoint | null,
@@ -42,21 +37,21 @@ export function getAngleInput(
 
 export function getInput(cutie: Cutie, simInput: CutieSimInput): CutieInput {
   return {
-    hunger: cutie.hunger / maxHunger,
+    hunger: cutie.hunger / settings.cutie.maxHunger,
     foundFood: simInput.nearestFood ? 1 : 0,
     angleToFood: getAngleInput(simInput.nearestFood, cutie.angle),
     distanceToFood: simInput.nearestFood
-      ? simInput.nearestFood.r / rangeRadius
+      ? simInput.nearestFood.r / settings.cutie.range
       : 0,
     foundCutie: simInput.nearestRemains ? 1 : 0,
     angleToCutie: getAngleInput(simInput.nearestCutie, cutie.angle),
     distanceToCutie: simInput.nearestCutie
-      ? simInput.nearestCutie.r / rangeRadius
+      ? simInput.nearestCutie.r / settings.cutie.range
       : 0,
     foundRemains: simInput.nearestRemains ? 1 : 0,
     angleToRemains: getAngleInput(simInput.nearestRemains, cutie.angle),
     distanceToRemains: simInput.nearestRemains
-      ? simInput.nearestRemains.r / rangeRadius
+      ? simInput.nearestRemains.r / settings.cutie.range
       : 0,
   };
 }
@@ -130,7 +125,7 @@ export class Cutie extends Entity {
       })
     );
     const energy =
-      ((1 + Math.abs(this.thoughts.speed)) ** 1.5 / 4 +
+      ((1 + Math.abs(this.thoughts.speed)) ** 1.5 / 6 +
         Math.abs(this.thoughts.angle)) *
       (this.wantsToEat() ? 1 : 0.5) *
       (this.wantsToLayEgg() ? 1 : 0.5) *
@@ -139,7 +134,7 @@ export class Cutie extends Entity {
     this.hunger += energy;
     this.wasteStored += energy;
 
-    if (this.hunger > maxHunger) {
+    if (this.hunger > settings.cutie.maxHunger) {
       this.die();
     }
 
@@ -160,7 +155,7 @@ export class Cutie extends Entity {
   eat = (pellet: Food | Remains) => {
     const rate =
       (pellet instanceof Remains ? this.carnivore : 1 - this.carnivore) *
-      eatingRate *
+      settings.cutie.eatingRate *
       2;
 
     this.hunger -= rate;
@@ -178,26 +173,29 @@ export class Cutie extends Entity {
 
   wantsToLayEgg = (): boolean => this.thoughts.layEgg > 0;
 
-  canLayEgg = (): boolean => this.hunger + eggCost * 1.1 < maxHunger;
+  canLayEgg = (): boolean =>
+    this.hunger + settings.cutie.eggCost * 1.1 < settings.cutie.maxHunger;
 
-  canAttack = (it: number): boolean => it - this.lastAttack > attackCooldown;
+  canAttack = (it: number): boolean =>
+    it - this.lastAttack > settings.cutie.attackCooldown;
 
   layEgg = (it: number): Egg => {
     const egg = new Egg(this);
     this.lastEggLaying = it;
-    this.hunger += eggCost;
-    this.wasteStored += eggCost;
+    this.hunger += settings.cutie.eggCost;
+    this.wasteStored += settings.cutie.eggCost;
 
     return egg;
   };
 
-  shouldDumpWaste = (): boolean => this.wasteStored > droppedWasteValue;
+  shouldDumpWaste = (): boolean =>
+    this.wasteStored > settings.cutie.droppedWasteValue;
 
   dumpWaste = (): Waste => {
-    this.wasteStored -= droppedWasteValue;
+    this.wasteStored -= settings.cutie.droppedWasteValue;
     return new Waste({
       position: this.position,
-      value: droppedWasteValue,
+      value: settings.cutie.droppedWasteValue,
     });
   };
 

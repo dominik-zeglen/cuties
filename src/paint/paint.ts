@@ -6,10 +6,10 @@ import {
   drawStaticPellet,
 } from ".";
 import { theme } from "../components/theme";
-import { maxHunger } from "../core/entities/cutie";
 import { defaultInitialFoodValue } from "../core/entities/food";
 import { Sim } from "../core/sim";
 import { maxValue } from "../core/entities/waste";
+import settings from "../core/settings";
 
 export interface PaintOpts {
   width: number;
@@ -51,7 +51,7 @@ export function paint(
     drawPellet(context, {
       color: theme.entities.remains.string(),
       pellet: remains,
-      maxValue: maxHunger / 2,
+      maxValue: settings.cutie.maxHunger / 2,
     })
   );
 

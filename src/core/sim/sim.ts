@@ -1,13 +1,9 @@
 import type { Sim } from ".";
-import {
-  Cutie,
-  CutieSimInput,
-  maxHunger,
-  rangeRadius,
-} from "../entities/cutie";
+import { Cutie, CutieSimInput } from "../entities/cutie";
 import { Flower, rangeRadius as flowerRangeRadius } from "../entities/flowers";
 import { Remains } from "../entities/remains";
 import { PolarPoint, sub, toPolar } from "../r2";
+import settings from "../settings";
 
 export function getCutieInput(
   cutie: Cutie,
@@ -39,7 +35,7 @@ export function getCutieInput(
 }
 
 export function simCutie(cutie: Cutie, sim: Sim, think: boolean): void {
-  const nearestFood = sim.getNearestFood(cutie.position, rangeRadius);
+  const nearestFood = sim.getNearestFood(cutie.position, settings.cutie.range);
   let nearestFoodPolarPosition: PolarPoint | null = null;
   let actionTaken = false;
 
@@ -56,7 +52,7 @@ export function simCutie(cutie: Cutie, sim: Sim, think: boolean): void {
 
   const nearestCutie = sim.getNearestCutie(
     cutie.position,
-    rangeRadius,
+    settings.cutie.range,
     (candidateCutie) => candidateCutie.id !== cutie.id
   );
   let nearestCutiePolarPosition: PolarPoint | null = null;
@@ -77,7 +73,10 @@ export function simCutie(cutie: Cutie, sim: Sim, think: boolean): void {
     }
   }
 
-  const nearestRemains = sim.getNearestRemains(cutie.position, rangeRadius);
+  const nearestRemains = sim.getNearestRemains(
+    cutie.position,
+    settings.cutie.range
+  );
   let nearestRemainsPolarPosition: PolarPoint | null = null;
 
   if (nearestRemains && cutie.wantsToEat()) {
@@ -119,7 +118,7 @@ export function simCutie(cutie: Cutie, sim: Sim, think: boolean): void {
   if (cutie.shouldDelete) {
     const remains = new Remains({
       position: cutie.position,
-      value: 100 + maxHunger - cutie.hunger,
+      value: 100 + settings.cutie.maxHunger - cutie.hunger,
     });
     sim.registerEntity(remains);
   }
