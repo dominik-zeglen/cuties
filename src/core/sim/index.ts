@@ -57,10 +57,10 @@ export class Sim {
       spawnRandomFood(this);
       this.entityLoader.init(this.entities);
     }
-    for (let cutieIndex = 0; cutieIndex < 45; cutieIndex++) {
+    for (let cutieIndex = 0; cutieIndex < 100; cutieIndex++) {
       spawnRandomCutie(this);
     }
-    for (let flowerIndex = 0; flowerIndex < 15; flowerIndex++) {
+    for (let flowerIndex = 0; flowerIndex < 30; flowerIndex++) {
       spawnRandomFlower(this);
     }
 

@@ -22,7 +22,7 @@ export const baseSystem: CutieAi = {
 };
 
 // AI following current target
-baseSystem.action[1].biases[0][1] = 0.01;
+baseSystem.action[1].biases[0][1] = 0.05;
 baseSystem.action[1].biases[0][2] = 0.2;
 baseSystem.action[1].biases[0][4] = 0.2;
 baseSystem.action[1].weights[0][0] = -0.6;

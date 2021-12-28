@@ -13,7 +13,7 @@ import { Food } from "./food";
 import settings from "../settings";
 
 const initialHunger =
-  settings.flower.maxHunger - settings.flower.nextNodeCost * 0.6;
+  settings.flower.maxHunger - settings.flower.nextNodeCost * 0.9;
 
 export type EatDirection = "forward" | "backward" | null;
 
@@ -73,8 +73,8 @@ export class Flower extends Entity {
   sim = (simInput: FlowerSimInput | null): void => {
     const age = this.getAge(simInput.iteration);
     simInput.waste.forEach((waste) => this.eat(waste, null));
-    this.hunger += settings.flower.eatingRate + (this.degree - 1) / 10;
-    this.sunlightStored += 0.6;
+    this.hunger += settings.flower.passiveEnergyCost + (this.degree - 1) / 10;
+    this.sunlightStored += 0.7;
 
     if (this.parent && age < settings.flower.growCooldown) {
       this.position = add(

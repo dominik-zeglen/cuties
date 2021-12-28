@@ -125,7 +125,7 @@ export class Cutie extends Entity {
       })
     );
     const energy =
-      ((1 + Math.abs(this.thoughts.speed)) ** 1.5 / 6 +
+      ((1 + Math.abs(this.thoughts.speed)) ** 1.5 / 15 +
         Math.abs(this.thoughts.angle)) *
       (this.wantsToEat() ? 1 : 0.5) *
       (this.wantsToLayEgg() ? 1 : 0.5) *
