@@ -18,13 +18,14 @@ import {
 import { Food } from "./food";
 import { Waste } from "./waste";
 import { Remains } from "./remains";
+import { theme } from "../../components/theme";
 
 export const maxHunger = 2000;
 const eggCost = 900;
 const initialHunger = maxHunger - eggCost * 0.9;
 const eatingRate = 10;
-const droppedWasteValue = 250;
-export const attackCooldown = 10;
+const droppedWasteValue = 500;
+export const attackCooldown = 60;
 export const rangeRadius = 300;
 
 export function getAngleInput(
@@ -71,6 +72,8 @@ export interface InitialCutieInput extends InitialEntityInput {
   ai: CutieAi;
   angle: number;
   ancestors: number;
+  color: string;
+  tail: number;
 }
 
 export class Cutie extends Entity {
@@ -84,6 +87,8 @@ export class Cutie extends Entity {
   wasteStored: number;
   hp: number;
   carnivore: number;
+  color: string;
+  tail: number;
 
   constructor(initial: InitialCutieInput) {
     super(initial);
@@ -103,6 +108,8 @@ export class Cutie extends Entity {
     this.lastAttack = 0;
     this.hp = 100;
     this.carnivore = 0.5;
+    this.color = initial.color;
+    this.tail = initial.tail;
   }
 
   die = this.markToDelete;
@@ -147,7 +154,7 @@ export class Cutie extends Entity {
 
   attack = (it: number, cutie: Cutie) => {
     cutie.hp -= 10;
-    cutie.lastAttack = it;
+    this.lastAttack = it;
   };
 
   eat = (pellet: Food | Remains) => {
@@ -200,6 +207,8 @@ export class Cutie extends Entity {
       ancestors: this.ancestors,
       angle: this.angle,
       position: cloneDeep(this.position),
+      color: this.color,
+      tail: this.tail,
     });
 
     newCutie.createdAt = this.createdAt;
@@ -220,6 +229,8 @@ export function getRandomCutie(bounds: Point[]): Cutie {
     ancestors: 0,
     ai: getRandomCutieAi(),
     position: getRandomPositionInBounds(bounds),
+    color: theme.entities.cutie.string(),
+    tail: 1,
   });
 
   return cutie;

@@ -1,6 +1,6 @@
 import { CutieInput, Matrix2d } from "./types";
 
-export function getInputMatrix(input: CutieInput): Matrix2d {
+export function getTargetInputMatrix(input: CutieInput): Matrix2d {
   return [
     [
       input.hunger,

@@ -1,9 +1,8 @@
-import { subtract } from "mathjs";
-import { rootMeanSquare, shuffle } from "simple-statistics";
-import { createEmptyNetwork } from ".";
+import { shuffle } from "simple-statistics";
+import { createEmptyNetwork, NeuralNetwork } from ".";
 import { feed, sgd, think } from "./ai";
 import { getRandomCutieAi, mutate } from "./mutate";
-import { CutieAi, CutieInput } from "./types";
+import { CutieInput } from "./types";
 
 test("Inputs work correctly", () => {
   // Given
@@ -63,7 +62,7 @@ test("Properly mutates", () => {
 
 describe("SGD", () => {
   it("descends in valid gradient", () => {
-    const ai: CutieAi = createEmptyNetwork(2, 6, 1);
+    const ai: NeuralNetwork = createEmptyNetwork(2, 6, 1);
     const input = [[0, 1]];
     const output = feed(input, ai);
     const desiredOutput = [[1]];

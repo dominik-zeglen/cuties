@@ -36,6 +36,8 @@ test("Gets nearest cutie", () => {
         x: -5,
         y: -5,
       },
+      color: "",
+      tail: 0,
     })
   );
 
@@ -69,9 +71,11 @@ test("Gets nearest remains", () => {
 test("Properly calculates eaten food", () => {
   const cutie = new Cutie({
     angle: 0,
-    ai: [],
+    ai: getRandomCutieAi(),
     ancestors: 0,
     position: { x: 0, y: 0 },
+    color: "",
+    tail: 0,
   });
   cutie.hunger = 2;
   const food = new Food({

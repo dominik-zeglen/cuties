@@ -4,33 +4,42 @@ import {
   CutieInput,
   CutieOutput,
   Matrix2d,
-  CutieAiLayer,
+  NeuralNetworkLayer,
+  NeuralNetwork,
 } from "./types";
-import { getInputMatrix } from "./utils";
+import { getTargetInputMatrix } from "./utils";
 
-export function createEmptyNetwork(...size: number[]): CutieAi {
+export function createEmptyNetwork(...size: number[]): NeuralNetwork {
   return size.slice(0, -1).map((inputLayer, layerIndex) => ({
     biases: zeros([1, size[layerIndex + 1]]) as Matrix2d,
     weights: zeros([inputLayer, size[layerIndex + 1]]) as Matrix2d,
   }));
 }
 
-export const baseSystem: CutieAi = createEmptyNetwork(10, 8, 5);
-baseSystem[1].biases[0][1] = 0.08;
-baseSystem[1].biases[0][2] = 0.2;
-baseSystem[1].biases[0][4] = 0.2;
-baseSystem[1].weights[0][0] = -0.6;
-baseSystem[0].weights[2][0] = 0.2;
+export const baseSystem: CutieAi = {
+  action: createEmptyNetwork(3, 3, 5),
+  target: createEmptyNetwork(10, 6, 2),
+};
 
-function feedLayer(inputLayer: Matrix2d, layer: CutieAiLayer): Matrix2d {
+// AI following current target
+baseSystem.action[1].biases[0][1] = 0.01;
+baseSystem.action[1].biases[0][2] = 0.2;
+baseSystem.action[1].biases[0][4] = 0.2;
+baseSystem.action[1].weights[0][0] = -0.6;
+baseSystem.action[0].weights[1][0] = 0.2;
+
+baseSystem.target[1].weights[0][0] = 1;
+baseSystem.target[0].weights[2][0] = 1;
+
+function feedLayer(inputLayer: Matrix2d, layer: NeuralNetworkLayer): Matrix2d {
   return map(
     add(multiply(inputLayer, layer.weights), layer.biases) as Matrix2d,
     Math.tanh
   );
 }
 
-export function feed(input: Matrix2d, ai: CutieAi): Matrix2d {
-  return ai.reduce(feedLayer, input);
+export function feed(input: Matrix2d, nn: NeuralNetwork): Matrix2d {
+  return nn.reduce(feedLayer, input);
 }
 
 function actDerivative(x: number): number {
@@ -38,12 +47,12 @@ function actDerivative(x: number): number {
 }
 
 export function sgd(
-  ai: CutieAi,
+  nn: NeuralNetwork,
   input: number[],
   output: number[],
   learningRate = 1e-2
-): CutieAi {
-  const layerValues = ai.reduce(
+): NeuralNetwork {
+  const layerValues = nn.reduce(
     (layers, layer, layerIndex) => [
       ...layers,
       transpose(feed(transpose(layers[layerIndex]), [layer])),
@@ -51,31 +60,31 @@ export function sgd(
     [transpose([input])] as Matrix2d[]
   );
   const errors: Matrix2d[] = [];
-  errors[ai.length - 1] = subtract(
+  errors[nn.length - 1] = subtract(
     transpose([output]),
     layerValues[layerValues.length - 1]
   ) as Matrix2d;
 
   const gradients: Matrix2d[] = [];
-  gradients[ai.length - 1] = multiply(
+  gradients[nn.length - 1] = multiply(
     map(
       map(layerValues[layerValues.length - 1], actDerivative),
       (el, [rowIndex, colIndex]) =>
-        el * errors[ai.length - 1][rowIndex][colIndex]
+        el * errors[nn.length - 1][rowIndex][colIndex]
     ),
     learningRate
   );
-  const newAi: CutieAi = [];
+  const newAi: NeuralNetwork = [];
 
-  for (let i = ai.length - 1; i > 0; i--) {
+  for (let i = nn.length - 1; i > 0; i--) {
     const deltas = multiply(gradients[i], transpose(layerValues[i]));
 
     newAi[i] = {
-      biases: add(ai[i].biases, transpose(gradients[i])) as Matrix2d,
-      weights: add(ai[i].weights, transpose(deltas)) as Matrix2d,
+      biases: add(nn[i].biases, transpose(gradients[i])) as Matrix2d,
+      weights: add(nn[i].weights, transpose(deltas)) as Matrix2d,
     };
 
-    errors[i - 1] = multiply(ai[i].weights, errors[i]);
+    errors[i - 1] = multiply(nn[i].weights, errors[i]);
     gradients[i - 1] = multiply(
       map(
         map(layerValues[i], actDerivative),
@@ -89,23 +98,22 @@ export function sgd(
   const deltas = multiply(gradients[0], iT);
 
   newAi[0] = {
-    biases: add(ai[0].biases, transpose(gradients[0])) as Matrix2d,
-    weights: add(ai[0].weights, transpose(deltas)) as Matrix2d,
+    biases: add(nn[0].biases, transpose(gradients[0])) as Matrix2d,
+    weights: add(nn[0].weights, transpose(deltas)) as Matrix2d,
   };
 
   return newAi;
 }
 
 export function think(input: CutieInput, ai: CutieAi): CutieOutput {
-  const inputMatrix = getInputMatrix(input);
-
-  const output = feed(inputMatrix, ai)[0];
+  const target = feed(getTargetInputMatrix(input), ai.target);
+  const actions = feed([[input.hunger, ...target[0]]], ai.action)[0];
 
   return {
-    angle: output[0],
-    speed: output[1],
-    layEgg: output[2],
-    attack: output[3],
-    eat: output[4],
+    angle: actions[0],
+    speed: actions[1],
+    layEgg: actions[2],
+    attack: actions[3],
+    eat: actions[4],
   };
 }

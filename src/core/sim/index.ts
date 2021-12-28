@@ -57,10 +57,10 @@ export class Sim {
       spawnRandomFood(this);
       this.entityLoader.init(this.entities);
     }
-    for (let cutieIndex = 0; cutieIndex < 15; cutieIndex++) {
+    for (let cutieIndex = 0; cutieIndex < 45; cutieIndex++) {
       spawnRandomCutie(this);
     }
-    for (let flowerIndex = 0; flowerIndex < 10; flowerIndex++) {
+    for (let flowerIndex = 0; flowerIndex < 15; flowerIndex++) {
       spawnRandomFlower(this);
     }
 
@@ -176,11 +176,11 @@ export class Sim {
   };
 
   registerEntity = (entity: Entity): boolean => {
-    if (entity instanceof Flower && this.entityLoader.flowers.length > 250) {
+    if (entity instanceof Flower && this.entityLoader.flowers.length > 350) {
       entity.die();
     }
 
-    if (entity instanceof Cutie && this.entityLoader.flowers.length > 300) {
+    if (entity instanceof Cutie && this.entityLoader.cuties.length > 300) {
       entity.die();
     }
 
@@ -193,6 +193,10 @@ export class Sim {
     }
 
     if (entity instanceof Egg && this.entityLoader.eggs.length > 100) {
+      entity.die();
+    }
+
+    if (entity instanceof Food && this.entityLoader.food.length > 500) {
       entity.die();
     }
 

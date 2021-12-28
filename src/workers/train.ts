@@ -2,7 +2,7 @@
 
 import maxBy from "lodash/maxBy";
 import shuffle from "lodash/shuffle";
-import { baseSystem, CutieAi, getInputMatrix, sgd } from "../core/ai";
+import { baseSystem, CutieAi, getTargetInputMatrix, sgd } from "../core/ai";
 import { pelletValue, Score, TrainingSim } from "../core/sim/training";
 import { Cutie, getInput, rangeRadius } from "../core/entities/cutie";
 import { getCutieInput } from "../core/sim/sim";
@@ -96,7 +96,7 @@ self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
       const nearestFood = sim.getNearestFood(cutie.position, rangeRadius);
       const nearestFoodPosition = nearestFood ? toPolar(nearestFood) : null;
       trainData.push({
-        input: getInputMatrix(
+        input: getTargetInputMatrix(
           getInput(
             cutie,
             getCutieInput(
@@ -121,7 +121,10 @@ self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
       shuffle(trainData)
         .slice(0, trainData.length / 5)
         .forEach((data) => {
-          ai = sgd(ai, data.input, data.output, 1e-4);
+          ai = {
+            action: sgd(ai.action, data.input, data.output, 1e-4),
+            target: sgd(ai.action, data.input, data.output, 1e-4),
+          };
         });
       trainData = [];
 

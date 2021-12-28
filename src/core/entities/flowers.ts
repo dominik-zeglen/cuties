@@ -14,9 +14,9 @@ import { Food } from "./food";
 export const maxHunger = 2000;
 const produceCost = 1100;
 const initialHunger = maxHunger - produceCost * 0.6;
-const eatingRate = 0.6;
+const eatingRate = 0.7;
 const foodValue = 500;
-const foodEnergyCostRatio = 0.1;
+const foodEnergyCostRatio = 0.2;
 const growDelay = 5000;
 export const rangeRadius = 80;
 
@@ -78,7 +78,7 @@ export class Flower extends Entity {
   sim = (simInput: FlowerSimInput | null): void => {
     const age = this.getAge(simInput.iteration);
     simInput.waste.forEach((waste) => this.eat(waste, null));
-    this.hunger += eatingRate * (0.5 + age / 6e4);
+    this.hunger += eatingRate + (this.degree - 1) / 10;
     this.sunlightStored += 0.6;
 
     if (this.parent && age < growDelay) {
@@ -96,14 +96,14 @@ export class Flower extends Entity {
     }
   };
 
-  eat = (waste: Waste, direction: EatDirection, chainLevel = 1): boolean => {
+  eat = (waste: Waste, direction: EatDirection, chainLevel = 0): boolean => {
     if (!waste.value) {
       return false;
     }
 
     if (this.hunger > 0) {
       waste.value -= eatingRate;
-      this.hunger -= eatingRate * 0.9 ** chainLevel;
+      this.hunger -= eatingRate * 0.8 ** chainLevel;
       return true;
     }
 
