@@ -10,15 +10,10 @@ import {
 } from "../r2";
 import { Waste } from "./waste";
 import { Food } from "./food";
+import settings from "../settings";
 
-export const maxHunger = 2000;
-const produceCost = 1100;
-const initialHunger = maxHunger - produceCost * 0.6;
-const eatingRate = 0.7;
-const foodValue = 500;
-const foodEnergyCostRatio = 0.2;
-const growDelay = 5000;
-export const rangeRadius = 80;
+const initialHunger =
+  settings.flower.maxHunger - settings.flower.nextNodeCost * 0.6;
 
 export type EatDirection = "forward" | "backward" | null;
 
@@ -78,20 +73,20 @@ export class Flower extends Entity {
   sim = (simInput: FlowerSimInput | null): void => {
     const age = this.getAge(simInput.iteration);
     simInput.waste.forEach((waste) => this.eat(waste, null));
-    this.hunger += eatingRate + (this.degree - 1) / 10;
+    this.hunger += settings.flower.eatingRate + (this.degree - 1) / 10;
     this.sunlightStored += 0.6;
 
-    if (this.parent && age < growDelay) {
+    if (this.parent && age < settings.flower.growCooldown) {
       this.position = add(
         this.position,
         toCartesian({
-          r: 30 / growDelay,
+          r: 30 / settings.flower.growCooldown,
           angle: this.angle,
         })
       );
     }
 
-    if (this.hunger > maxHunger) {
+    if (this.hunger > settings.flower.maxHunger) {
       this.die();
     }
   };
@@ -102,8 +97,8 @@ export class Flower extends Entity {
     }
 
     if (this.hunger > 0) {
-      waste.value -= eatingRate;
-      this.hunger -= eatingRate * 0.8 ** chainLevel;
+      waste.value -= settings.flower.eatingRate;
+      this.hunger -= settings.flower.eatingRate * 0.8 ** chainLevel;
       return true;
     }
 
@@ -134,12 +129,15 @@ export class Flower extends Entity {
 
   canSpawnFood = (): boolean =>
     !!this.next.length &&
-    (1 - foodEnergyCostRatio) * foodValue < this.sunlightStored;
+    (1 - settings.flower.foodEnergyCostRatio) *
+      settings.flower.spawnedFoodValue <
+      this.sunlightStored;
 
   canProduce = (it: number): boolean =>
-    this.hunger + produceCost + 100 < maxHunger &&
+    this.hunger + settings.flower.nextNodeCost + 100 <
+      settings.flower.maxHunger &&
     this.next.length === 0 &&
-    it - this.createdAt > growDelay;
+    it - this.createdAt > settings.flower.growCooldown;
 
   produce = (): Flower[] => {
     let { angle } = this;
@@ -208,10 +206,12 @@ export class Flower extends Entity {
     system.iterate();
     system.final();
 
-    this.hunger += produceCost;
+    this.hunger += settings.flower.nextNodeCost;
 
     this.next.forEach((node) => {
-      node.hunger = maxHunger - (maxHunger - node.hunger) / this.next.length;
+      node.hunger =
+        settings.flower.maxHunger -
+        (settings.flower.maxHunger - node.hunger) / this.next.length;
     });
     this.updateDegree();
 
@@ -224,10 +224,13 @@ export class Flower extends Entity {
         x: (Math.random() - 0.5) * 40,
         y: (Math.random() - 0.5) * 40,
       }),
-      value: foodValue,
+      value: settings.flower.spawnedFoodValue,
     });
-    this.hunger += foodEnergyCostRatio * foodValue;
-    this.sunlightStored -= (1 - foodEnergyCostRatio) * foodValue;
+    this.hunger +=
+      settings.flower.foodEnergyCostRatio * settings.flower.spawnedFoodValue;
+    this.sunlightStored -=
+      (1 - settings.flower.foodEnergyCostRatio) *
+      settings.flower.spawnedFoodValue;
 
     return food;
   };
