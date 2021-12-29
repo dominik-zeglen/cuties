@@ -37,12 +37,14 @@ export function spawnRandomFood(sim: Sim) {
 
 export function spawnRandomFlower(sim: Sim) {
   const flower = getRandomFlower(sim.bounds);
+  flower.hunger = 0;
   sim.registerEntity(flower);
 }
 
 export function spawnRandomCutie(sim: Sim) {
   const cutie = getRandomCutie(sim.bounds);
   cutie.position = getRandomPositionInBounds(sim.bounds);
+  cutie.hunger = 0;
   sim.registerEntity(cutie);
 }
 

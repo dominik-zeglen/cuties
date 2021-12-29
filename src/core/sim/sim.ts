@@ -125,7 +125,9 @@ export function simCutie(cutie: Cutie, sim: Sim, think: boolean): void {
 }
 
 export function simCuties(sim: Sim) {
-  sim.entityLoader.cuties.forEach((cutie) => simCutie(cutie, sim, true));
+  sim.entityLoader.cuties.forEach((cutie) =>
+    simCutie(cutie, sim, sim.iteration % 3 === 0)
+  );
 }
 
 function simFlower(flower: Flower, sim: Sim) {

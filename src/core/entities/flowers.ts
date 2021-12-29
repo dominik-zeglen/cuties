@@ -104,7 +104,7 @@ export class Flower extends Entity {
 
     if (direction === null) {
       for (let node = 0; node < this.next.length; node++) {
-        if (this.next[node].eat(waste, direction, chainLevel + 1)) {
+        if (this.next[node].eat(waste, "forward", chainLevel + 1)) {
           return true;
         }
       }

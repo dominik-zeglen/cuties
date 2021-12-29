@@ -148,7 +148,7 @@ export class Cutie extends Entity {
   };
 
   attack = (it: number, cutie: Cutie) => {
-    cutie.hp -= 10;
+    cutie.hp -= 20;
     this.lastAttack = it;
   };
 

@@ -176,7 +176,7 @@ export class Sim {
   };
 
   registerEntity = (entity: Entity): boolean => {
-    if (entity instanceof Flower && this.entityLoader.flowers.length > 350) {
+    if (entity instanceof Flower && this.entityLoader.flowers.length > 250) {
       entity.die();
     }
 
