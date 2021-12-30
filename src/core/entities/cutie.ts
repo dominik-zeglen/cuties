@@ -68,7 +68,7 @@ export interface InitialCutieInput extends InitialEntityInput {
   angle: number;
   ancestors: number;
   color: string;
-  tail: number;
+  shape: number;
 }
 
 export class Cutie extends Entity {
@@ -83,7 +83,7 @@ export class Cutie extends Entity {
   hp: number;
   carnivore: number;
   color: string;
-  tail: number;
+  shape: number;
 
   constructor(initial: InitialCutieInput) {
     super(initial);
@@ -104,7 +104,7 @@ export class Cutie extends Entity {
     this.hp = 100;
     this.carnivore = 0.5;
     this.color = initial.color;
-    this.tail = initial.tail;
+    this.shape = initial.shape;
   }
 
   die = this.markToDelete;
@@ -206,7 +206,7 @@ export class Cutie extends Entity {
       angle: this.angle,
       position: cloneDeep(this.position),
       color: this.color,
-      tail: this.tail,
+      shape: this.shape,
     });
 
     newCutie.createdAt = this.createdAt;
@@ -228,7 +228,7 @@ export function getRandomCutie(bounds: Point[]): Cutie {
     ai: getRandomCutieAi(),
     position: getRandomPositionInBounds(bounds),
     color: theme.entities.cutie.string(),
-    tail: 1,
+    shape: 1,
   });
 
   return cutie;

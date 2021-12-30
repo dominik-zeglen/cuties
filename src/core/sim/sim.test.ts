@@ -37,7 +37,7 @@ test("Gets nearest cutie", () => {
         y: -5,
       },
       color: "",
-      tail: 0,
+      shape: 0,
     })
   );
 
@@ -75,7 +75,7 @@ test("Properly calculates eaten food", () => {
     ancestors: 0,
     position: { x: 0, y: 0 },
     color: "",
-    tail: 0,
+    shape: 0,
   });
   cutie.hunger = 2;
   const food = new Food({

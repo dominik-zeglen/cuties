@@ -40,7 +40,7 @@ export class TrainingSim extends Sim {
           y: size / 2,
         },
         color: "",
-        tail: 0,
+        shape: 0,
       })
     );
     (this.getById(0) as Cutie).hunger = 500;

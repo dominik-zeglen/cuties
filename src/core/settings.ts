@@ -6,6 +6,10 @@ const settings = {
     droppedWasteValue: 200,
     attackCooldown: 60,
     range: 300,
+    shape: {
+      min: 0.5,
+      max: 1.3,
+    },
   },
   flower: {
     maxHunger: 3000,

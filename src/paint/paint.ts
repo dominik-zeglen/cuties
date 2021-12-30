@@ -57,7 +57,7 @@ export function paint(
 
   sim.entityLoader.flowerRoots.forEach((flower) => drawFlower(context, flower));
 
-  sim.entityLoader.cuties.forEach((cutie) => drawCutie(context, cutie));
+  sim.entityLoader.cuties.forEach((cutie) => drawCutie(context, cutie, 1));
 
   if (window.cuties.selected) {
     if (window.cuties.selected.shouldDelete) {
