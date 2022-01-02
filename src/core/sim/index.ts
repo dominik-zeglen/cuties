@@ -28,6 +28,8 @@ import { Cutie } from "../entities/cutie";
 import { Remains } from "../entities/remains";
 import { Flower } from "../entities/flowers";
 import { Egg } from "../entities/egg";
+import { EnvironmentAoE } from "../Environment/types";
+import { Attractor } from "../Environment/Attractor";
 
 const isNode = typeof window === "undefined";
 
@@ -40,6 +42,7 @@ export class Sim {
   entityLoader: EntityLoader;
   entityCounter: number;
   randomSpawns: boolean;
+  environmentAoes: EnvironmentAoE[];
 
   constructor(width: number, height: number) {
     this.entities = [];
@@ -52,6 +55,16 @@ export class Sim {
     this.entityLoader = new EntityLoader(width, height);
     this.selected = null;
     this.randomSpawns = true;
+    this.environmentAoes = [
+      new Attractor({
+        position: {
+          x: 500,
+          y: 500,
+        },
+        radius: 400,
+        strength: 100,
+      }),
+    ];
 
     while (this.shouldSpawnFood()) {
       spawnRandomFood(this);
@@ -223,6 +236,14 @@ export class Sim {
     }
 
     this.entityLoader.init(this.entities);
+
+    this.entities.forEach((entity) => {
+      this.environmentAoes.forEach((aoe) => {
+        if (len(sub(entity.position, aoe.position)) < aoe.radius) {
+          aoe.affect(entity);
+        }
+      });
+    });
 
     simCuties(this);
     simFlowers(this);

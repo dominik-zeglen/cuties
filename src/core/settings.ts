@@ -2,7 +2,7 @@ const settings = {
   cutie: {
     maxHunger: 2000,
     eggCost: 900,
-    eatingRate: 5,
+    eatingRate: 2,
     droppedWasteValue: 200,
     attackCooldown: 60,
     range: 300,
@@ -16,7 +16,7 @@ const settings = {
     maxHunger: 3000,
     nextNodeCost: 1600,
     eatingRate: 2,
-    spawnedFoodValue: 200,
+    spawnedFoodValue: 500,
     foodEnergyCostRatio: 0.1,
     growCooldown: 5000,
     range: 80,

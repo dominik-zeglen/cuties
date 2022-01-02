@@ -1,7 +1,6 @@
 import { Rect } from "@timohausmann/quadtree-js";
+import { notImplemented } from "../errors";
 import { Point } from "../r2";
-
-const notImplemented = new Error("Not implemented");
 
 export interface InitialEntityInput {
   position: Point;
