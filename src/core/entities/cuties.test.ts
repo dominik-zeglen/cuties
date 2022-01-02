@@ -1,6 +1,6 @@
 import { getRandomCutieAi } from "../ai";
 import { Point, sub, toPolar } from "../r2";
-import { Cutie, getAngleInput } from "./cutie";
+import { Cutie, getAngleInput, getRandomCutie } from "./cutie";
 
 interface TestCase {
   cutie: Cutie;
@@ -91,5 +91,51 @@ describe("getInput", () => {
     expect(Math.sqrt(angle ** 2 - testCase.expectedAngle ** 2)).toBeLessThan(
       1e-5
     );
+  });
+});
+
+describe("Energy usage", () => {
+  let cutie: Cutie;
+  let baseEnergy: number;
+
+  beforeEach(() => {
+    cutie = getRandomCutie();
+    baseEnergy = cutie.energyUsage();
+  });
+
+  it("is higher when rotating clockwise", () => {
+    cutie.thoughts.angle = -1;
+
+    expect(cutie.energyUsage()).toBeGreaterThan(baseEnergy);
+  });
+
+  it("is higher when moving forward", () => {
+    cutie.thoughts.speed = 1;
+
+    expect(cutie.energyUsage()).toBeGreaterThan(baseEnergy);
+  });
+
+  it("is higher when moving backward", () => {
+    cutie.thoughts.speed = -1;
+
+    expect(cutie.energyUsage()).toBeGreaterThan(baseEnergy);
+  });
+
+  it("is higher when attempting to eat", () => {
+    cutie.thoughts.eat = 1;
+
+    expect(cutie.energyUsage()).toBeGreaterThan(baseEnergy);
+  });
+
+  it("is higher when attempting to procreate", () => {
+    cutie.thoughts.layEgg = 1;
+
+    expect(cutie.energyUsage()).toBeGreaterThan(baseEnergy);
+  });
+
+  it("is higher when attempting to attack", () => {
+    cutie.thoughts.attack = 1;
+
+    expect(cutie.energyUsage()).toBeGreaterThan(baseEnergy);
   });
 });

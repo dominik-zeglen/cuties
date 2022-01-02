@@ -2,22 +2,42 @@ import { add, matrix, random } from "mathjs";
 import { CutieAi, Matrix2d } from "./types";
 import { baseSystem } from "./ai";
 
-function getRandomSystem(divide: number): CutieAi {
+function getRandomSystem(factor: number): CutieAi {
   return {
     action: baseSystem.action.map((layer) => ({
       biases: matrix(layer.biases)
-        .map(() => random(-divide, divide))
+        .map(() =>
+          random(
+            (-1 / Math.sqrt(layer.biases.length)) * factor,
+            (1 / Math.sqrt(layer.biases.length)) * factor
+          )
+        )
         .toArray() as Matrix2d,
       weights: matrix(layer.weights)
-        .map(() => random(-divide, divide))
+        .map(() =>
+          random(
+            (-1 / Math.sqrt(layer.weights.length)) * factor,
+            (1 / Math.sqrt(layer.weights.length)) * factor
+          )
+        )
         .toArray() as Matrix2d,
     })),
     target: baseSystem.target.map((layer) => ({
       biases: matrix(layer.biases)
-        .map(() => random(-divide, divide))
+        .map(() =>
+          random(
+            (-1 / Math.sqrt(layer.biases.length)) * factor,
+            (1 / Math.sqrt(layer.biases.length)) * factor
+          )
+        )
         .toArray() as Matrix2d,
       weights: matrix(layer.weights)
-        .map(() => random(-divide, divide))
+        .map(() =>
+          random(
+            (-1 / Math.sqrt(layer.weights.length)) * factor,
+            (1 / Math.sqrt(layer.weights.length)) * factor
+          )
+        )
         .toArray() as Matrix2d,
     })),
   };
@@ -53,5 +73,5 @@ export function mutate(ai: CutieAi, factor: number): CutieAi {
 }
 
 export function getRandomCutieAi(): CutieAi {
-  return addSystems(baseSystem, getRandomSystem(1e-1));
+  return addSystems(baseSystem, getRandomSystem(1));
 }

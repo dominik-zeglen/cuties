@@ -8,13 +8,7 @@ import {
 } from "../ai";
 import { Egg } from "./egg";
 import { Entity, InitialEntityInput } from "./entity";
-import {
-  add,
-  getRandomPositionInBounds,
-  Point,
-  PolarPoint,
-  toCartesian,
-} from "../r2";
+import { add, PolarPoint, toCartesian } from "../r2";
 import { Food } from "./food";
 import { Waste } from "./waste";
 import { Remains } from "./remains";
@@ -38,17 +32,17 @@ export function getAngleInput(
 export function getInput(cutie: Cutie, simInput: CutieSimInput): CutieInput {
   return {
     hunger: cutie.hunger / settings.cutie.maxHunger,
-    foundFood: simInput.nearestFood ? 1 : 0,
+    foundFood: simInput.nearestFood ? 1 : -1,
     angleToFood: getAngleInput(simInput.nearestFood, cutie.angle),
     distanceToFood: simInput.nearestFood
       ? simInput.nearestFood.r / settings.cutie.range
       : 0,
-    foundCutie: simInput.nearestRemains ? 1 : 0,
+    foundCutie: simInput.nearestRemains ? 1 : -1,
     angleToCutie: getAngleInput(simInput.nearestCutie, cutie.angle),
     distanceToCutie: simInput.nearestCutie
       ? simInput.nearestCutie.r / settings.cutie.range
       : 0,
-    foundRemains: simInput.nearestRemains ? 1 : 0,
+    foundRemains: simInput.nearestRemains ? 1 : -1,
     angleToRemains: getAngleInput(simInput.nearestRemains, cutie.angle),
     distanceToRemains: simInput.nearestRemains
       ? simInput.nearestRemains.r / settings.cutie.range
@@ -114,8 +108,8 @@ export class Cutie extends Entity {
       this.thoughts = think(getInput(this, simInput), this.ai);
     }
 
-    const distance = this.thoughts.speed * (this.thoughts.speed > 0 ? 2 : 0.25);
-    this.angle += ((this.thoughts.angle * Math.PI) / 180) * 30;
+    const distance = this.thoughts.speed * (this.thoughts.speed > 0 ? 1 : 0.25);
+    this.angle += ((this.thoughts.angle * Math.PI) / 180) * 5;
 
     this.position = add(
       this.position,
@@ -124,12 +118,7 @@ export class Cutie extends Entity {
         r: distance,
       })
     );
-    const energy =
-      ((1 + Math.abs(this.thoughts.speed)) ** 1.5 / 15 +
-        Math.abs(this.thoughts.angle)) *
-      (this.wantsToEat() ? 1 : 0.5) *
-      (this.wantsToLayEgg() ? 1 : 0.5) *
-      (this.wantsToAttack() ? 2 : 1);
+    const energy = this.energyUsage();
 
     this.hunger += energy;
     this.wasteStored += energy;
@@ -179,11 +168,17 @@ export class Cutie extends Entity {
   canAttack = (it: number): boolean =>
     it - this.lastAttack > settings.cutie.attackCooldown;
 
+  energyUsage = (): number =>
+    ((1 + Math.abs(this.thoughts.speed)) ** 1.5 / 15 +
+      Math.abs(this.thoughts.angle) * 2) *
+    (this.wantsToEat() ? 1 : 0.5) *
+    (this.wantsToLayEgg() ? 1 : 0.5) *
+    (this.wantsToAttack() ? 2 : 1);
+
   layEgg = (it: number): Egg => {
     const egg = new Egg(this);
     this.lastEggLaying = it;
     this.hunger += settings.cutie.eggCost;
-    this.wasteStored += settings.cutie.eggCost;
 
     return egg;
   };
@@ -192,10 +187,11 @@ export class Cutie extends Entity {
     this.wasteStored > settings.cutie.droppedWasteValue;
 
   dumpWaste = (): Waste => {
-    this.wasteStored -= settings.cutie.droppedWasteValue;
+    const value = this.wasteStored;
+    this.wasteStored = 0;
     return new Waste({
       position: this.position,
-      value: settings.cutie.droppedWasteValue,
+      value,
     });
   };
 
@@ -221,12 +217,12 @@ export class Cutie extends Entity {
   };
 }
 
-export function getRandomCutie(bounds: Point[]): Cutie {
+export function getRandomCutie(): Cutie {
   const cutie = new Cutie({
     angle: (Math.random() - 0.5) * Math.PI * 2,
     ancestors: 0,
     ai: getRandomCutieAi(),
-    position: getRandomPositionInBounds(bounds),
+    position: { x: 0, y: 0 },
     color: theme.entities.cutie.string(),
     shape: 1,
   });

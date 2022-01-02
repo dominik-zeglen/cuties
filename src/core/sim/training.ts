@@ -1,11 +1,13 @@
+import { rootMeanSquare } from "simple-statistics";
 import { Sim } from ".";
 import { CutieAi } from "../ai";
 import { Cutie } from "../entities/cutie";
-import { sub, len } from "../r2";
+import { sub, len, getRandomPositionInBounds } from "../r2";
 import { Food } from "../entities/food";
 import { cleanDepletedPellets, cleanOutOfBounds } from "./gc";
 import { simCutie } from "./sim";
 import foods from "../../mapAssets/training.json";
+import { Remains } from "../entities/remains";
 
 const size = 400;
 
@@ -16,7 +18,7 @@ export type Score = Record<
   speed: number[];
 };
 
-export const pelletValue = 100;
+export const pelletValue = 500;
 
 export class TrainingSim extends Sim {
   eggs: number;
@@ -25,6 +27,7 @@ export class TrainingSim extends Sim {
   traveled: number;
   foodOffset: number;
   enableThinking: boolean;
+  distances: number[];
 
   constructor(ai: CutieAi, foodOffset: number) {
     super(size, size);
@@ -39,8 +42,8 @@ export class TrainingSim extends Sim {
           x: size / 2,
           y: size / 2,
         },
-        color: "",
-        shape: 0,
+        color: "#FFFFFF",
+        shape: 1,
       })
     );
     (this.getById(0) as Cutie).hunger = 500;
@@ -52,12 +55,29 @@ export class TrainingSim extends Sim {
         value: pelletValue,
       })
     );
+    this.registerEntity(
+      new Remains({
+        position: getRandomPositionInBounds(this.bounds),
+        value: pelletValue,
+      })
+    );
+    this.registerEntity(
+      new Cutie({
+        position: getRandomPositionInBounds(this.bounds),
+        ai: undefined,
+        ancestors: 0,
+        angle: 0,
+        color: "#FF00FF",
+        shape: 2,
+      })
+    );
 
     this.entityLoader.init(this.entities);
     this.eggs = 0;
     this.pelletsEaten = [];
     this.newPelletCooldown = 0;
     this.enableThinking = true;
+    this.distances = [];
   }
 
   clean = (): void => {
@@ -82,6 +102,7 @@ export class TrainingSim extends Sim {
 
     if (this.entityLoader.food.length === 0) {
       if (this.newPelletCooldown === 0) {
+        this.distances = [];
         this.pelletsEaten.push(this.iteration);
         this.newPelletCooldown = 15;
       } else {
@@ -96,6 +117,8 @@ export class TrainingSim extends Sim {
           })
         );
       }
+    } else {
+      this.distances.push(this.getDistanceToFood());
     }
 
     this.entityLoader.init(this.entities);
@@ -123,7 +146,7 @@ export class TrainingSim extends Sim {
 
   getScore = (): Score => ({
     currentFood: this.entityLoader.food[0]?.value || 0,
-    distance: this.getDistanceToFood(),
+    distance: this.distances.length ? rootMeanSquare(this.distances) : 0,
     eaten: this.pelletsEaten.length,
     eggs: this.eggs,
     speed: this.pelletsEaten,

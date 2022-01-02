@@ -16,7 +16,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({ children }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          height: "80vh",
+          minHeight: "80vh",
         },
       }),
     []

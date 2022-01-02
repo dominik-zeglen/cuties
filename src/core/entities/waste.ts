@@ -1,7 +1,7 @@
 import cloneDeep from "lodash/cloneDeep";
 import { Entity, InitialEntityInput } from "./entity";
 
-export const maxValue = 900;
+export const maxValue = 400;
 const valueLossRate = 2e-2;
 
 export interface InitialWasteInput extends InitialEntityInput {

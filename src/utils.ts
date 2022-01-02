@@ -45,10 +45,10 @@ export function simPopulation(
   opts: SimPopulationOpts
 ): SimPopulation[][] {
   return population.map((ai) =>
-    Array(4)
+    Array(5)
       .fill(0)
       .map((_, index) => {
-        const sim = new TrainingSim(ai, index * 5);
+        const sim = new TrainingSim(ai, index * 10);
 
         let it = 0;
         for (; it < opts.maxIterations; it++) {

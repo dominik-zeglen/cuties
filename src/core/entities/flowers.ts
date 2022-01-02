@@ -25,7 +25,6 @@ export interface FlowerSimInput {
 export interface InitialFlowerInput extends InitialEntityInput {
   angle: number;
   parent: Flower | null;
-  produces: string;
 }
 
 export class Flower extends Entity {
@@ -33,8 +32,6 @@ export class Flower extends Entity {
   parent: Flower | null;
   next: Flower[] | null;
   hunger: number;
-  produces: string | null;
-  wasteStored: number;
   sunlightStored: number;
   degree: number;
 
@@ -43,7 +40,6 @@ export class Flower extends Entity {
     this.angle = initial.angle;
     this.next = [];
     this.parent = initial.parent;
-    this.produces = initial.produces;
     this.hunger = initialHunger;
     this.sunlightStored = 0;
     this.degree = 1;
@@ -73,8 +69,10 @@ export class Flower extends Entity {
   sim = (simInput: FlowerSimInput | null): void => {
     const age = this.getAge(simInput.iteration);
     simInput.waste.forEach((waste) => this.eat(waste, null));
-    this.hunger += settings.flower.passiveEnergyCost + (this.degree - 1) / 10;
-    this.sunlightStored += 0.7;
+    this.hunger += settings.flower.passiveEnergyCost + (this.degree - 1) / 5;
+    if (this.next.length) {
+      this.sunlightStored += 1;
+    }
 
     if (this.parent && age < settings.flower.growCooldown) {
       this.position = add(
@@ -98,7 +96,7 @@ export class Flower extends Entity {
 
     if (this.hunger > 0) {
       waste.value -= settings.flower.eatingRate;
-      this.hunger -= settings.flower.eatingRate * 0.8 ** chainLevel;
+      this.hunger -= settings.flower.eatingRate * 0.9 ** chainLevel;
       return true;
     }
 
@@ -131,7 +129,8 @@ export class Flower extends Entity {
     !!this.next.length &&
     (1 - settings.flower.foodEnergyCostRatio) *
       settings.flower.spawnedFoodValue <
-      this.sunlightStored;
+      this.sunlightStored &&
+    this.hunger < settings.flower.maxHunger * 0.8;
 
   canProduce = (it: number): boolean =>
     this.hunger + settings.flower.nextNodeCost + 100 <
@@ -191,7 +190,6 @@ export class Flower extends Entity {
                   r: 2,
                 })
               ),
-              produces: null,
             })
           );
         },
@@ -251,7 +249,6 @@ export function getRandomFlower(bounds: Point[]): Flower {
     angle: (Math.random() - 0.5) * Math.PI * 2,
     parent: null,
     position: getRandomPositionInBounds(bounds),
-    produces: null,
   });
 
   return cutie;

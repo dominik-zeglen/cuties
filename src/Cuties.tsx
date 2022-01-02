@@ -7,6 +7,7 @@ import { theme } from "./components/theme";
 import { len, sub } from "./core/r2";
 import { paint as paintCuties } from "./paint";
 import { moveCamera } from "./paint/camera";
+import { TrainingSim } from "./core/sim/training";
 
 function createColormap(nshades: number): string[] {
   return Array<Color>(nshades)

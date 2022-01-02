@@ -17,19 +17,9 @@ export function createEmptyNetwork(...size: number[]): NeuralNetwork {
 }
 
 export const baseSystem: CutieAi = {
-  action: createEmptyNetwork(3, 3, 5),
+  action: createEmptyNetwork(3, 4, 5),
   target: createEmptyNetwork(10, 6, 2),
 };
-
-// AI following current target
-baseSystem.action[1].biases[0][1] = 0.05;
-baseSystem.action[1].biases[0][2] = 0.2;
-baseSystem.action[1].biases[0][4] = 0.2;
-baseSystem.action[1].weights[0][0] = -0.6;
-baseSystem.action[0].weights[1][0] = 0.2;
-
-baseSystem.target[1].weights[0][0] = 1;
-baseSystem.target[0].weights[2][0] = 1;
 
 function feedLayer(inputLayer: Matrix2d, layer: NeuralNetworkLayer): Matrix2d {
   return map(
@@ -105,13 +95,21 @@ export function sgd(
   return newAi;
 }
 
+function deadZone(value: number, zone: number): number {
+  if (Math.abs(value) < zone) {
+    return 0;
+  }
+
+  return value;
+}
+
 export function think(input: CutieInput, ai: CutieAi): CutieOutput {
   const target = feed(getTargetInputMatrix(input), ai.target);
   const actions = feed([[input.hunger, ...target[0]]], ai.action)[0];
 
   return {
-    angle: actions[0],
-    speed: actions[1],
+    angle: deadZone(actions[0], 0.2),
+    speed: actions[1] > 0 ? deadZone(actions[1], 0.2) : 0,
     layEgg: actions[2],
     attack: actions[3],
     eat: actions[4],

@@ -39,10 +39,16 @@ export function spawnRandomFlower(sim: Sim) {
   const flower = getRandomFlower(sim.bounds);
   flower.hunger = 0;
   sim.registerEntity(flower);
+
+  const next = flower.produce();
+  next.forEach((node) => {
+    node.hunger = 0;
+    sim.registerEntity(node);
+  });
 }
 
 export function spawnRandomCutie(sim: Sim) {
-  const cutie = getRandomCutie(sim.bounds);
+  const cutie = getRandomCutie();
   cutie.position = getRandomPositionInBounds(sim.bounds);
   cutie.hunger = 0;
   sim.registerEntity(cutie);
