@@ -9,11 +9,13 @@ export const Loader: React.FC<LoaderProps> = ({ progress }) => (
   <>
     <style>
       {`.wrapper {
+    display: block;
     width: 250px;
     height: 24px;
     border-radius: 4px;
     overflow: hidden;
     border: 2px solid ${theme.primary.toString()};
+    margin-bottom: ${theme.spacing * 3}px;
   }
   .progress {
     background-color: ${theme.primary.toString()};

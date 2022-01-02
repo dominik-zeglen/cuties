@@ -6,8 +6,12 @@ export interface LoadingPageProps {
   progress: number;
 }
 
-export const LoadingPage: React.FC<LoadingPageProps> = ({ progress }) => (
+export const LoadingPage: React.FC<LoadingPageProps> = ({
+  children,
+  progress,
+}) => (
   <PageContainer>
     <Loader progress={progress} />
+    {children}
   </PageContainer>
 );

@@ -16,3 +16,11 @@ export function getTargetInputMatrix(input: CutieInput): Matrix2d {
     ],
   ];
 }
+
+export function limit(value: number, threshold: number): number {
+  return value > threshold
+    ? threshold
+    : value < -threshold
+    ? -threshold
+    : value;
+}

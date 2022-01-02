@@ -1,6 +1,7 @@
 import { add, matrix, random } from "mathjs";
 import { CutieAi, Matrix2d } from "./types";
 import { baseSystem } from "./ai";
+import { limit } from ".";
 
 function getRandomSystem(factor: number): CutieAi {
   return {
@@ -68,8 +69,24 @@ function addSystems(a: CutieAi, b: CutieAi): CutieAi {
   };
 }
 
+// eslint-disable-next-line no-unused-vars
+function mapSystem(ai: CutieAi, cb: (value: number) => number): CutieAi {
+  return {
+    action: ai.action.map((layer) => ({
+      biases: matrix(layer.biases).map(cb).toArray() as Matrix2d,
+      weights: matrix(layer.weights).map(cb).toArray() as Matrix2d,
+    })),
+    target: ai.target.map((layer) => ({
+      biases: matrix(layer.biases).map(cb).toArray() as Matrix2d,
+      weights: matrix(layer.weights).map(cb).toArray() as Matrix2d,
+    })),
+  };
+}
+
 export function mutate(ai: CutieAi, factor: number): CutieAi {
-  return addSystems(ai, getRandomSystem(factor));
+  const newSystem = addSystems(ai, getRandomSystem(factor));
+
+  return mapSystem(newSystem, (value) => limit(value, 2));
 }
 
 export function getRandomCutieAi(): CutieAi {

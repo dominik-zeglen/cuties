@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "../components/Button";
 import settings from "../core/settings";
 import { LoadingPage } from "../pages/Loading";
 import { TrainPage } from "../pages/Train";
@@ -9,7 +10,7 @@ const opts: TrainInitMsg = {
   generations: 1000,
   maxIterations: settings.cutie.oldAge,
   momentumLimit: 50,
-  populationSize: 100,
+  populationSize: 50,
 };
 
 export const Train: React.FC = () => {
@@ -38,8 +39,19 @@ export const Train: React.FC = () => {
     return () => worker.current.terminate();
   }, []);
 
+  const handleStop = () => {
+    worker.current.terminate();
+    setProgress(1);
+  };
+
   if (progress < 1) {
-    return <LoadingPage progress={progress} />;
+    return (
+      <LoadingPage progress={progress}>
+        <div>
+          <Button onClick={handleStop}>Stop</Button>
+        </div>
+      </LoadingPage>
+    );
   }
 
   return <TrainPage data={data} />;

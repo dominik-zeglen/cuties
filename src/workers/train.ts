@@ -75,15 +75,9 @@ self.onmessage = (event: MessageEvent<TrainInitMsg>) => {
     lastHighScore = populationData[0].endScore;
 
     population = best.map((aiScoreData) => aiScoreData.ai);
-    population.push(...best.map(getRandomCutieAi));
-
-    if (momentumCounter > 5) {
-      population.push(...best.map((aiScoreData) => mutate(aiScoreData.ai, 2)));
-      population.push(...best.map((aiScoreData) => mutate(aiScoreData.ai, 1)));
-    }
 
     while (population.length !== event.data.populationSize) {
-      population.push(...best.map((aiScoreData) => mutate(aiScoreData.ai, 10)));
+      population.push(...best.map((aiScoreData) => mutate(aiScoreData.ai, 1)));
     }
 
     if (momentumCounter > event.data.momentumLimit) {
