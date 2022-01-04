@@ -20,4 +20,9 @@ export class EnvironmentAoE {
   affect(entity: Entity) {
     throw notImplemented;
   }
+
+  // eslint-disable-next-line class-methods-use-this, no-unused-vars
+  get type(): string {
+    throw notImplemented;
+  }
 }

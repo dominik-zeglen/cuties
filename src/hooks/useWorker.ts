@@ -1,10 +1,10 @@
 import { RefObject, useEffect, useRef } from "react";
 
-export function useWorker(worker: Worker): RefObject<Worker> {
-  const workerRef = useRef<Worker>(worker);
+export function useWorker(workerFn: () => Worker): RefObject<Worker> {
+  const workerRef = useRef<Worker>(null);
 
   useEffect(() => {
-    workerRef.current = worker;
+    workerRef.current = workerFn();
 
     return () => workerRef.current.terminate();
   }, []);

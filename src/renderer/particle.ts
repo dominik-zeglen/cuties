@@ -12,6 +12,15 @@ export interface Particle extends Drawable, ParticleTemplate {
   speed: Point;
 }
 
+export interface InitialEmitterInput {
+  position: Point;
+  radius: number;
+  template: ParticleTemplate;
+  spawnRate: number;
+  quantity: number;
+  force: number;
+}
+
 export class Emitter {
   force: number;
   particles: Particle[];
@@ -21,28 +30,33 @@ export class Emitter {
   template: ParticleTemplate;
   quantity: number;
 
-  constructor(
-    position: Point,
-    radius: number,
-    template: ParticleTemplate,
-    spawnRate: number,
-    quantity: number
-  ) {
+  constructor({
+    force,
+    position,
+    quantity,
+    radius,
+    spawnRate,
+    template,
+  }: InitialEmitterInput) {
     this.particles = [];
     this.position = position;
     this.radius = radius;
     this.template = template;
     this.spawnRate = spawnRate;
-    this.force = -1;
+    this.force = force;
     this.quantity = quantity;
   }
 
   spawnParticle = (it: number): Particle => {
+    let r = Infinity;
+    while (r > this.radius) {
+      r = (this.radius * Math.random()) ** 2 + 10;
+    }
     const position = add(
       this.position,
       toCartesian({
         angle: Math.random() * 2 * Math.PI,
-        r: Math.random() * this.radius,
+        r,
       })
     );
     const particle: Particle = {

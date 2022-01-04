@@ -1,7 +1,8 @@
 import minBy from "lodash/minBy";
 import Quadtree from "@timohausmann/quadtree-js";
+import math, { randomInt } from "mathjs";
 import { Food } from "../entities/food";
-import { len, Point, sub } from "../r2";
+import { getRandomPositionInBounds, len, Point, sub } from "../r2";
 import { Entity } from "../entities/entity";
 import { EntityLoader } from "../entities/loader";
 import {
@@ -30,6 +31,7 @@ import { Flower } from "../entities/flowers";
 import { Egg } from "../entities/egg";
 import { EnvironmentAoE } from "../Environment/types";
 import { Attractor } from "../Environment/Attractor";
+import { Repeller } from "../Environment/Repeller";
 
 const isNode = typeof window === "undefined";
 
@@ -57,12 +59,14 @@ export class Sim {
     this.randomSpawns = true;
     this.environmentAoes = [
       new Attractor({
-        position: {
-          x: 500,
-          y: 500,
-        },
-        radius: 400,
-        strength: 100,
+        position: getRandomPositionInBounds(this.bounds),
+        radius: randomInt(100, 400),
+        strength: randomInt(100, 300),
+      }),
+      new Repeller({
+        position: getRandomPositionInBounds(this.bounds),
+        radius: randomInt(100, 400),
+        strength: randomInt(100, 300),
       }),
     ];
 

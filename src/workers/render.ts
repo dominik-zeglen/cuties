@@ -7,10 +7,11 @@ import { DrawableRemains } from "../core/entities/remains";
 import { DrawableWaste } from "../core/entities/waste";
 import { Point } from "../core/r2";
 import { Drawable } from "../renderer/drawable";
+import { EmitterInput } from "../renderer/emitters/types";
 import { Renderer } from "../renderer/renderer";
 
 export interface BaseRenderMsg {
-  type: "init" | "update" | "move-camera";
+  type: "init" | "update" | "move-camera" | "add-emitter";
 }
 
 export interface RenderInitMsg extends BaseRenderMsg {
@@ -29,7 +30,15 @@ export interface RenderUpdateMsg extends BaseRenderMsg {
 
 export interface RenderCameraMoveMsg extends BaseRenderMsg, Point {}
 
-export type RenderMsg = RenderInitMsg | RenderUpdateMsg | RenderCameraMoveMsg;
+export interface RenderAddEmitterMsg extends BaseRenderMsg {
+  emitter: EmitterInput;
+}
+
+export type RenderMsg =
+  | RenderInitMsg
+  | RenderUpdateMsg
+  | RenderCameraMoveMsg
+  | RenderAddEmitterMsg;
 
 let renderer: Renderer | null = null;
 
@@ -54,6 +63,9 @@ self.onmessage = (event: MessageEvent<RenderMsg>) => {
     } else if (event.data.type === "move-camera") {
       const data = event.data as RenderCameraMoveMsg;
       renderer.moveCamera(data.x, data.y);
+    } else if (event.data.type === "add-emitter") {
+      const data = event.data as RenderAddEmitterMsg;
+      renderer.addEmitter(data.emitter);
     }
   }
 };

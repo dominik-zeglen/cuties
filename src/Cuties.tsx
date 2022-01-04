@@ -6,7 +6,11 @@ import { Sim } from "./core/sim";
 import { theme } from "./components/theme";
 import { len, sub } from "./core/r2";
 import { useWorker } from "./hooks/useWorker";
-import { RenderCameraMoveMsg, RenderUpdateMsg } from "./workers/render";
+import {
+  RenderAddEmitterMsg,
+  RenderCameraMoveMsg,
+  RenderUpdateMsg,
+} from "./workers/render";
 
 function createColormap(nshades: number): string[] {
   return Array<Color>(nshades)
@@ -53,7 +57,7 @@ export const Cuties: React.FC<CutiesProps> = () => {
     []
   );
   const renderWorker = useWorker(
-    new Worker(new URL("./workers/render.ts", import.meta.url))
+    () => new Worker(new URL("./workers/render.ts", import.meta.url))
   );
 
   React.useEffect(() => {
@@ -66,6 +70,17 @@ export const Cuties: React.FC<CutiesProps> = () => {
       },
       [offscreen]
     );
+
+    sim.current.environmentAoes.forEach((aoe) => {
+      renderWorker.current.postMessage({
+        emitter: {
+          position: aoe.position,
+          radius: aoe.radius,
+          type: aoe.type,
+        },
+        type: "add-emitter",
+      } as RenderAddEmitterMsg);
+    });
   }, []);
 
   const paint = () => {
@@ -91,6 +106,12 @@ export const Cuties: React.FC<CutiesProps> = () => {
   };
 
   React.useEffect(() => {
+    renderWorker.current.postMessage({
+      type: "move-camera",
+      x: 0,
+      y: 0,
+    } as RenderCameraMoveMsg);
+
     interval.current = setInterval(
       sim.current.next,
       1000 / 60 / speed

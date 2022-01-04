@@ -18,7 +18,7 @@ export const Train: React.FC = () => {
   const [progress, setProgress] = React.useState(0);
   const [data, setData] = React.useState<number[]>([]);
   const worker = useWorker(
-    new Worker(new URL("../workers/train.ts", import.meta.url))
+    () => new Worker(new URL("../workers/train.ts", import.meta.url))
   );
 
   React.useEffect(() => {

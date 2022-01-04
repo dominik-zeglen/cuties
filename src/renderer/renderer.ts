@@ -10,6 +10,8 @@ import { drawCutie, drawFlower, drawPellet, drawStaticPellet } from "./paint";
 import { Camera, moveCamera } from "./paint/camera";
 import { Drawable } from "./drawable";
 import { Emitter } from "./particle";
+import { EmitterInput } from "./emitters/types";
+import { createEmitter } from "./emitters/map";
 
 export interface RendererUpdateOpts {
   cuties: DrawableCutie[];
@@ -40,26 +42,17 @@ export class Renderer {
         end: { ...bounds[1] },
       },
     };
+    this.emitters = [];
 
     this.iteration = 0;
-
-    this.emitters = [
-      new Emitter(
-        { x: 100, y: 100 },
-        100,
-        {
-          color: "rgba(102, 204, 255, 0.4)",
-          size: 1,
-          timeToLive: 10,
-        },
-        1,
-        2
-      ),
-    ];
   }
 
   moveCamera = (x: number, y: number): void => {
     moveCamera(this.camera, this.context, x, y, this.bounds);
+  };
+
+  addEmitter = (input: EmitterInput) => {
+    this.emitters.push(createEmitter(input));
   };
 
   update = ({
