@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, css } from "aphrodite";
 import { PageContainer } from "../../components/PageContainer";
 import { theme } from "../../components/theme";
-import { drawCutie } from "../../paint";
+import { drawCutie } from "../../renderer/paint";
 import { Point } from "../../core/r2";
 import { Slider } from "../../components/Slider";
 import { Switch } from "../../components/Switch";
