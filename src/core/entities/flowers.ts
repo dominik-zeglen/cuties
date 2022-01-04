@@ -11,11 +11,18 @@ import {
 import { Waste } from "./waste";
 import { Food } from "./food";
 import settings from "../settings";
+import { Drawable } from "../../renderer/drawable";
 
 const initialHunger =
   settings.flower.maxHunger - settings.flower.nextNodeCost * 0.9;
 
 export type EatDirection = "forward" | "backward" | null;
+
+export interface DrawableFlower extends Drawable {
+  degree: number;
+  hunger: number;
+  next: DrawableFlower[];
+}
 
 export interface FlowerSimInput {
   iteration: number;
@@ -242,6 +249,13 @@ export class Flower extends Entity {
       this.parent.updateDegree();
     }
   };
+
+  drawable = (): DrawableFlower => ({
+    position: this.position,
+    degree: this.degree,
+    hunger: this.hunger,
+    next: this.next.map((node) => node.drawable()),
+  });
 }
 
 export function getRandomFlower(bounds: Point[]): Flower {

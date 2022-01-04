@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "../components/Button";
 import settings from "../core/settings";
+import { useWorker } from "../hooks/useWorker";
 import { LoadingPage } from "../pages/Loading";
 import { TrainPage } from "../pages/Train";
 import type { CheckResponse, TrainInitMsg } from "../workers/train";
@@ -16,13 +17,11 @@ const opts: TrainInitMsg = {
 export const Train: React.FC = () => {
   const [progress, setProgress] = React.useState(0);
   const [data, setData] = React.useState<number[]>([]);
-  const worker = React.useRef<Worker>(null);
+  const worker = useWorker(
+    new Worker(new URL("../workers/train.ts", import.meta.url))
+  );
 
   React.useEffect(() => {
-    worker.current = new Worker(
-      new URL("../workers/train.ts", import.meta.url)
-    );
-
     worker.current.postMessage(opts);
 
     worker.current.addEventListener(
@@ -35,9 +34,7 @@ export const Train: React.FC = () => {
         localStorage.setItem("best", JSON.stringify(best.ai));
       }
     );
-
-    return () => worker.current.terminate();
-  }, []);
+  }, [worker]);
 
   const handleStop = () => {
     worker.current.terminate();

@@ -1,8 +1,13 @@
 import cloneDeep from "lodash/cloneDeep";
+import { Drawable } from "../../renderer/drawable";
 import { Entity, InitialEntityInput } from "./entity";
 
 export const maxValue = 400;
 const valueLossRate = 2e-2;
+
+export interface DrawableWaste extends Drawable {
+  value: number;
+}
 
 export interface InitialWasteInput extends InitialEntityInput {
   value?: number;
@@ -34,4 +39,9 @@ export class Waste extends Entity {
 
     return newWaste;
   };
+
+  drawable = (): DrawableWaste => ({
+    position: this.position,
+    value: this.value,
+  });
 }

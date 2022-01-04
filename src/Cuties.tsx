@@ -5,9 +5,8 @@ import minBy from "lodash/minBy";
 import { Sim } from "./core/sim";
 import { theme } from "./components/theme";
 import { len, sub } from "./core/r2";
-import { paint as paintCuties } from "./paint";
-import { moveCamera } from "./paint/camera";
-import { TrainingSim } from "./core/sim/training";
+import { useWorker } from "./hooks/useWorker";
+import { RenderCameraMoveMsg, RenderUpdateMsg } from "./workers/render";
 
 function createColormap(nshades: number): string[] {
   return Array<Color>(nshades)
@@ -53,27 +52,40 @@ export const Cuties: React.FC<CutiesProps> = () => {
       }),
     []
   );
-  const camera = React.useRef({
-    height,
-    sim,
-    width,
-    viewPort: {
-      start: { x: 0, y: 0 },
-      end: { x: width, y: height },
-    },
-  });
+  const renderWorker = useWorker(
+    new Worker(new URL("./workers/render.ts", import.meta.url))
+  );
+
+  React.useEffect(() => {
+    const offscreen = canvas.current.transferControlToOffscreen();
+    renderWorker.current.postMessage(
+      {
+        bounds: sim.current.bounds,
+        canvas: offscreen,
+        type: "init",
+      },
+      [offscreen]
+    );
+  }, []);
 
   const paint = () => {
     if (!canvas.current) {
       return;
     }
 
-    const context = canvas.current.getContext("2d");
-    paintCuties(context, {
-      sim: sim.current,
-      width,
-      height,
-    });
+    renderWorker.current.postMessage({
+      type: "update",
+      cuties: sim.current.entityLoader.cuties.map((cutie) => cutie.drawable()),
+      food: sim.current.entityLoader.food.map((food) => food.drawable()),
+      eggs: sim.current.entityLoader.eggs.map((egg) => egg.drawable()),
+      flowers: sim.current.entityLoader.flowerRoots.map((flower) =>
+        flower.drawable()
+      ),
+      waste: sim.current.entityLoader.waste.map((waste) => waste.drawable()),
+      remains: sim.current.entityLoader.remains.map((remains) =>
+        remains.drawable()
+      ),
+    } as RenderUpdateMsg);
 
     window.requestAnimationFrame(paint);
   };
@@ -83,7 +95,7 @@ export const Cuties: React.FC<CutiesProps> = () => {
       sim.current.next,
       1000 / 60 / speed
     ) as unknown as number;
-    paint();
+    window.requestAnimationFrame(paint);
     document.addEventListener("keydown", handlePause);
 
     return () => {
@@ -94,34 +106,36 @@ export const Cuties: React.FC<CutiesProps> = () => {
 
   const handleClick: MouseEventHandler<HTMLCanvasElement> = React.useCallback(
     (event) => {
-      const rect = event.currentTarget.getBoundingClientRect();
-      const point = {
-        x: event.clientX - rect.left + camera.current.viewPort.start.x,
-        y: event.clientY - rect.top + camera.current.viewPort.start.y,
-      };
-
-      const { id, dist } = minBy(
-        sim.current.entities.map((ent) => ({
-          id: ent.id,
-          dist: len(sub(ent.position, point)),
-        })),
-        "dist"
-      );
-      if (dist < 20) {
-        window.cuties.selected = sim.current.entities.find(
-          (ent) => ent.id === id
-        );
-      } else {
-        window.cuties.selected = null;
-      }
+      // const rect = event.currentTarget.getBoundingClientRect();
+      // const point = {
+      //   x: event.clientX - rect.left + camera.current.viewPort.start.x,
+      //   y: event.clientY - rect.top + camera.current.viewPort.start.y,
+      // };
+      // const { id, dist } = minBy(
+      //   sim.current.entities.map((ent) => ({
+      //     id: ent.id,
+      //     dist: len(sub(ent.position, point)),
+      //   })),
+      //   "dist"
+      // );
+      // if (dist < 20) {
+      //   window.cuties.selected = sim.current.entities.find(
+      //     (ent) => ent.id === id
+      //   );
+      // } else {
+      //   window.cuties.selected = null;
+      // }
     },
     []
   );
 
   const handleMouseMove: MouseEventHandler<HTMLCanvasElement> = (event) => {
     if (event.buttons === 1) {
-      const context = canvas.current.getContext("2d");
-      moveCamera(camera, context, -event.movementX, -event.movementY);
+      renderWorker.current.postMessage({
+        type: "move-camera",
+        x: -event.movementX,
+        y: -event.movementY,
+      } as RenderCameraMoveMsg);
     }
   };
 

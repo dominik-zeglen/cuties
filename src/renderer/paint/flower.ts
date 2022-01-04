@@ -1,9 +1,12 @@
-import { drawStaticPellet } from ".";
-import { theme } from "../components/theme";
-import { Flower } from "../core/entities/flowers";
-import settings from "../core/settings";
+import { drawStaticPellet } from "./pellet";
+import { theme } from "../../components/theme";
+import { DrawableFlower } from "../../core/entities/flowers";
+import settings from "../../core/settings";
 
-export function drawFlower(context: CanvasRenderingContext2D, flower: Flower) {
+export function drawFlower(
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
+  flower: DrawableFlower
+) {
   context.strokeStyle = theme.primary.string();
   context.save();
 

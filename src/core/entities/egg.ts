@@ -3,6 +3,7 @@ import { Cutie } from "./cutie";
 import { CutieAi, mutate } from "../ai";
 import { Entity } from "./entity";
 import settings from "../settings";
+import { Drawable } from "../../renderer/drawable";
 
 const mutationChance = 0.02;
 
@@ -56,4 +57,8 @@ export class Egg extends Entity {
   };
 
   die = this.markToDelete;
+
+  drawable = (): Drawable => ({
+    position: this.position,
+  });
 }

@@ -1,9 +1,9 @@
-import { theme } from "../components/theme";
-import { Cutie } from "../core/entities/cutie";
-import { Entity } from "../core/entities/entity";
-import { Flower } from "../core/entities/flowers";
-import { add, toCartesian } from "../core/r2";
-import settings from "../core/settings";
+import { theme } from "../../components/theme";
+import { Cutie } from "../../core/entities/cutie";
+import { Entity } from "../../core/entities/entity";
+import { Flower } from "../../core/entities/flowers";
+import { add, toCartesian } from "../../core/r2";
+import settings from "../../core/settings";
 
 interface DrawIndicatorOpts {
   entity: Entity & { angle?: number };

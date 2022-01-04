@@ -14,6 +14,7 @@ import { Waste } from "./waste";
 import { Remains } from "./remains";
 import { theme } from "../../components/theme";
 import settings from "../settings";
+import { Drawable } from "../../renderer/drawable";
 
 const initialHunger = settings.cutie.maxHunger - settings.cutie.eggCost * 0.9;
 
@@ -48,6 +49,13 @@ export function getInput(cutie: Cutie, simInput: CutieSimInput): CutieInput {
       ? simInput.nearestRemains.r / settings.cutie.range
       : 0,
   };
+}
+
+export interface DrawableCutie extends Drawable {
+  angle: number;
+  color: string;
+  hunger: number;
+  shape: number;
 }
 
 export interface CutieSimInput {
@@ -215,6 +223,14 @@ export class Cutie extends Entity {
 
     return newCutie;
   };
+
+  drawable = (): DrawableCutie => ({
+    angle: this.angle,
+    color: this.color,
+    hunger: this.hunger,
+    position: this.position,
+    shape: this.shape,
+  });
 }
 
 export function getRandomCutie(): Cutie {

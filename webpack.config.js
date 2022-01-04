@@ -7,7 +7,7 @@ const config = {
   module: {
     rules: [
       {
-        test: /views\/.*\.tsx$/,
+        test: /.*\.tsx$/,
         loader: "string-replace-loader",
         options: {
           search: /import_meta\.url/,

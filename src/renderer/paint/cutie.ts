@@ -1,6 +1,6 @@
-import { Cutie } from "../core/entities/cutie";
-import { add, rotate, sub, toCartesian } from "../core/r2";
-import settings from "../core/settings";
+import { Cutie } from "../../core/entities/cutie";
+import { add, rotate, sub, toCartesian } from "../../core/r2";
+import settings from "../../core/settings";
 
 export type DrawCutieInput = Pick<
   Cutie,
@@ -8,7 +8,7 @@ export type DrawCutieInput = Pick<
 >;
 
 export function drawCutie(
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   cutie: DrawCutieInput,
   scale: number
 ) {

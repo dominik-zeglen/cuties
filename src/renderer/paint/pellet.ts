@@ -1,10 +1,10 @@
-import { Entity } from "../core/entities/entity";
+import { Drawable } from "../drawable";
 
-type Pellet = Entity & { value: number };
+type Pellet = Drawable & { value: number };
 
 export interface DrawStaticPelletOpts {
   color: string;
-  pellet: Entity;
+  pellet: Drawable;
   size: number;
 }
 
@@ -14,7 +14,7 @@ export interface DrawPelletOpts extends Omit<DrawStaticPelletOpts, "size"> {
 }
 
 export function drawStaticPellet(
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   { color, pellet, size }: DrawStaticPelletOpts
 ) {
   if (size < 0) {
@@ -37,7 +37,7 @@ export function drawStaticPellet(
 }
 
 export function drawPellet(
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   { pellet, maxValue, ...rest }: DrawPelletOpts
 ) {
   const size = (pellet.value / maxValue) * 4;
